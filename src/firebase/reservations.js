@@ -129,3 +129,21 @@ export const getReservationsByStatus = async (status) => {
     throw error;
   }
 };
+
+// Get reservations by date
+export const getReservationsByDate = async (dateString) => {
+  try {
+    const q = query(
+      collection(db, RESERVATIONS_COLLECTION),
+      where('fecha', '==', dateString)
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error('Error getting reservations by date:', error);
+    throw error;
+  }
+};

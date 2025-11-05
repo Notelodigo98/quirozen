@@ -68,6 +68,18 @@ service cloud.firestore {
       // Allow delete for anyone (users can cancel their reservations)
       allow delete: if true;
     }
+    
+    // Availability collection
+    match /availability/{availabilityId} {
+      // Allow read for anyone (users need to check available dates/times)
+      allow read: if true;
+      
+      // Allow create/update/delete for anyone (admin operations)
+      // Note: In production, restrict this to admin users only
+      allow create: if true;
+      allow update: if true;
+      allow delete: if true;
+    }
   }
 }
 ```

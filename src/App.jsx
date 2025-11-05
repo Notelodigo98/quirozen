@@ -1,5 +1,18 @@
 import './App.css'
 import { useState, useEffect } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import DatePicker from 'react-datepicker';
+import { registerLocale, setDefaultLocale } from 'react-datepicker';
+import es from 'date-fns/locale/es';
+import 'react-datepicker/dist/react-datepicker.css';
+import Terminos from './pages/Terminos';
+import Acuerdo from './pages/Acuerdo';
+import Layout from './components/Layout';
+import BannerSlider from './components/BannerSlider';
+
+// Register Spanish locale
+registerLocale('es', es);
 import {
   saveReservation as saveReservationDB,
   getReservations as getReservationsDB,
@@ -7,8 +20,20 @@ import {
   updateReservation as updateReservationDB,
   deleteReservation as deleteReservationDB,
   getReservationsByStatus,
-  generateReservationCode
+  generateReservationCode,
+  getReservationsByDate
 } from './firebase/reservations';
+import {
+  saveAvailability,
+  getAvailabilityConfigs,
+  getDefaultGenericConfig,
+  deleteAvailabilityConfig,
+  updateAvailabilityConfig,
+  generateTimeSlots,
+  getAvailableDatesInRange,
+  getAvailableSlots,
+  checkSlotAvailability
+} from './firebase/availability';
 
 const horarios = [
   { dia: 'Lunes a Viernes', horas: '9 - 13h y 16-20h (citas urgencias de 20 a 21h)' },
@@ -122,12 +147,138 @@ const ReservationForm = ({ masajes }) => {
   const [reservationCode, setReservationCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [availableSlots, setAvailableSlots] = useState([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
+  const [availableDates, setAvailableDates] = useState([]);
+  const [loadingDates, setLoadingDates] = useState(false);
+
+  // Calculate max date (2 months from now) - computed once
+  const getMaxDate = () => {
+    const endDate = new Date();
+    endDate.setMonth(endDate.getMonth() + 2);
+    return endDate.toISOString().split('T')[0];
+  };
+
+  // Load available dates when component mounts
+  useEffect(() => {
+    loadAvailableDates();
+  }, []);
+
+  // Load available slots when date changes
+  useEffect(() => {
+    if (formData.fecha) {
+      loadAvailableSlots(formData.fecha);
+      // Reset hora when fecha changes
+      setFormData(prev => ({ ...prev, hora: '' }));
+    } else {
+      setAvailableSlots([]);
+    }
+  }, [formData.fecha]);
+
+  const loadAvailableDates = async () => {
+    setLoadingDates(true);
+    try {
+      // Start from tomorrow (block today)
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0);
+      const endDate = new Date();
+      endDate.setMonth(endDate.getMonth() + 2); // Load next 2 months
+      endDate.setHours(23, 59, 59, 999); // End of day
+      
+      const dates = await getAvailableDatesInRange(
+        tomorrow.toISOString().split('T')[0],
+        endDate.toISOString().split('T')[0]
+      );
+      setAvailableDates(dates.map(d => d.date));
+    } catch (err) {
+      console.error('Error loading available dates:', err);
+      setError('Error al cargar las fechas disponibles');
+    } finally {
+      setLoadingDates(false);
+    }
+  };
+
+  const loadAvailableSlots = async (dateString) => {
+    setLoadingSlots(true);
+    setError(''); // Clear previous errors when loading new slots
+    try {
+      // Get reservations for this date
+      const reservations = await getReservationsByDate(dateString);
+      
+      // Get available slots considering reservations
+      const result = await getAvailableSlots(dateString, reservations);
+      
+      if (result.available) {
+        setAvailableSlots(result.slots);
+        if (result.slots.length === 0) {
+          setError('Esta fecha está disponible pero no tiene horarios libres. Por favor, selecciona otra fecha.');
+        }
+      } else {
+        setAvailableSlots([]);
+        setError(`Esta fecha no está disponible: ${result.reason || 'Fecha bloqueada o sin configuración'}`);
+      }
+    } catch (err) {
+      console.error('Error loading available slots:', err);
+      setError('Error al cargar los horarios disponibles. Por favor, intenta de nuevo.');
+      setAvailableSlots([]);
+    } finally {
+      setLoadingSlots(false);
+    }
+  };
+
+  // Helper: Get tomorrow's date (to block today)
+  const getTomorrowDate = () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    return tomorrow;
+  };
+
+  // Helper: Convert Date to YYYY-MM-DD string
+  const dateToString = (date) => {
+    if (!date) return '';
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  // Helper: Convert YYYY-MM-DD string to Date
+  const stringToDate = (dateString) => {
+    if (!dateString) return null;
+    return new Date(dateString + 'T00:00:00');
+  };
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
+    
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     });
+    
+    // Clear error when user changes inputs
+    if (error) setError('');
+  };
+
+  // Handle date change from DatePicker
+  const handleDateChange = (date) => {
+    const dateString = dateToString(date);
+    setFormData({
+      ...formData,
+      fecha: dateString,
+      hora: '' // Reset hour when date changes
+    });
+    setError(''); // Clear previous errors
+  };
+
+  // Filter dates to only show available ones
+  const isDateAvailable = (date) => {
+    if (availableDates.length === 0) return true; // Allow all if no dates loaded yet
+    const dateString = dateToString(date);
+    return availableDates.includes(dateString);
   };
 
   const handleSubmit = async (e) => {
@@ -143,6 +294,18 @@ const ReservationForm = ({ masajes }) => {
     }
 
     try {
+      // Final validation: check if slot is still available
+      const reservations = await getReservationsByDate(formData.fecha);
+      const slotAvailability = await getAvailableSlots(formData.fecha, reservations);
+      
+      if (!slotAvailability.available || !slotAvailability.slots.includes(formData.hora)) {
+        setError('Lo sentimos, este horario ya no está disponible. Por favor, selecciona otro.');
+        // Reload slots
+        await loadAvailableSlots(formData.fecha);
+        setLoading(false);
+        return;
+      }
+
       const code = generateReservationCode();
       const reservation = {
         ...formData,
@@ -163,27 +326,13 @@ const ReservationForm = ({ masajes }) => {
         hora: '',
         notas: ''
       });
+      setAvailableSlots([]);
     } catch (err) {
       setError('Error al guardar la reserva. Por favor, intenta de nuevo.');
       console.error(err);
     } finally {
       setLoading(false);
     }
-  };
-
-  const generateTimeSlots = () => {
-    const slots = [];
-    // Morning slots: 9:00 - 13:00
-    for (let hour = 9; hour < 13; hour++) {
-      slots.push(`${hour.toString().padStart(2, '0')}:00`);
-      if (hour < 12) slots.push(`${hour.toString().padStart(2, '0')}:30`);
-    }
-    // Afternoon slots: 16:00 - 20:00
-    for (let hour = 16; hour < 20; hour++) {
-      slots.push(`${hour.toString().padStart(2, '0')}:00`);
-      slots.push(`${hour.toString().padStart(2, '0')}:30`);
-    }
-    return slots;
   };
 
   if (submitted) {
@@ -257,37 +406,75 @@ const ReservationForm = ({ masajes }) => {
               {masaje.nombre} - {masaje.duracion} - {masaje.precio}
             </option>
           ))}
+          <option value="Otro">Otro</option>
         </select>
       </div>
 
       <div className="form-row">
         <div className="form-group">
           <label htmlFor="fecha">Fecha *</label>
-          <input
-            type="date"
-            id="fecha"
-            name="fecha"
-            value={formData.fecha}
-            onChange={handleChange}
-            min={new Date().toISOString().split('T')[0]}
-            required
-          />
+          {loadingDates ? (
+            <p className="loading-text">Cargando fechas disponibles...</p>
+          ) : (
+            <>
+              <DatePicker
+                id="fecha"
+                selected={stringToDate(formData.fecha)}
+                onChange={handleDateChange}
+                dateFormat="dd/MM/yyyy"
+                locale="es"
+                minDate={getTomorrowDate()}
+                maxDate={(() => {
+                  const endDate = new Date();
+                  endDate.setMonth(endDate.getMonth() + 2);
+                  return endDate;
+                })()}
+                filterDate={isDateAvailable}
+                placeholderText="Selecciona una fecha"
+                className="date-picker-input"
+                required
+              />
+              {availableDates.length === 0 && !loadingDates && (
+                <p className="warning-text">No hay fechas disponibles configuradas. Contacta al administrador.</p>
+              )}
+              {availableDates.length > 0 && (
+                <p className="info-text">
+                  Fechas disponibles: {availableDates.length} día(s) en los próximos 2 meses
+                </p>
+              )}
+            </>
+          )}
         </div>
 
         <div className="form-group">
           <label htmlFor="hora">Hora *</label>
-          <select
-            id="hora"
-            name="hora"
-            value={formData.hora}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Selecciona una hora</option>
-            {generateTimeSlots().map((slot, i) => (
-              <option key={i} value={slot}>{slot}</option>
-            ))}
-          </select>
+          {!formData.fecha ? (
+            <select id="hora" name="hora" disabled>
+              <option value="">Primero selecciona una fecha</option>
+            </select>
+          ) : loadingSlots ? (
+            <p className="loading-text">Cargando horarios disponibles...</p>
+          ) : availableSlots.length === 0 ? (
+            <>
+              <select id="hora" name="hora" disabled>
+                <option value="">No hay horarios disponibles</option>
+              </select>
+              <p className="warning-text">Esta fecha no tiene horarios disponibles.</p>
+            </>
+          ) : (
+            <select
+              id="hora"
+              name="hora"
+              value={formData.hora}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Selecciona una hora</option>
+              {availableSlots.map((slot, i) => (
+                <option key={i} value={slot}>{slot}</option>
+              ))}
+            </select>
+          )}
         </div>
       </div>
 
@@ -385,6 +572,36 @@ const ManageReservation = () => {
     }
   };
 
+  // Helper: Get tomorrow's date (to block today)
+  const getTomorrowDate = () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    return tomorrow;
+  };
+
+  // Helper: Convert Date to YYYY-MM-DD string
+  const dateToString = (date) => {
+    if (!date) return '';
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  // Helper: Convert YYYY-MM-DD string to Date
+  const stringToDate = (dateString) => {
+    if (!dateString) return null;
+    return new Date(dateString + 'T00:00:00');
+  };
+
+  // Handle date change from DatePicker
+  const handleDateChange = (date) => {
+    const dateString = dateToString(date);
+    setEditData({ ...editData, fecha: dateString });
+  };
+
   return (
     <div className="manage-reservation">
       <h3>Gestionar mi reserva</h3>
@@ -452,11 +669,14 @@ const ManageReservation = () => {
           <h4>Modificar reserva</h4>
           <div className="form-group">
             <label>Fecha *</label>
-            <input
-              type="date"
-              value={editData.fecha}
-              onChange={(e) => setEditData({ ...editData, fecha: e.target.value })}
-              min={new Date().toISOString().split('T')[0]}
+            <DatePicker
+              selected={stringToDate(editData.fecha)}
+              onChange={handleDateChange}
+              dateFormat="dd/MM/yyyy"
+              locale="es"
+              minDate={getTomorrowDate()}
+              placeholderText="Selecciona una fecha"
+              className="date-picker-input"
               required
             />
           </div>
@@ -491,12 +711,654 @@ const ManageReservation = () => {
   );
 };
 
+// Availability Manager Component
+const AvailabilityManager = () => {
+  const [activeSubTab, setActiveSubTab] = useState('generic'); // generic, specific
+  const [weeklySchedule, setWeeklySchedule] = useState({
+    monday: { available: false, ranges: [] },
+    tuesday: { available: false, ranges: [] },
+    wednesday: { available: false, ranges: [] },
+    thursday: { available: false, ranges: [] },
+    friday: { available: false, ranges: [] },
+    saturday: { available: false, ranges: [] },
+    sunday: { available: false, ranges: [] }
+  });
+  const [editingDay, setEditingDay] = useState(null);
+  const [specificConfigs, setSpecificConfigs] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
+
+  const daysOfWeek = [
+    { key: 'monday', label: 'Lunes' },
+    { key: 'tuesday', label: 'Martes' },
+    { key: 'wednesday', label: 'Miércoles' },
+    { key: 'thursday', label: 'Jueves' },
+    { key: 'friday', label: 'Viernes' },
+    { key: 'saturday', label: 'Sábado' },
+    { key: 'sunday', label: 'Domingo' }
+  ];
+
+  useEffect(() => {
+    loadGenericConfig();
+    loadSpecificConfigs();
+  }, []);
+
+  const loadGenericConfig = async () => {
+    setLoading(true);
+    try {
+      const config = await getDefaultGenericConfig();
+      if (config && config.weeklySchedule) {
+        // Ensure all days have the correct structure with ranges array
+        const defaultSchedule = {
+          monday: { available: false, ranges: [] },
+          tuesday: { available: false, ranges: [] },
+          wednesday: { available: false, ranges: [] },
+          thursday: { available: false, ranges: [] },
+          friday: { available: false, ranges: [] },
+          saturday: { available: false, ranges: [] },
+          sunday: { available: false, ranges: [] }
+        };
+        
+        // Merge with loaded config, converting slots to ranges if needed
+        const loadedSchedule = { ...defaultSchedule };
+        Object.keys(defaultSchedule).forEach(day => {
+          if (config.weeklySchedule[day]) {
+            const dayConfig = config.weeklySchedule[day];
+            let ranges = [];
+            
+            // If ranges exist, use them directly
+            if (Array.isArray(dayConfig.ranges) && dayConfig.ranges.length > 0) {
+              ranges = dayConfig.ranges;
+            }
+            // If slots exist, convert them to ranges
+            else if (Array.isArray(dayConfig.slots) && dayConfig.slots.length > 0) {
+              ranges = convertSlotsToRanges(dayConfig.slots);
+            }
+            
+            loadedSchedule[day] = {
+              available: dayConfig.available || false,
+              ranges: ranges
+            };
+          }
+        });
+        
+        setWeeklySchedule(loadedSchedule);
+      }
+    } catch (err) {
+      console.error('Error loading generic config:', err);
+      setMessage({ type: 'error', text: 'Error al cargar la configuración' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadSpecificConfigs = async () => {
+    try {
+      const configs = await getAvailabilityConfigs();
+      setSpecificConfigs(configs.filter(c => c.type === 'specific') || []);
+    } catch (err) {
+      console.error('Error loading specific configs:', err);
+      setSpecificConfigs([]); // Ensure it's always an array
+    }
+  };
+
+  const toggleDayAvailability = (day) => {
+    setWeeklySchedule({
+      ...weeklySchedule,
+      [day]: {
+        ...weeklySchedule[day],
+        available: !weeklySchedule[day].available,
+        ranges: !weeklySchedule[day].available ? weeklySchedule[day].ranges : []
+      }
+    });
+  };
+
+  const addTimeRange = (day) => {
+    setWeeklySchedule({
+      ...weeklySchedule,
+      [day]: {
+        ...weeklySchedule[day],
+        ranges: [...weeklySchedule[day].ranges, { start: '09:00', end: '13:00' }]
+      }
+    });
+  };
+
+  const updateTimeRange = (day, index, field, value) => {
+    const newRanges = [...weeklySchedule[day].ranges];
+    newRanges[index][field] = value;
+    setWeeklySchedule({
+      ...weeklySchedule,
+      [day]: { ...weeklySchedule[day], ranges: newRanges }
+    });
+  };
+
+  const removeTimeRange = (day, index) => {
+    const newRanges = weeklySchedule[day].ranges.filter((_, i) => i !== index);
+    setWeeklySchedule({
+      ...weeklySchedule,
+      [day]: { ...weeklySchedule[day], ranges: newRanges }
+    });
+  };
+
+  const generateSlotsFromRanges = (ranges) => {
+    return generateTimeSlots(ranges, 30);
+  };
+
+  // Convert slots back to ranges for editing (reverse of generateSlotsFromRanges)
+  const convertSlotsToRanges = (slots) => {
+    if (!Array.isArray(slots) || slots.length === 0) {
+      return [];
+    }
+
+    const ranges = [];
+    let currentRangeStart = null;
+    let currentRangeEnd = null;
+
+    // Sort slots to ensure correct order
+    const sortedSlots = [...slots].sort();
+
+    sortedSlots.forEach((slot, index) => {
+      const [hour, minute] = slot.split(':').map(Number);
+      const slotMinutes = hour * 60 + minute;
+
+      if (currentRangeStart === null) {
+        // Start new range
+        currentRangeStart = slot;
+        currentRangeEnd = slot;
+      } else {
+        // Check if this slot is 30 minutes after the last one in current range
+        const [lastHour, lastMin] = currentRangeEnd.split(':').map(Number);
+        const lastSlotMinutes = lastHour * 60 + lastMin;
+        
+        if (slotMinutes === lastSlotMinutes + 30) {
+          // Continue the current range - update end
+          currentRangeEnd = slot;
+        } else {
+          // Gap found, finish current range and start new one
+          // Calculate end as 30 minutes after the last slot in the range
+          const [endHour, endMin] = currentRangeEnd.split(':').map(Number);
+          const endTotalMin = endHour * 60 + endMin + 30;
+          const finalEndHour = Math.floor(endTotalMin / 60);
+          const finalEndMin = endTotalMin % 60;
+          const finalEnd = `${finalEndHour.toString().padStart(2, '0')}:${finalEndMin.toString().padStart(2, '0')}`;
+          
+          ranges.push({ start: currentRangeStart, end: finalEnd });
+          
+          // Start new range
+          currentRangeStart = slot;
+          currentRangeEnd = slot;
+        }
+      }
+    });
+
+    // Add the last range
+    if (currentRangeStart !== null) {
+      // Calculate end as 30 minutes after the last slot
+      const [endHour, endMin] = currentRangeEnd.split(':').map(Number);
+      const endTotalMin = endHour * 60 + endMin + 30;
+      const finalEndHour = Math.floor(endTotalMin / 60);
+      const finalEndMin = endTotalMin % 60;
+      const finalEnd = `${finalEndHour.toString().padStart(2, '0')}:${finalEndMin.toString().padStart(2, '0')}`;
+      
+      ranges.push({ start: currentRangeStart, end: finalEnd });
+    }
+
+    return ranges;
+  };
+
+  const saveGenericSchedule = async () => {
+    setSaving(true);
+    setMessage({ type: '', text: '' });
+    
+    try {
+      // Convert ranges to slots for each day
+      const scheduleWithSlots = {};
+      Object.keys(weeklySchedule).forEach(day => {
+        const dayData = weeklySchedule[day];
+        scheduleWithSlots[day] = {
+          available: dayData.available,
+          slots: dayData.available && dayData.ranges.length > 0 
+            ? generateSlotsFromRanges(dayData.ranges)
+            : []
+        };
+      });
+
+      await saveAvailability({
+        type: 'generic',
+        isDefault: true,
+        name: 'Horario por defecto',
+        weeklySchedule: scheduleWithSlots
+      });
+
+      setMessage({ type: 'success', text: 'Horario genérico guardado correctamente' });
+    } catch (err) {
+      console.error('Error saving generic schedule:', err);
+      setMessage({ type: 'error', text: 'Error al guardar el horario' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteSpecificConfig = async (configId) => {
+    if (!confirm('¿Estás seguro de que deseas eliminar esta configuración?')) return;
+    
+    try {
+      await deleteAvailabilityConfig(configId);
+      await loadSpecificConfigs();
+      setMessage({ type: 'success', text: 'Configuración eliminada' });
+    } catch (err) {
+      console.error('Error deleting config:', err);
+      setMessage({ type: 'error', text: 'Error al eliminar la configuración' });
+    }
+  };
+
+  // Specific Date Configuration Component
+  const SpecificDateForm = ({ onSave, onCancel, initialData }) => {
+    const [formData, setFormData] = useState(initialData || {
+      name: '',
+      dateRange: { start: '', end: '' },
+      available: false,
+      slots: [],
+      reason: '',
+      isSingleDate: true
+    });
+    const [saving, setSaving] = useState(false);
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      if (formData.isSingleDate && !formData.dateRange.start) {
+        alert('Por favor, selecciona una fecha');
+        return;
+      }
+      if (!formData.isSingleDate && (!formData.dateRange.start || !formData.dateRange.end)) {
+        alert('Por favor, selecciona un rango de fechas');
+        return;
+      }
+
+      setSaving(true);
+      const config = {
+        type: 'specific',
+        name: formData.name || 'Configuración específica',
+        dateRange: {
+          start: formData.dateRange.start,
+          end: formData.isSingleDate ? formData.dateRange.start : formData.dateRange.end
+        },
+        available: formData.available,
+        slots: formData.available ? formData.slots : [],
+        reason: formData.reason
+      };
+
+      try {
+        await saveAvailability(config);
+        await loadSpecificConfigs();
+        setMessage({ type: 'success', text: 'Configuración guardada' });
+        onSave();
+      } catch (err) {
+        console.error('Error saving specific config:', err);
+        setMessage({ type: 'error', text: 'Error al guardar' });
+      } finally {
+        setSaving(false);
+      }
+    };
+
+    const addSlot = () => {
+      setFormData({
+        ...formData,
+        slots: [...formData.slots, '09:00']
+      });
+    };
+
+    const updateSlot = (index, value) => {
+      const newSlots = [...formData.slots];
+      newSlots[index] = value;
+      setFormData({ ...formData, slots: newSlots });
+    };
+
+    const removeSlot = (index) => {
+      setFormData({
+        ...formData,
+        slots: formData.slots.filter((_, i) => i !== index)
+      });
+    };
+
+    // Helper: Convert Date to YYYY-MM-DD string
+    const dateToString = (date) => {
+      if (!date) return '';
+      const d = new Date(date);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    // Helper: Convert YYYY-MM-DD string to Date
+    const stringToDate = (dateString) => {
+      if (!dateString) return null;
+      return new Date(dateString + 'T00:00:00');
+    };
+
+    // Handle date change from DatePicker
+    const handleStartDateChange = (date) => {
+      const dateString = dateToString(date);
+      setFormData({
+        ...formData,
+        dateRange: { ...formData.dateRange, start: dateString }
+      });
+    };
+
+    const handleEndDateChange = (date) => {
+      const dateString = dateToString(date);
+      setFormData({
+        ...formData,
+        dateRange: { ...formData.dateRange, end: dateString }
+      });
+    };
+
+    return (
+      <form onSubmit={handleSubmit} className="specific-date-form">
+        <div className="form-group">
+          <label>Nombre (opcional)</label>
+          <input
+            type="text"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            placeholder="Ej: Vacaciones Navidad"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>
+            <input
+              type="checkbox"
+              checked={formData.isSingleDate}
+              onChange={(e) => setFormData({ ...formData, isSingleDate: e.target.checked })}
+            />
+            Fecha única
+          </label>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label>Fecha inicio *</label>
+            <DatePicker
+              selected={stringToDate(formData.dateRange.start)}
+              onChange={handleStartDateChange}
+              dateFormat="dd/MM/yyyy"
+              locale="es"
+              placeholderText="Selecciona fecha inicio"
+              className="date-picker-input"
+              required
+            />
+          </div>
+          {!formData.isSingleDate && (
+            <div className="form-group">
+              <label>Fecha fin *</label>
+              <DatePicker
+                selected={stringToDate(formData.dateRange.end)}
+                onChange={handleEndDateChange}
+                dateFormat="dd/MM/yyyy"
+                locale="es"
+                minDate={stringToDate(formData.dateRange.start)}
+                placeholderText="Selecciona fecha fin"
+                className="date-picker-input"
+                required
+              />
+            </div>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label>
+            <input
+              type="checkbox"
+              checked={formData.available}
+              onChange={(e) => setFormData({ ...formData, available: e.target.checked })}
+            />
+            {formData.available ? 'Horario especial (selecciona horas)' : 'Día completo bloqueado'}
+          </label>
+        </div>
+
+        {formData.available && (
+          <div className="form-group">
+            <label>Horas disponibles</label>
+            {formData.slots.map((slot, index) => (
+              <div key={index} className="slot-input-row">
+                <input
+                  type="time"
+                  value={slot}
+                  onChange={(e) => updateSlot(index, e.target.value)}
+                />
+                <button type="button" onClick={() => removeSlot(index)} className="btn-danger-small">Eliminar</button>
+              </div>
+            ))}
+            <button type="button" onClick={addSlot} className="btn-secondary">Agregar hora</button>
+          </div>
+        )}
+
+        <div className="form-group">
+          <label>Motivo (opcional)</label>
+          <input
+            type="text"
+            value={formData.reason}
+            onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+            placeholder="Ej: Día festivo, Vacaciones"
+          />
+        </div>
+
+        <div className="form-actions">
+          <button type="submit" className="btn-primary" disabled={saving}>
+            {saving ? 'Guardando...' : 'Guardar'}
+          </button>
+          <button type="button" onClick={onCancel} className="btn-secondary" disabled={saving}>Cancelar</button>
+        </div>
+      </form>
+    );
+  };
+
+  const [showSpecificForm, setShowSpecificForm] = useState(false);
+
+  return (
+    <div className="availability-manager">
+      <h3>Gestión de Disponibilidad</h3>
+      
+      <div className="availability-tabs">
+        <button
+          className={activeSubTab === 'generic' ? 'active' : ''}
+          onClick={() => setActiveSubTab('generic')}
+        >
+          Horario Genérico
+        </button>
+        <button
+          className={activeSubTab === 'specific' ? 'active' : ''}
+          onClick={() => setActiveSubTab('specific')}
+        >
+          Configuraciones Específicas
+        </button>
+      </div>
+
+      {message.text && (
+        <div className={`message ${message.type === 'success' ? 'success' : 'error'}`}>
+          {message.text}
+        </div>
+      )}
+
+      {activeSubTab === 'generic' && (
+        <div className="generic-schedule-editor">
+          <p className="help-text">Configura los horarios por defecto para cada día de la semana. Estos horarios se aplicarán a todas las fechas que no tengan una configuración específica.</p>
+          
+          {loading ? (
+            <p>Cargando...</p>
+          ) : (
+            <>
+              {daysOfWeek.map(({ key, label }) => {
+                const daySchedule = weeklySchedule[key] || { available: false, ranges: [] };
+                return (
+                <div key={key} className="day-schedule-row">
+                  <div className="day-header">
+                    <label className="day-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={daySchedule.available}
+                        onChange={() => toggleDayAvailability(key)}
+                      />
+                      <strong>{label}</strong>
+                    </label>
+                    {daySchedule.available && (
+                      <button
+                        onClick={() => setEditingDay(editingDay === key ? null : key)}
+                        className="btn-secondary-small"
+                      >
+                        {editingDay === key ? 'Ocultar' : 'Editar horarios'}
+                      </button>
+                    )}
+                  </div>
+
+                  {daySchedule.available && editingDay === key && (
+                    <div className="time-ranges-editor">
+                      {(Array.isArray(daySchedule.ranges) ? daySchedule.ranges : []).map((range, index) => {
+                        const slots = generateSlotsFromRanges([range]);
+                        return (
+                          <div key={index} className="time-range-item">
+                            <div className="time-range-inputs">
+                              <input
+                                type="time"
+                                value={range.start}
+                                onChange={(e) => updateTimeRange(key, index, 'start', e.target.value)}
+                              />
+                              <span>a</span>
+                              <input
+                                type="time"
+                                value={range.end}
+                                onChange={(e) => updateTimeRange(key, index, 'end', e.target.value)}
+                              />
+                              <button
+                                onClick={() => removeTimeRange(key, index)}
+                                className="btn-danger-small"
+                              >
+                                Eliminar
+                              </button>
+                            </div>
+                            <div className="slots-preview">
+                              <small>Slots generados: {slots.join(', ')}</small>
+                            </div>
+                          </div>
+                        );
+                      })}
+                      <button
+                        onClick={() => addTimeRange(key)}
+                        className="btn-secondary-small"
+                      >
+                        Agregar rango de horas
+                      </button>
+                    </div>
+                  )}
+
+                  {daySchedule.available && editingDay !== key && Array.isArray(daySchedule.ranges) && daySchedule.ranges.length > 0 && (
+                    <div className="day-summary">
+                      {daySchedule.ranges.map((range, i) => (
+                        <span key={i} className="range-badge">
+                          {range.start} - {range.end}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                );
+              })}
+
+              <button
+                onClick={saveGenericSchedule}
+                className="btn-primary"
+                disabled={saving}
+              >
+                {saving ? 'Guardando...' : 'Guardar Horario Genérico'}
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
+      {activeSubTab === 'specific' && (
+        <div className="specific-configs">
+          {!showSpecificForm ? (
+            <>
+              <div className="configs-header">
+                <h4>Configuraciones Específicas</h4>
+                <button
+                  onClick={() => setShowSpecificForm(true)}
+                  className="btn-primary"
+                >
+                  Nueva Configuración
+                </button>
+              </div>
+
+              {!Array.isArray(specificConfigs) || specificConfigs.length === 0 ? (
+                <p>No hay configuraciones específicas. Crea una para bloquear fechas o establecer horarios especiales.</p>
+              ) : (
+                <div className="specific-configs-list">
+                  {specificConfigs.map((config) => (
+                    <div key={config.id} className="specific-config-card">
+                      <div className="config-header">
+                        <strong>{config.name || 'Sin nombre'}</strong>
+                        <button
+                          onClick={() => deleteSpecificConfig(config.id)}
+                          className="btn-danger-small"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                      <div className="config-info">
+                        {config.dateRange && (
+                          <p>
+                            <strong>Fechas:</strong>{' '}
+                            {new Date(config.dateRange.start).toLocaleDateString('es-ES')}
+                            {config.dateRange.start !== config.dateRange.end && (
+                              <> - {new Date(config.dateRange.end).toLocaleDateString('es-ES')}</>
+                            )}
+                          </p>
+                        )}
+                        <p>
+                          <strong>Estado:</strong>{' '}
+                          {config.available ? (
+                            <span className="status-available">Horario especial</span>
+                          ) : (
+                            <span className="status-blocked">Bloqueado</span>
+                          )}
+                        </p>
+                        {config.available && Array.isArray(config.slots) && config.slots.length > 0 && (
+                          <p>
+                            <strong>Horas:</strong> {config.slots.join(', ')}
+                          </p>
+                        )}
+                        {config.reason && (
+                          <p><strong>Motivo:</strong> {config.reason}</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <SpecificDateForm
+              onSave={() => setShowSpecificForm(false)}
+              onCancel={() => setShowSpecificForm(false)}
+            />
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Admin Panel Component
 const AdminPanel = ({ masajes }) => {
   const [reservations, setReservations] = useState([]);
   const [allReservations, setAllReservations] = useState([]);
   const [adminPassword, setAdminPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [adminTab, setAdminTab] = useState('reservations'); // reservations, availability
   const [filter, setFilter] = useState('todas'); // todas, pendiente, confirmada, cancelada
   const [loading, setLoading] = useState(false);
 
@@ -591,119 +1453,122 @@ const AdminPanel = ({ masajes }) => {
         <button onClick={() => setIsAuthenticated(false)} className="btn-secondary">Cerrar sesión</button>
       </div>
 
-      <div className="admin-filters">
+      <div className="admin-main-tabs">
         <button
-          onClick={() => setFilter('todas')}
-          className={filter === 'todas' ? 'active' : ''}
+          className={adminTab === 'reservations' ? 'active' : ''}
+          onClick={() => setAdminTab('reservations')}
         >
-          Todas ({allReservations.length})
+          Reservas
         </button>
         <button
-          onClick={() => setFilter('pendiente')}
-          className={filter === 'pendiente' ? 'active' : ''}
+          className={adminTab === 'availability' ? 'active' : ''}
+          onClick={() => setAdminTab('availability')}
         >
-          Pendientes ({allReservations.filter(r => r.estado === 'pendiente').length})
-        </button>
-        <button
-          onClick={() => setFilter('confirmada')}
-          className={filter === 'confirmada' ? 'active' : ''}
-        >
-          Confirmadas ({allReservations.filter(r => r.estado === 'confirmada').length})
-        </button>
-        <button
-          onClick={() => setFilter('cancelada')}
-          className={filter === 'cancelada' ? 'active' : ''}
-        >
-          Canceladas ({allReservations.filter(r => r.estado === 'cancelada').length})
+          Disponibilidad
         </button>
       </div>
 
-      <div className="reservations-list">
-        {loading ? (
-          <p>Cargando reservas...</p>
-        ) : reservations.length === 0 ? (
-          <p>No hay reservas para mostrar.</p>
-        ) : (
-          reservations.map((reservation, index) => (
-            <div key={index} className="reservation-admin-card">
-              <div className="reservation-header">
-                <div>
-                  <strong>Código: {reservation.code}</strong>
-                  <span className={`status-badge status-${reservation.estado}`}>
-                    {reservation.estado}
-                  </span>
+      {adminTab === 'reservations' && (
+        <>
+          <div className="admin-filters">
+            <button
+              onClick={() => setFilter('todas')}
+              className={filter === 'todas' ? 'active' : ''}
+            >
+              Todas ({allReservations.length})
+            </button>
+            <button
+              onClick={() => setFilter('pendiente')}
+              className={filter === 'pendiente' ? 'active' : ''}
+            >
+              Pendientes ({allReservations.filter(r => r.estado === 'pendiente').length})
+            </button>
+            <button
+              onClick={() => setFilter('confirmada')}
+              className={filter === 'confirmada' ? 'active' : ''}
+            >
+              Confirmadas ({allReservations.filter(r => r.estado === 'confirmada').length})
+            </button>
+            <button
+              onClick={() => setFilter('cancelada')}
+              className={filter === 'cancelada' ? 'active' : ''}
+            >
+              Canceladas ({allReservations.filter(r => r.estado === 'cancelada').length})
+            </button>
+          </div>
+
+          <div className="reservations-list">
+            {loading ? (
+              <p>Cargando reservas...</p>
+            ) : reservations.length === 0 ? (
+              <p>No hay reservas para mostrar.</p>
+            ) : (
+                             reservations.map((reservation, index) => (
+                <div key={index} className="reservation-admin-card">
+                  <div className="reservation-header">
+                    <div>
+                      <strong>Código: {reservation.code}</strong>
+                      <span className={`status-badge status-${reservation.estado}`}>
+                        {reservation.estado}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => handleDelete(reservation.code)}
+                      className="btn-danger-small"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                  <div className="reservation-info">
+                    <p><strong>Cliente:</strong> {reservation.nombre}</p>
+                    <p><strong>Contacto:</strong> {reservation.email} | {reservation.telefono}</p>
+                    <p><strong>Servicio:</strong> {reservation.servicio}</p>
+                    <p><strong>Fecha y hora:</strong> {new Date(reservation.fecha).toLocaleDateString('es-ES')} a las {reservation.hora}</p>
+                    {reservation.notas && <p><strong>Notas:</strong> {reservation.notas}</p>}
+                    <p><strong>Fecha de reserva:</strong> {new Date(reservation.fechaCreacion).toLocaleString('es-ES')}</p>
+                  </div>
+                  <div className="reservation-status-actions">
+                    <button
+                      onClick={() => updateReservationStatus(reservation.code, 'confirmada')}
+                      className={reservation.estado === 'confirmada' ? 'btn-success active' : 'btn-success'}
+                      disabled={reservation.estado === 'confirmada'}
+                    >
+                      Confirmar
+                    </button>
+                    <button
+                      onClick={() => updateReservationStatus(reservation.code, 'pendiente')}
+                      className={reservation.estado === 'pendiente' ? 'btn-secondary active' : 'btn-secondary'}
+                      disabled={reservation.estado === 'pendiente'}
+                    >
+                      Pendiente
+                    </button>
+                    <button
+                      onClick={() => updateReservationStatus(reservation.code, 'cancelada')}
+                      className={reservation.estado === 'cancelada' ? 'btn-warning active' : 'btn-warning'}
+                      disabled={reservation.estado === 'cancelada'}
+                    >
+                      Cancelar
+                    </button>
+                  </div>
                 </div>
-                <button
-                  onClick={() => handleDelete(reservation.code)}
-                  className="btn-danger-small"
-                >
-                  Eliminar
-                </button>
-              </div>
-              <div className="reservation-info">
-                <p><strong>Cliente:</strong> {reservation.nombre}</p>
-                <p><strong>Contacto:</strong> {reservation.email} | {reservation.telefono}</p>
-                <p><strong>Servicio:</strong> {reservation.servicio}</p>
-                <p><strong>Fecha y hora:</strong> {new Date(reservation.fecha).toLocaleDateString('es-ES')} a las {reservation.hora}</p>
-                {reservation.notas && <p><strong>Notas:</strong> {reservation.notas}</p>}
-                <p><strong>Fecha de reserva:</strong> {new Date(reservation.fechaCreacion).toLocaleString('es-ES')}</p>
-              </div>
-              <div className="reservation-status-actions">
-                <button
-                  onClick={() => updateReservationStatus(reservation.code, 'confirmada')}
-                  className={reservation.estado === 'confirmada' ? 'btn-success active' : 'btn-success'}
-                  disabled={reservation.estado === 'confirmada'}
-                >
-                  Confirmar
-                </button>
-                <button
-                  onClick={() => updateReservationStatus(reservation.code, 'pendiente')}
-                  className={reservation.estado === 'pendiente' ? 'btn-secondary active' : 'btn-secondary'}
-                  disabled={reservation.estado === 'pendiente'}
-                >
-                  Pendiente
-                </button>
-                <button
-                  onClick={() => updateReservationStatus(reservation.code, 'cancelada')}
-                  className={reservation.estado === 'cancelada' ? 'btn-warning active' : 'btn-warning'}
-                  disabled={reservation.estado === 'cancelada'}
-                >
-                  Cancelar
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+              ))
+            )}
+          </div>
+        </>
+      )}
+
+      {adminTab === 'availability' && <AvailabilityManager />}
     </div>
   );
 };
 
-function App() {
-  const [menuOpen, setMenuOpen] = useState(false);
+// Home Component
+function Home() {
   const [activeTab, setActiveTab] = useState('reservar'); // reservar, gestionar, admin
 
   return (
-    <div className="main-container">
-      <header className="fixed-header">
-        <div className="header-content">
-          <img src="/logo-removebg-preview.png" alt="Logo Quirozen" className="main-logo left" />
-          <nav className={`main-nav ${menuOpen ? 'open' : ''}`}>
-            <ul>
-              <li><a href="#info" onClick={() => setMenuOpen(false)}>Información principal</a></li>
-              <li><a href="#reservas" onClick={() => setMenuOpen(false)}>Reservas</a></li>
-              <li><a href="#sobre" onClick={() => setMenuOpen(false)}>Sobre nosotros</a></li>
-              <li><a href="#promos" onClick={() => setMenuOpen(false)}>Promociones/Bonos</a></li>
-            </ul>
-          </nav>
-          <button className="hamburger" onClick={() => setMenuOpen(!menuOpen)} aria-label="Abrir menú">
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
-        </div>
-      </header>
-      <main>
+    <>
+        <BannerSlider />
         <section id="info" className="section">
           <h2>Información principal</h2>
           <h3>Horarios</h3>
@@ -753,7 +1618,69 @@ function App() {
         </section>
         <section id="sobre" className="section">
           <h2>Sobre nosotros</h2>
-          <p>Próximamente.</p>
+          
+          <div className="about-content">
+            <div className="about-text">
+              <p className="intro-text">
+                Desde <strong>Quirozen by Laura Escribano</strong> ofrecemos una amplia gama de masajes y tratamientos 
+                terapéuticos diseñados para tu bienestar físico y mental. Con años de experiencia y dedicación, 
+                nos especializamos en proporcionar servicios personalizados que se adaptan a tus necesidades específicas.
+              </p>
+              <p>
+                Nuestro enfoque combina técnicas tradicionales con métodos modernos para ofrecerte una experiencia 
+                única de relajación y recuperación. Ya sea que busques alivio del estrés, tratamiento para tensiones 
+                musculares, o simplemente un momento de bienestar, estamos aquí para ayudarte.
+              </p>
+              <p className="closing-text">
+                <strong>Te esperamos en nuestro local para brindarte el cuidado que mereces.</strong>
+              </p>
+            </div>
+
+            <div className="contact-info">
+              <div className="contact-card">
+                <div className="contact-icon">📍</div>
+                <div className="contact-details">
+                  <h3>Dirección</h3>
+                  <p>Calle Leopoldo Arias Clarín, Local 148</p>
+                  <p>Dos Hermanas, Sevilla</p>
+                </div>
+              </div>
+
+              <div className="contact-card">
+                <div className="contact-icon">📞</div>
+                <div className="contact-details">
+                  <h3>Teléfono</h3>
+                  <p><a href="tel:675610730" className="phone-link">675 61 07 30</a></p>
+                </div>
+              </div>
+            </div>
+
+            <div className="map-container">
+              <h3>¿Cómo llegar?</h3>
+              <div className="map-wrapper">
+                <iframe
+                  src="https://www.google.com/maps?q=Leopoldo+Arias+Clarín+148,+Dos+Hermanas,+Sevilla&output=embed"
+                  width="100%"
+                  height="400"
+                  style={{ border: 0, borderRadius: '8px' }}
+                  allowFullScreen=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Ubicación de Quirozen by Laura Escribano"
+                ></iframe>
+              </div>
+              <p className="map-note">
+                <a 
+                  href="https://www.google.com/maps/search/?api=1&query=Leopoldo+Arias+Clarín+148+Dos+Hermanas" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="map-link"
+                >
+                  Abrir en Google Maps →
+                </a>
+              </p>
+            </div>
+          </div>
         </section>
         <section id="promos" className="section">
           <h2>Promociones y Bonos</h2>
@@ -763,15 +1690,25 @@ function App() {
                 <h4>{b.titulo}</h4>
                 <p>{b.descripcion}</p>
                 <p><strong>{b.detalles}</strong></p>
-                <p><strong>Precio:</strong> {b.precio}</p>
+                <p><strong>Precio: {b.precio}</strong></p>
                 {b.regalo && <p><em>{b.regalo}</em></p>}
               </div>
             ))}
           </div>
         </section>
-      </main>
-    </div>
-  )
+    </>
+  );
+}
+
+// App Component with Routes
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Layout><Home /></Layout>} />
+      <Route path="/terminos" element={<Terminos />} />
+      <Route path="/acuerdo" element={<Acuerdo />} />
+    </Routes>
+  );
 }
 
 export default App
