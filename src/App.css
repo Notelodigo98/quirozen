@@ -86,14 +86,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.4rem 2rem;
+  padding: 0.05rem 2rem;
 }
 
 .main-logo.left {
-  width: 120px;
+  width: 180px;
   max-width: 30vw;
   margin: 0;
-  padding: 0.2rem 0;
+  padding: 0;
   filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.6)) 
           drop-shadow(0 0 20px rgba(212, 175, 55, 0.4));
   transition: transform 0.3s ease, filter 0.3s ease;
@@ -124,7 +124,7 @@
   color: var(--gray-light);
   font-weight: 600;
   font-size: 1.05rem;
-  padding: 0.5rem 1rem;
+  padding: 0.3rem 1rem;
   border-radius: 8px;
   transition: all 0.3s ease;
   position: relative;
@@ -175,12 +175,12 @@
    ============================================ */
 
 main {
-  margin-top: 120px;
+  margin-top: 130px;
   width: 100%;
   max-width: 1200px;
   padding: 0 1.5rem;
   animation: fadeInUp 0.8s ease-out;
-  scroll-margin-top: 120px;
+  scroll-margin-top: 110px;
 }
 
 /* ============================================
@@ -199,7 +199,7 @@ main {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
   overflow: hidden;
-  scroll-margin-top: 120px;
+  scroll-margin-top: 110px;
 }
 
 .section::before {
@@ -492,11 +492,11 @@ main {
 
 @media (max-width: 800px) {
   .header-content {
-    padding: 0.4rem 1.5rem;
+    padding: 0.05rem 1.5rem;
   }
   
   .main-logo.left {
-    width: 90px;
+    width: 130px;
   }
   
   .main-nav ul {
@@ -505,7 +505,7 @@ main {
   
   .main-nav a {
     font-size: 0.95rem;
-    padding: 0.5rem 1rem;
+    padding: 0.3rem 1rem;
   }
   
   main {
@@ -515,11 +515,11 @@ main {
 
 @media (max-width: 600px) {
   .header-content {
-    padding: 0.3rem 1rem;
+    padding: 0.05rem 1rem;
   }
   
   .main-logo.left {
-    width: 70px;
+    width: 100px;
     filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.7)) 
             drop-shadow(0 0 15px rgba(212, 175, 55, 0.5));
   }
@@ -559,7 +559,7 @@ main {
     font-size: 1.1rem;
     width: 100%;
     display: block;
-    padding: 1rem 1.2rem;
+    padding: 0.8rem 1.2rem;
     border-radius: 10px;
     color: var(--gray-light);
   }
@@ -574,7 +574,7 @@ main {
   }
   
   main {
-    margin-top: 75px;
+    margin-top: 80px;
     padding: 0 1rem;
   }
   
@@ -599,7 +599,7 @@ main {
 
 @media (max-width: 400px) {
   .main-logo.left {
-    width: 60px;
+    width: 85px;
   }
   
   .section h2 {
@@ -608,5 +608,549 @@ main {
   
   .section h3 {
     font-size: 1.5em;
+  }
+}
+
+/* ============================================
+   RESERVATION SYSTEM
+   ============================================ */
+
+.reservation-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+  padding-bottom: 0.5rem;
+}
+
+.reservation-tabs button {
+  background: none;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-black);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -0.5rem;
+}
+
+.reservation-tabs button:hover {
+  color: var(--golden);
+}
+
+.reservation-tabs button.active {
+  color: var(--golden);
+  border-bottom-color: var(--golden);
+}
+
+/* Reservation Form */
+.reservation-form {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text-black);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.8rem;
+  border: 2px solid rgba(212, 175, 55, 0.3);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--golden);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.error-message {
+  background: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #dc3545;
+  font-weight: 500;
+}
+
+/* Buttons */
+.btn-primary {
+  background: linear-gradient(135deg, var(--golden) 0%, var(--golden-light) 100%);
+  color: var(--text-black);
+  border: none;
+  padding: 0.9rem 2rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, var(--sea-blue) 0%, var(--sea-blue-light) 100%);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.8rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(8, 131, 149, 0.3);
+}
+
+.btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(8, 131, 149, 0.4);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.8rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+}
+
+.btn-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+}
+
+.btn-danger-small {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-danger-small:hover {
+  background: #c82333;
+  transform: translateY(-1px);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-success:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.btn-success:disabled,
+.btn-success.active {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+  color: var(--text-black);
+  border: none;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-warning:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+}
+
+.btn-warning:disabled,
+.btn-warning.active {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Reservation Success */
+.reservation-success {
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(32, 201, 151, 0.1) 100%);
+  border-radius: 16px;
+  border: 2px solid rgba(40, 167, 69, 0.3);
+}
+
+.reservation-success h3 {
+  color: #28a745;
+  margin-bottom: 1.5rem;
+  font-size: 1.8em;
+}
+
+.reservation-code-display {
+  margin: 2rem 0;
+}
+
+.code-box {
+  background: linear-gradient(135deg, var(--golden) 0%, var(--golden-light) 100%);
+  color: var(--text-black);
+  padding: 1.5rem;
+  font-size: 2em;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  border-radius: 12px;
+  margin: 1rem 0;
+  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+  font-family: 'Courier New', monospace;
+}
+
+.code-instruction {
+  color: var(--text-black);
+  font-size: 0.95rem;
+  margin-top: 1rem;
+  font-style: italic;
+}
+
+/* Manage Reservation */
+.manage-reservation,
+.lookup-form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.reservation-details {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 248, 255, 0.95) 100%);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-top: 2rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  border: 2px solid rgba(212, 175, 55, 0.3);
+}
+
+.reservation-details h4 {
+  margin-bottom: 1.5rem;
+  color: var(--text-black);
+  font-size: 1.5em;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.detail-row:last-of-type {
+  border-bottom: none;
+}
+
+.detail-row strong {
+  color: var(--text-black);
+  font-weight: 600;
+  min-width: 120px;
+}
+
+.detail-row span {
+  color: var(--text-black);
+  text-align: right;
+  flex: 1;
+}
+
+.status-pendiente {
+  color: #ffc107;
+  font-weight: 700;
+}
+
+.status-confirmada {
+  color: #28a745;
+  font-weight: 700;
+}
+
+.status-cancelada {
+  color: #dc3545;
+  font-weight: 700;
+}
+
+.reservation-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.reservation-actions button {
+  flex: 1;
+  min-width: 150px;
+}
+
+.edit-reservation-form {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 248, 255, 0.95) 100%);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-top: 2rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  border: 2px solid rgba(212, 175, 55, 0.3);
+}
+
+.edit-reservation-form h4 {
+  margin-bottom: 1.5rem;
+  color: var(--text-black);
+}
+
+/* Admin Panel */
+.admin-login {
+  max-width: 400px;
+  margin: 2rem auto;
+}
+
+.admin-panel {
+  margin-top: 2rem;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+}
+
+.admin-header h3 {
+  margin: 0;
+  color: var(--text-black);
+}
+
+.admin-filters {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.admin-filters button {
+  background: rgba(212, 175, 55, 0.1);
+  border: 2px solid rgba(212, 175, 55, 0.3);
+  color: var(--text-black);
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.admin-filters button:hover {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: var(--golden);
+}
+
+.admin-filters button.active {
+  background: linear-gradient(135deg, var(--golden) 0%, var(--golden-light) 100%);
+  border-color: var(--golden);
+  color: var(--text-black);
+}
+
+.reservations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.reservation-admin-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 250, 240, 0.95) 100%);
+  border-radius: 16px;
+  padding: 1.8rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  border: 2px solid rgba(212, 175, 55, 0.25);
+  transition: all 0.3s ease;
+}
+
+.reservation-admin-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.reservation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid rgba(212, 175, 55, 0.2);
+}
+
+.reservation-header strong {
+  font-size: 1.2em;
+  color: var(--text-black);
+  margin-right: 1rem;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-left: 1rem;
+  text-transform: capitalize;
+}
+
+.status-badge.status-pendiente {
+  background: rgba(255, 193, 7, 0.2);
+  color: #856404;
+}
+
+.status-badge.status-confirmada {
+  background: rgba(40, 167, 69, 0.2);
+  color: #155724;
+}
+
+.status-badge.status-cancelada {
+  background: rgba(220, 53, 69, 0.2);
+  color: #721c24;
+}
+
+.reservation-info {
+  margin-bottom: 1.5rem;
+}
+
+.reservation-info p {
+  margin: 0.6rem 0;
+  color: var(--text-black);
+  line-height: 1.6;
+}
+
+.reservation-info strong {
+  color: var(--text-black);
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+.reservation-status-actions {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.reservation-status-actions button {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* Responsive Design for Reservations */
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .reservation-tabs {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .reservation-tabs button {
+    width: 100%;
+    text-align: left;
+    padding: 0.8rem;
+  }
+
+  .reservation-actions {
+    flex-direction: column;
+  }
+
+  .reservation-actions button {
+    width: 100%;
+  }
+
+  .admin-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .admin-filters {
+    width: 100%;
+  }
+
+  .admin-filters button {
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .reservation-status-actions {
+    flex-direction: column;
+  }
+
+  .reservation-status-actions button {
+    width: 100%;
+  }
+
+  .detail-row {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .detail-row span {
+    text-align: left;
+  }
+
+  .code-box {
+    font-size: 1.5em;
+    padding: 1rem;
   }
 }

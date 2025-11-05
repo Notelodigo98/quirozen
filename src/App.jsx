@@ -1,5 +1,14 @@
 import './App.css'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import {
+  saveReservation as saveReservationDB,
+  getReservations as getReservationsDB,
+  getReservationByCode as getReservationByCodeDB,
+  updateReservation as updateReservationDB,
+  deleteReservation as deleteReservationDB,
+  getReservationsByStatus,
+  generateReservationCode
+} from './firebase/reservations';
 
 const horarios = [
   { dia: 'Lunes a Viernes', horas: '9 - 13h y 16-20h (citas urgencias de 20 a 21h)' },
@@ -96,8 +105,583 @@ const bonos = [
   },
 ];
 
+// Reservation utility functions now use Firebase (imported from firebase/reservations.js)
+
+// Reservation Form Component
+const ReservationForm = ({ masajes }) => {
+  const [formData, setFormData] = useState({
+    nombre: '',
+    email: '',
+    telefono: '',
+    servicio: '',
+    fecha: '',
+    hora: '',
+    notas: ''
+  });
+  const [submitted, setSubmitted] = useState(false);
+  const [reservationCode, setReservationCode] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    // Validation
+    if (!formData.nombre || !formData.email || !formData.telefono || !formData.servicio || !formData.fecha || !formData.hora) {
+      setError('Por favor, completa todos los campos obligatorios.');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const code = generateReservationCode();
+      const reservation = {
+        ...formData,
+        code,
+        fechaCreacion: new Date().toISOString(),
+        estado: 'pendiente'
+      };
+
+      await saveReservationDB(reservation);
+      setReservationCode(code);
+      setSubmitted(true);
+      setFormData({
+        nombre: '',
+        email: '',
+        telefono: '',
+        servicio: '',
+        fecha: '',
+        hora: '',
+        notas: ''
+      });
+    } catch (err) {
+      setError('Error al guardar la reserva. Por favor, intenta de nuevo.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const generateTimeSlots = () => {
+    const slots = [];
+    // Morning slots: 9:00 - 13:00
+    for (let hour = 9; hour < 13; hour++) {
+      slots.push(`${hour.toString().padStart(2, '0')}:00`);
+      if (hour < 12) slots.push(`${hour.toString().padStart(2, '0')}:30`);
+    }
+    // Afternoon slots: 16:00 - 20:00
+    for (let hour = 16; hour < 20; hour++) {
+      slots.push(`${hour.toString().padStart(2, '0')}:00`);
+      slots.push(`${hour.toString().padStart(2, '0')}:30`);
+    }
+    return slots;
+  };
+
+  if (submitted) {
+    return (
+      <div className="reservation-success">
+        <h3>¡Reserva confirmada!</h3>
+        <div className="reservation-code-display">
+          <p>Tu código de reserva es:</p>
+          <div className="code-box">{reservationCode}</div>
+          <p className="code-instruction">Guarda este código para modificar o cancelar tu reserva.</p>
+        </div>
+        <button onClick={() => { setSubmitted(false); setReservationCode(''); }} className="btn-secondary">
+          Hacer otra reserva
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="reservation-form">
+      {error && <div className="error-message">{error}</div>}
+      
+      <div className="form-group">
+        <label htmlFor="nombre">Nombre completo *</label>
+        <input
+          type="text"
+          id="nombre"
+          name="nombre"
+          value={formData.nombre}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="email">Email *</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="telefono">Teléfono *</label>
+        <input
+          type="tel"
+          id="telefono"
+          name="telefono"
+          value={formData.telefono}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="servicio">Tipo de servicio *</label>
+        <select
+          id="servicio"
+          name="servicio"
+          value={formData.servicio}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Selecciona un servicio</option>
+          {masajes.map((masaje, i) => (
+            <option key={i} value={masaje.nombre}>
+              {masaje.nombre} - {masaje.duracion} - {masaje.precio}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="form-row">
+        <div className="form-group">
+          <label htmlFor="fecha">Fecha *</label>
+          <input
+            type="date"
+            id="fecha"
+            name="fecha"
+            value={formData.fecha}
+            onChange={handleChange}
+            min={new Date().toISOString().split('T')[0]}
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="hora">Hora *</label>
+          <select
+            id="hora"
+            name="hora"
+            value={formData.hora}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Selecciona una hora</option>
+            {generateTimeSlots().map((slot, i) => (
+              <option key={i} value={slot}>{slot}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="notas">Notas adicionales (opcional)</label>
+        <textarea
+          id="notas"
+          name="notas"
+          value={formData.notas}
+          onChange={handleChange}
+          rows="3"
+          placeholder="Indica cualquier preferencia o necesidad especial..."
+        />
+      </div>
+
+      <button type="submit" className="btn-primary" disabled={loading}>
+        {loading ? 'Guardando...' : 'Confirmar reserva'}
+      </button>
+    </form>
+  );
+};
+
+// Manage Reservation Component
+const ManageReservation = () => {
+  const [code, setCode] = useState('');
+  const [reservation, setReservation] = useState(null);
+  const [error, setError] = useState('');
+  const [editMode, setEditMode] = useState(false);
+  const [editData, setEditData] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  const handleLookup = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    if (!code) {
+      setError('Por favor, ingresa un código de reserva.');
+      setLoading(false);
+      return;
+    }
+    try {
+      const found = await getReservationByCodeDB(code);
+      if (found) {
+        setReservation(found);
+        setEditData(found);
+        setEditMode(false);
+      } else {
+        setError('No se encontró ninguna reserva con ese código.');
+        setReservation(null);
+      }
+    } catch (err) {
+      setError('Error al buscar la reserva. Por favor, intenta de nuevo.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const success = await updateReservationDB(code, editData);
+      if (success) {
+        setReservation(editData);
+        setEditMode(false);
+        setError('');
+        alert('Reserva actualizada correctamente.');
+      } else {
+        setError('Error al actualizar la reserva.');
+      }
+    } catch (err) {
+      setError('Error al actualizar la reserva. Por favor, intenta de nuevo.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancel = async () => {
+    if (confirm('¿Estás seguro de que deseas cancelar esta reserva?')) {
+      setLoading(true);
+      try {
+        await deleteReservationDB(code);
+        setReservation(null);
+        setCode('');
+        setEditMode(false);
+        alert('Reserva cancelada correctamente.');
+      } catch (err) {
+        setError('Error al cancelar la reserva. Por favor, intenta de nuevo.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  return (
+    <div className="manage-reservation">
+      <h3>Gestionar mi reserva</h3>
+      <form onSubmit={handleLookup} className="lookup-form">
+        <div className="form-group">
+          <label htmlFor="reservation-code">Código de reserva</label>
+          <input
+            type="text"
+            id="reservation-code"
+            value={code}
+            onChange={(e) => setCode(e.target.value.toUpperCase())}
+            placeholder="Ingresa tu código"
+            maxLength="8"
+            style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}
+          />
+        </div>
+        <button type="submit" className="btn-secondary" disabled={loading}>
+          {loading ? 'Buscando...' : 'Buscar reserva'}
+        </button>
+      </form>
+
+      {error && <div className="error-message">{error}</div>}
+
+      {reservation && !editMode && (
+        <div className="reservation-details">
+          <h4>Detalles de la reserva</h4>
+          <div className="detail-row">
+            <strong>Código:</strong> <span>{reservation.code}</span>
+          </div>
+          <div className="detail-row">
+            <strong>Nombre:</strong> <span>{reservation.nombre}</span>
+          </div>
+          <div className="detail-row">
+            <strong>Email:</strong> <span>{reservation.email}</span>
+          </div>
+          <div className="detail-row">
+            <strong>Teléfono:</strong> <span>{reservation.telefono}</span>
+          </div>
+          <div className="detail-row">
+            <strong>Servicio:</strong> <span>{reservation.servicio}</span>
+          </div>
+          <div className="detail-row">
+            <strong>Fecha:</strong> <span>{new Date(reservation.fecha).toLocaleDateString('es-ES')}</span>
+          </div>
+          <div className="detail-row">
+            <strong>Hora:</strong> <span>{reservation.hora}</span>
+          </div>
+          {reservation.notas && (
+            <div className="detail-row">
+              <strong>Notas:</strong> <span>{reservation.notas}</span>
+            </div>
+          )}
+          <div className="detail-row">
+            <strong>Estado:</strong> <span className={`status-${reservation.estado}`}>{reservation.estado}</span>
+          </div>
+          <div className="reservation-actions">
+            <button onClick={() => setEditMode(true)} className="btn-secondary">Modificar</button>
+            <button onClick={handleCancel} className="btn-danger">Cancelar reserva</button>
+          </div>
+        </div>
+      )}
+
+      {reservation && editMode && (
+        <form onSubmit={handleUpdate} className="edit-reservation-form">
+          <h4>Modificar reserva</h4>
+          <div className="form-group">
+            <label>Fecha *</label>
+            <input
+              type="date"
+              value={editData.fecha}
+              onChange={(e) => setEditData({ ...editData, fecha: e.target.value })}
+              min={new Date().toISOString().split('T')[0]}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Hora *</label>
+            <input
+              type="time"
+              value={editData.hora}
+              onChange={(e) => setEditData({ ...editData, hora: e.target.value })}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Notas</label>
+            <textarea
+              value={editData.notas || ''}
+              onChange={(e) => setEditData({ ...editData, notas: e.target.value })}
+              rows="3"
+            />
+          </div>
+          <div className="reservation-actions">
+            <button type="submit" className="btn-primary" disabled={loading}>
+              {loading ? 'Guardando...' : 'Guardar cambios'}
+            </button>
+            <button type="button" onClick={() => setEditMode(false)} className="btn-secondary" disabled={loading}>
+              Cancelar
+            </button>
+          </div>
+        </form>
+      )}
+    </div>
+  );
+};
+
+// Admin Panel Component
+const AdminPanel = ({ masajes }) => {
+  const [reservations, setReservations] = useState([]);
+  const [allReservations, setAllReservations] = useState([]);
+  const [adminPassword, setAdminPassword] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [filter, setFilter] = useState('todas'); // todas, pendiente, confirmada, cancelada
+  const [loading, setLoading] = useState(false);
+
+  // Simple password check - in production, use proper authentication
+  const ADMIN_PASSWORD = 'admin123'; // Change this to a secure password
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadReservations();
+    }
+  }, [isAuthenticated, filter]);
+
+  const loadReservations = async () => {
+    setLoading(true);
+    try {
+      let all = await getReservationsDB();
+      setAllReservations(all);
+      
+      if (filter !== 'todas') {
+        all = all.filter(r => r.estado === filter);
+      }
+      all.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+      setReservations(all);
+    } catch (err) {
+      console.error('Error loading reservations:', err);
+      alert('Error al cargar las reservas');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (adminPassword === ADMIN_PASSWORD) {
+      setIsAuthenticated(true);
+      setAdminPassword('');
+    } else {
+      alert('Contraseña incorrecta');
+    }
+  };
+
+  const updateReservationStatus = async (code, newStatus) => {
+    try {
+      const reservation = await getReservationByCodeDB(code);
+      if (reservation) {
+        await updateReservationDB(code, { ...reservation, estado: newStatus });
+        await loadReservations();
+      }
+    } catch (err) {
+      console.error('Error updating reservation status:', err);
+      alert('Error al actualizar el estado de la reserva');
+    }
+  };
+
+  const handleDelete = async (code) => {
+    if (confirm('¿Estás seguro de que deseas eliminar esta reserva?')) {
+      try {
+        await deleteReservationDB(code);
+        await loadReservations();
+      } catch (err) {
+        console.error('Error deleting reservation:', err);
+        alert('Error al eliminar la reserva');
+      }
+    }
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="admin-login">
+        <h3>Panel de administración</h3>
+        <form onSubmit={handleLogin}>
+          <div className="form-group">
+            <label htmlFor="admin-password">Contraseña</label>
+            <input
+              type="password"
+              id="admin-password"
+              value={adminPassword}
+              onChange={(e) => setAdminPassword(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit" className="btn-primary">Acceder</button>
+        </form>
+      </div>
+    );
+  }
+
+  return (
+    <div className="admin-panel">
+      <div className="admin-header">
+        <h3>Panel de administración</h3>
+        <button onClick={() => setIsAuthenticated(false)} className="btn-secondary">Cerrar sesión</button>
+      </div>
+
+      <div className="admin-filters">
+        <button
+          onClick={() => setFilter('todas')}
+          className={filter === 'todas' ? 'active' : ''}
+        >
+          Todas ({allReservations.length})
+        </button>
+        <button
+          onClick={() => setFilter('pendiente')}
+          className={filter === 'pendiente' ? 'active' : ''}
+        >
+          Pendientes ({allReservations.filter(r => r.estado === 'pendiente').length})
+        </button>
+        <button
+          onClick={() => setFilter('confirmada')}
+          className={filter === 'confirmada' ? 'active' : ''}
+        >
+          Confirmadas ({allReservations.filter(r => r.estado === 'confirmada').length})
+        </button>
+        <button
+          onClick={() => setFilter('cancelada')}
+          className={filter === 'cancelada' ? 'active' : ''}
+        >
+          Canceladas ({allReservations.filter(r => r.estado === 'cancelada').length})
+        </button>
+      </div>
+
+      <div className="reservations-list">
+        {loading ? (
+          <p>Cargando reservas...</p>
+        ) : reservations.length === 0 ? (
+          <p>No hay reservas para mostrar.</p>
+        ) : (
+          reservations.map((reservation, index) => (
+            <div key={index} className="reservation-admin-card">
+              <div className="reservation-header">
+                <div>
+                  <strong>Código: {reservation.code}</strong>
+                  <span className={`status-badge status-${reservation.estado}`}>
+                    {reservation.estado}
+                  </span>
+                </div>
+                <button
+                  onClick={() => handleDelete(reservation.code)}
+                  className="btn-danger-small"
+                >
+                  Eliminar
+                </button>
+              </div>
+              <div className="reservation-info">
+                <p><strong>Cliente:</strong> {reservation.nombre}</p>
+                <p><strong>Contacto:</strong> {reservation.email} | {reservation.telefono}</p>
+                <p><strong>Servicio:</strong> {reservation.servicio}</p>
+                <p><strong>Fecha y hora:</strong> {new Date(reservation.fecha).toLocaleDateString('es-ES')} a las {reservation.hora}</p>
+                {reservation.notas && <p><strong>Notas:</strong> {reservation.notas}</p>}
+                <p><strong>Fecha de reserva:</strong> {new Date(reservation.fechaCreacion).toLocaleString('es-ES')}</p>
+              </div>
+              <div className="reservation-status-actions">
+                <button
+                  onClick={() => updateReservationStatus(reservation.code, 'confirmada')}
+                  className={reservation.estado === 'confirmada' ? 'btn-success active' : 'btn-success'}
+                  disabled={reservation.estado === 'confirmada'}
+                >
+                  Confirmar
+                </button>
+                <button
+                  onClick={() => updateReservationStatus(reservation.code, 'pendiente')}
+                  className={reservation.estado === 'pendiente' ? 'btn-secondary active' : 'btn-secondary'}
+                  disabled={reservation.estado === 'pendiente'}
+                >
+                  Pendiente
+                </button>
+                <button
+                  onClick={() => updateReservationStatus(reservation.code, 'cancelada')}
+                  className={reservation.estado === 'cancelada' ? 'btn-warning active' : 'btn-warning'}
+                  disabled={reservation.estado === 'cancelada'}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+};
+
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('reservar'); // reservar, gestionar, admin
 
   return (
     <div className="main-container">
@@ -142,7 +726,30 @@ function App() {
         </section>
         <section id="reservas" className="section">
           <h2>Reservas</h2>
-          <p>Próximamente: formulario de reservas online.</p>
+          <div className="reservation-tabs">
+            <button
+              className={activeTab === 'reservar' ? 'active' : ''}
+              onClick={() => setActiveTab('reservar')}
+            >
+              Nueva reserva
+            </button>
+            <button
+              className={activeTab === 'gestionar' ? 'active' : ''}
+              onClick={() => setActiveTab('gestionar')}
+            >
+              Gestionar mi reserva
+            </button>
+            <button
+              className={activeTab === 'admin' ? 'active' : ''}
+              onClick={() => setActiveTab('admin')}
+            >
+              Admin
+            </button>
+          </div>
+
+          {activeTab === 'reservar' && <ReservationForm masajes={masajes} />}
+          {activeTab === 'gestionar' && <ManageReservation />}
+          {activeTab === 'admin' && <AdminPanel masajes={masajes} />}
         </section>
         <section id="sobre" className="section">
           <h2>Sobre nosotros</h2>
