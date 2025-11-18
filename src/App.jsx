@@ -42,22 +42,22 @@ const horarios = [
 ];
 
 const masajes = [
-  { nombre: 'Masaje descontracturante', descripcion: 'Ideal para tensiones musculares en cuello, espalda y hombros con un toque relajante que reduce ansiedad muscular.', duracion: '50 min', precio: '30 €' },
-  { nombre: 'Masaje relajante', descripcion: 'Suave y rítmico para liberar estrés acumulado y calmar la ansiedad de todo el cuerpo.', duracion: '50 min', precio: '30 €' },
-  { nombre: 'Masaje deportivo', descripcion: 'Prepara o recupera el músculo con maniobras relajantes que controlan la ansiedad previa al esfuerzo.', duracion: '50 min', precio: '35 €' },
-  { nombre: 'Masaje circulatorio', descripcion: 'Estimula sistema venoso y linfático con bombeos relajantes que alivian la ansiedad de las piernas cansadas.', duracion: '50 min', precio: '30 €' },
-  { nombre: 'Masaje craneofacial', descripcion: 'Trabaja cara, cráneo y cuello con presiones relajantes ideales para dolores de cabeza por ansiedad.', duracion: '30 min', precio: '30 €' },
-  { nombre: 'Masaje de espalda', descripcion: 'Focalizado en zona dorsal, lumbar y cervical con pases relajantes que liberan ansiedad postural.', duracion: '30 min', precio: '30 €' },
-  { nombre: 'Masaje cervical', descripcion: 'Específico para cervicales y trapecios con fricciones relajantes que disminuyen ansiedad tensional.', duracion: '20 min', precio: '30 €' },
-  { nombre: 'Masaje podal (pies)', descripcion: 'Reflexología suave y relajante para descargar la ansiedad acumulada en las piernas.', duracion: '30 min', precio: '20 €' },
-  { nombre: 'Masaje abdominal', descripcion: 'Movimiento suave y relajante que mejora digestión y calma ansiedad visceral.', duracion: '50 min', precio: '30 €' },
-  { nombre: 'Masaje combinado', descripcion: 'Back + piernas o facial con secuencias relajantes para equilibrar la ansiedad corporal.', duracion: '50 min', precio: '40 €' },
-  { nombre: 'Masaje con aromaterapia', descripcion: 'Aceites esenciales personalizados para un viaje relajante que reduce ansiedad sensorial.', duracion: '50 min', precio: '30 €' },
-  { nombre: 'Masaje con piedras calientes', descripcion: 'Calor profundo y maniobras relajantes que derriten ansiedad y contracturas.', duracion: '50 min', precio: '30 €' },
-  { nombre: 'Masaje maderoterapia', descripcion: 'Rodillos y copas de madera con ritmo relajante para moldear y liberar ansiedad corporal.', duracion: '50 min', precio: '30 €' },
-  { nombre: 'Masaje embarazadas', descripcion: 'En camilla o silla terapéutica con apoyo relajante que tranquiliza ansiedad prenatal.', duracion: '50 min', precio: '30 €' },
-  { nombre: 'Método Mindfulness', descripcion: 'PENDIENTE', duracion: '50 min', precio: '45 €' },
-  { nombre: 'Presoterapia', descripcion: 'PENDIENTE', duracion: '30 min', precio: '30 €' },
+  { nombre: 'Masaje descontracturante', descripcion: 'Ideal para tensiones musculares en cuello, espalda y hombros con un toque relajante que reduce ansiedad muscular.', duracion: '50 min', precio: '30€' },
+  { nombre: 'Masaje relajante', descripcion: 'Suave y rítmico para liberar estrés acumulado y calmar la ansiedad de todo el cuerpo.', duracion: '50 min', precio: '30€' },
+  { nombre: 'Masaje deportivo', descripcion: 'Prepara o recupera el músculo con maniobras relajantes que controlan la ansiedad previa al esfuerzo.', duracion: '50 min', precio: '35€' },
+  { nombre: 'Masaje circulatorio', descripcion: 'Estimula sistema venoso y linfático con bombeos relajantes que alivian la ansiedad de las piernas cansadas.', duracion: '50 min', precio: '30€' },
+  { nombre: 'Masaje craneofacial', descripcion: 'Trabaja cara, cráneo y cuello con presiones relajantes ideales para dolores de cabeza por ansiedad.', duracion: '30 min', precio: '30€' },
+  { nombre: 'Masaje de espalda', descripcion: 'Focalizado en zona dorsal, lumbar y cervical con pases relajantes que liberan ansiedad postural.', duracion: '30 min', precio: '30€' },
+  { nombre: 'Masaje cervical', descripcion: 'Específico para cervicales y trapecios con fricciones relajantes que disminuyen ansiedad tensional.', duracion: '20 min', precio: '30€' },
+  { nombre: 'Masaje podal (pies)', descripcion: 'Reflexología suave y relajante para descargar la ansiedad acumulada en las piernas.', duracion: '30 min', precio: '20€' },
+  { nombre: 'Masaje abdominal', descripcion: 'Movimiento suave y relajante que mejora digestión y calma ansiedad visceral.', duracion: '50 min', precio: '30€' },
+  { nombre: 'Masaje combinado', descripcion: 'Back + piernas o facial con secuencias relajantes para equilibrar la ansiedad corporal.', duracion: '50 min', precio: '40€' },
+  { nombre: 'Masaje con aromaterapia', descripcion: 'Aceites esenciales personalizados para un viaje relajante que reduce ansiedad sensorial.', duracion: '50 min', precio: '30€' },
+  { nombre: 'Masaje con piedras calientes', descripcion: 'Calor profundo y maniobras relajantes que derriten ansiedad y contracturas.', duracion: '50 min', precio: '30€' },
+  { nombre: 'Masaje maderoterapia', descripcion: 'Rodillos y copas de madera con ritmo relajante para moldear y liberar ansiedad corporal.', duracion: '50 min', precio: '30€' },
+  { nombre: 'Masaje embarazadas', descripcion: 'En camilla o silla terapéutica con apoyo relajante que tranquiliza ansiedad prenatal.', duracion: '50 min', precio: '30€' },
+  { nombre: 'Método Mindfulness', descripcion: 'PENDIENTE', duracion: '50 min', precio: '45€' },
+  { nombre: 'Presoterapia', descripcion: 'PENDIENTE', duracion: '30 min', precio: '30€' },
 ];
 
 const bonos = [
@@ -65,27 +65,27 @@ const bonos = [
     titulo: 'Bono 5 sesiones',
     descripcion: 'Ideal para quienes vienen una vez por semana o cada 15 días.',
     detalles: '5 masajes de 50 min',
-    precio: '125 €',
+    precio: '125€',
     regalo: '1 desayuno en cafetería Novara'
   },
   {
     titulo: 'Bono 10 sesiones',
     descripcion: 'Para clientes constantes o con tratamiento prolongado (espalda, cervicales, estrés).',
     detalles: '10 masajes de 50 min',
-    precio: '250 €',
+    precio: '250€',
     regalo: '1 masaje facial o podal de 20 min'
   },
   {
     titulo: 'Programa “Mensual Relax”',
     descripcion: 'Cuota mensual para bienestar continuo.',
     detalles: '1 sesión semanal (4 al mes) de 50 min. Se deben gastar en el mismo mes y bajo reserva.',
-    precio: '100 €/mes',
+    precio: '100€/mes',
     regalo: ''
   },
   {
     titulo: 'Tarjeta de fidelidad “Tu 6º masaje es GRATIS”',
     descripcion: 'Sellas 5 sesiones → la 6ª es gratis (o al 50%). Válido durante 3 meses.',
-    detalles: 'Premia a quien te recomienda: trae a un amigo → ambos tenéis 5 € de descuento en la siguiente sesión de descontracturante, relajante o deportivo.',
+    detalles: 'Premia a quien te recomienda: trae a un amigo → ambos tenéis 5€ de descuento en la siguiente sesión de descontracturante, relajante o deportivo.',
     precio: 'Promoción por tiempo limitado o permanente',
     regalo: ''
   },
@@ -93,34 +93,34 @@ const bonos = [
     titulo: 'Bono “Mindfulness para niños”',
     descripcion: 'Para que el niño se relaje y se beneficie del bienestar.',
     detalles: '1 sesión de mindfulness para niño',
-    precio: '45 €',
+    precio: '45€',
     regalo: 'Ideal para sábado por la mañana o tarde'
   },
   // {
   //   titulo: 'Bono "Dúo Relax"',
   //   descripcion: 'Para parejas que quieren compartir bienestar.',
   //   detalles: '2 masajes relajantes de 60 min (uno cada uno, en el mismo día o separados)',
-  //   precio: '65 € (en lugar de 70 €)',
+  //   precio: '65€ (en lugar de 70€)',
   //   regalo: 'Puedes ofrecer ambiente con velas y música suave'
   // },
   // {
   //   titulo: 'Bono "Pareja Constante"',
   //   descripcion: 'Para parejas que quieren cuidarse mes a mes.',
   //   detalles: '4 sesiones al mes (2 por persona)',
-  //   precio: '120 € (en lugar de 140 €)',
+  //   precio: '120€ (en lugar de 140€)',
   //   regalo: ''
   // },
   {
     titulo: 'Bono "Mimos para mí"',
     descripcion: 'Porque cuidar a otros también merece autocuidado.',
     detalles: '4 sesiones de 50 min (relajante o espalda)',
-    precio: '100 €',
+    precio: '100€',
     regalo: 'Masaje craneal y podal de 20 min a elegir + desayuno en cafetería Novara.'
   },
   {
     titulo: 'Bono FCSE + bomberos y sanitarios con acreditación demostrable',
     descripcion: 'Para aliviar tensiones por carga física o emocional.',
-    detalles: 'Descuento de 5 € a cualquier terapia',
+    detalles: 'Descuento de 5€ a cualquier terapia',
     precio: '',
     regalo: ''
   },
@@ -128,14 +128,14 @@ const bonos = [
     titulo: 'Bono Presoterapia',
     descripcion: 'Para aliviar tensiones por carga física o emocional.',
     detalles: '5 sesiones de 40 minutos',
-    precio: '150 €',
+    precio: '150€',
     regalo: ''
   },
   {
     titulo: 'Bono 10 Sesiones',
     descripcion: 'Para aliviar tensiones por carga física o emocional.',
     detalles: '10 sesiones de 50 minutos',
-    precio: '300 €',
+    precio: '300€',
     regalo: ''
   },
 ];
