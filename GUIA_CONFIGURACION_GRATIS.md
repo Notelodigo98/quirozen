@@ -64,8 +64,12 @@
    - Nombre: `Quirozen Web Client`
    - **URI de redirección autorizados:**
      - Haz clic en "+ AGREGAR URI"
-     - Agrega: `http://localhost:5173/oauth2callback.html`
-     - Si tienes un dominio de producción, también agrega: `https://tu-dominio.com/oauth2callback.html`
+     - Agrega: `https://www.quirozendh.com/oauth2callback.html` (tu dominio de producción)
+     - Opcional (para desarrollo local): `http://localhost:5173/oauth2callback.html`
+   - **Orígenes de JavaScript autorizados:**
+     - Haz clic en "+ AGREGAR URI"
+     - Agrega: `https://www.quirozendh.com`
+     - Opcional (para desarrollo local): `http://localhost:5173`
    - Haz clic en **CREAR**
 
 4. **Copiar las credenciales:**
@@ -80,8 +84,8 @@
 ## 🚀 Paso 4: Obtener Tokens de Acceso (3 minutos)
 
 1. **Abrir la página de configuración:**
-   - Inicia tu aplicación (si no está corriendo: `npm run dev`)
-   - Abre en tu navegador: `http://localhost:5173/setup-calendar.html`
+   - Abre en tu navegador: `https://www.quirozendh.com/setup-calendar.html`
+   - (O si estás desarrollando localmente: `http://localhost:5173/setup-calendar.html`)
 
 2. **Ingresar credenciales:**
    - Pega tu **Client ID** en el primer campo
@@ -106,7 +110,7 @@
 ## ✅ Paso 5: Verificar que Funciona (2 minutos)
 
 1. **Recargar la aplicación:**
-   - Ve a: `http://localhost:5173`
+   - Ve a: `https://www.quirozendh.com`
    - Abre la consola del navegador (F12)
    - Deberías ver: `✅ Google Calendar cargado desde localStorage`
 

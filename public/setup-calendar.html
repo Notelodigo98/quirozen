@@ -91,6 +91,7 @@
             }
 
             const scopes = 'https://www.googleapis.com/auth/calendar';
+            // Usar el dominio actual (funciona tanto en localhost como en producción)
             const redirectUri = window.location.origin + '/oauth2callback.html';
             
             const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
