@@ -2,7 +2,7 @@ import emailjs from '@emailjs/browser';
 
 // EmailJS configuration
 // These values should be set in environment variables or config
-const EMAILJS_SERVICE_ID = 'service_ljxmqik'; // Service ID de EmailJS
+const EMAILJS_SERVICE_ID = 'service_w39ad6t'; // Service ID de EmailJS
 const EMAILJS_TEMPLATE_ID_NEW = 'template_ggas0sa'; // Template para nuevas reservas
 const EMAILJS_TEMPLATE_ID_UPDATE = 'template_rl4xsby'; // Template para modificaciones de reserva
 const EMAILJS_PUBLIC_KEY = 'LL6OIXIfaRQBCOXxO'; // Public Key de EmailJS
@@ -10,7 +10,11 @@ const EMAILJS_PUBLIC_KEY = 'LL6OIXIfaRQBCOXxO'; // Public Key de EmailJS
 // Initialize EmailJS
 export const initEmailJS = () => {
   if (EMAILJS_PUBLIC_KEY && EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY') {
-    emailjs.init(EMAILJS_PUBLIC_KEY);
+    try {
+      emailjs.init(EMAILJS_PUBLIC_KEY);
+    } catch (error) {
+      console.error('Error inicializando EmailJS:', error);
+    }
   }
 };
 
@@ -41,6 +45,7 @@ export const sendReservationEmail = async (reservation) => {
       return false;
     }
 
+    // Initialize EmailJS before sending
     initEmailJS();
 
     const templateParams = {
@@ -55,11 +60,20 @@ export const sendReservationEmail = async (reservation) => {
       reservation_status: reservation.estado || 'pendiente',
     };
 
-    await emailjs.send(
+    console.log('Enviando email con:', {
+      serviceId: EMAILJS_SERVICE_ID,
+      templateId: EMAILJS_TEMPLATE_ID_NEW,
+      to: reservation.email
+    });
+
+    const response = await emailjs.send(
       EMAILJS_SERVICE_ID,
       EMAILJS_TEMPLATE_ID_NEW,
-      templateParams
+      templateParams,
+      EMAILJS_PUBLIC_KEY
     );
+
+    console.log('Respuesta de EmailJS:', response);
 
     console.log('Email de confirmación enviado correctamente');
     return true;
@@ -81,6 +95,7 @@ export const sendReservationUpdateEmail = async (reservation) => {
       return false;
     }
 
+    // Initialize EmailJS before sending
     initEmailJS();
 
     const templateParams = {
@@ -95,11 +110,20 @@ export const sendReservationUpdateEmail = async (reservation) => {
       reservation_status: reservation.estado || 'pendiente',
     };
 
-    await emailjs.send(
+    console.log('Enviando email de actualización con:', {
+      serviceId: EMAILJS_SERVICE_ID,
+      templateId: EMAILJS_TEMPLATE_ID_UPDATE,
+      to: reservation.email
+    });
+
+    const response = await emailjs.send(
       EMAILJS_SERVICE_ID,
       EMAILJS_TEMPLATE_ID_UPDATE,
-      templateParams
+      templateParams,
+      EMAILJS_PUBLIC_KEY
     );
+
+    console.log('Respuesta de EmailJS:', response);
 
     console.log('Email de actualización enviado correctamente');
     return true;
