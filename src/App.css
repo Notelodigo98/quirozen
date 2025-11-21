@@ -1318,14 +1318,28 @@ main {
   }
   
   .contact-card {
-    flex-direction: column;
-    text-align: center;
+    flex-direction: row;
+    text-align: left;
     padding: 1.5rem 1.2rem;
   }
   
   .contact-icon {
     font-size: 2rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+  
+  .contact-details {
+    text-align: left;
+  }
+  
+  .contact-details h3 {
+    text-align: left;
+  }
+  
+  .contact-details h3::after {
+    left: 0;
+    transform: none;
   }
   
   .map-wrapper iframe {
@@ -2131,7 +2145,7 @@ main {
   width: 20px;
   height: 20px;
   cursor: pointer;
-  accent-color: var(--golden);
+  accent-color: var(--sea-blue);
 }
 
 .day-checkbox strong {
@@ -2141,17 +2155,17 @@ main {
 .btn-secondary-small {
   padding: 0.4rem 0.8rem;
   font-size: 0.85rem;
-  background: rgba(212, 175, 55, 0.1);
-  color: var(--golden);
-  border: 1px solid rgba(212, 175, 55, 0.3);
+  background: rgba(0, 123, 255, 0.1);
+  color: var(--sea-blue);
+  border: 1px solid rgba(0, 123, 255, 0.3);
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .btn-secondary-small:hover {
-  background: rgba(212, 175, 55, 0.2);
-  border-color: var(--golden);
+  background: rgba(0, 123, 255, 0.2);
+  border-color: var(--sea-blue);
 }
 
 .time-ranges-editor {
@@ -2177,9 +2191,16 @@ main {
 
 .time-range-inputs input[type="time"] {
   padding: 0.5rem;
-  border: 1px solid rgba(212, 175, 55, 0.3);
+  border: 1px solid rgba(0, 123, 255, 0.3);
   border-radius: 4px;
   font-size: 0.9rem;
+  color: var(--sea-blue);
+}
+
+.time-range-inputs input[type="time"]:focus {
+  outline: none;
+  border-color: var(--sea-blue);
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
 }
 
 .time-range-inputs span {
@@ -2209,8 +2230,8 @@ main {
 .range-badge {
   display: inline-block;
   padding: 0.3rem 0.6rem;
-  background: rgba(212, 175, 55, 0.1);
-  color: var(--golden);
+  background: rgba(0, 123, 255, 0.1);
+  color: var(--sea-blue);
   border-radius: 4px;
   font-size: 0.85rem;
   font-weight: 500;
@@ -2286,6 +2307,55 @@ main {
 }
 
 /* Specific Date Form */
+.services-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 6px;
+  border: 1px solid rgba(0, 123, 255, 0.2);
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.checkbox-label:hover {
+  background: rgba(0, 123, 255, 0.05);
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--sea-blue);
+  flex-shrink: 0;
+}
+
+.checkbox-label input[type="checkbox"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.checkbox-label span {
+  color: var(--text-black);
+  font-size: 0.95rem;
+  user-select: none;
+}
+
+.checkbox-label:has(input:disabled) span {
+  color: var(--text-gray);
+}
+
 .specific-date-form {
   margin-top: 1rem;
   padding: 1.5rem;
@@ -2312,6 +2382,7 @@ main {
 
 .form-actions {
   display: flex;
+  align-items: center;
   gap: 1rem;
   margin-top: 1.5rem;
   padding-top: 1rem;
@@ -2319,8 +2390,20 @@ main {
 }
 
 .form-actions button {
-  flex: 1;
-  max-width: 200px;
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto !important;
+  padding: 0.9rem 2rem !important;
+  min-height: 48px !important;
+  height: 48px !important;
+  line-height: 1.5 !important;
+  font-size: 1.05rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  vertical-align: top !important;
 }
 
 /* Responsive for Availability Manager */
@@ -2767,6 +2850,12 @@ main {
   .footer-links-legal {
     flex-direction: column;
     gap: 1.5rem;
+    text-align: center;
+  }
+
+  .footer-links-legal > .footer-links,
+  .footer-links-legal > .footer-legal {
+    text-align: center;
   }
 
   .footer-section h3::after {

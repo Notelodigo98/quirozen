@@ -32,7 +32,8 @@ import {
   generateTimeSlots,
   getAvailableDatesInRange,
   getAvailableSlots,
-  checkSlotAvailability
+  checkSlotAvailability,
+  getAvailableServices
 } from './firebase/availability';
 
 const horarios = [
@@ -51,11 +52,12 @@ const masajes = [
   { nombre: 'Masaje cervical', descripcion: 'Específico para cervicales y trapecios con fricciones relajantes que disminuyen ansiedad tensional.', duracion: '20 min', precio: '30€' },
   { nombre: 'Masaje podal (pies)', descripcion: 'Reflexología suave y relajante para descargar la ansiedad acumulada en las piernas.', duracion: '30 min', precio: '20€' },
   { nombre: 'Masaje abdominal', descripcion: 'Movimiento suave y relajante que mejora digestión y calma ansiedad visceral.', duracion: '50 min', precio: '30€' },
-  { nombre: 'Masaje combinado', descripcion: 'Back + piernas o facial con secuencias relajantes para equilibrar la ansiedad corporal.', duracion: '50 min', precio: '40€' },
+  { nombre: 'Masaje combinado', descripcion: 'Espalda + piernas o facial con secuencias relajantes para equilibrar la ansiedad corporal.', duracion: '50 min', precio: '40€' },
   { nombre: 'Masaje con aromaterapia', descripcion: 'Aceites esenciales personalizados para un viaje relajante que reduce ansiedad sensorial.', duracion: '50 min', precio: '30€' },
   { nombre: 'Masaje con piedras calientes', descripcion: 'Calor profundo y maniobras relajantes que derriten ansiedad y contracturas.', duracion: '50 min', precio: '30€' },
   { nombre: 'Masaje maderoterapia', descripcion: 'Rodillos y copas de madera con ritmo relajante para moldear y liberar ansiedad corporal.', duracion: '50 min', precio: '30€' },
   { nombre: 'Masaje embarazadas', descripcion: 'En camilla o silla terapéutica con apoyo relajante que tranquiliza ansiedad prenatal.', duracion: '50 min', precio: '30€' },
+  { nombre: 'Presoterapia', descripcion: 'Tratamiento que aplica presión de aire para mejorar el drenaje linfático, circulación y reducir celulitis.', duracion: '45 min', precio: '30€' },
 ];
 
 const bonos = [
@@ -82,14 +84,14 @@ const bonos = [
   },
   {
     titulo: 'Tarjeta de fidelidad "Tu 6º masaje es GRATIS"',
-    descripcion: 'Sellas 5 sesiones → la 6ª es gratis (o al 50%). Válido durante 3 meses.',
-    detalles: 'Premia a quien te recomienda: trae a un amigo → ambos tenéis 5€ de descuento en la siguiente sesión de descontracturante, relajante o deportivo.',
+    descripcion: '',
+    detalles: 'Sellas 5 sesiones → la 6ª es gratis (o al 50%). Válido durante 3 meses.',
     precio: ''
   },
   {
-    titulo: 'Bono "Mindfulness para niños"',
-    descripcion: 'Para que el niño se relaje y se beneficie del bienestar.',
-    detalles: '1 sesión de mindfulness para niño',
+    titulo: 'Bono "Mindfulness familiar"',
+    descripcion: 'Para la relajacion y el bienestar de la familia, sean niños o adultos.',
+    detalles: '1 sesión de mindfulness',
     precio: '45€'
   },
   // {
@@ -157,6 +159,7 @@ const ReservationForm = ({ masajes }) => {
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [availableDates, setAvailableDates] = useState([]);
   const [loadingDates, setLoadingDates] = useState(false);
+  const [availableServices, setAvailableServices] = useState(masajes); // Start with all services
 
   // Calculate max date (2 months from now) - computed once
   const getMaxDate = () => {
@@ -170,16 +173,32 @@ const ReservationForm = ({ masajes }) => {
     loadAvailableDates();
   }, []);
 
-  // Load available slots when date changes
+  // Load available services and slots when date changes
   useEffect(() => {
     if (formData.fecha) {
+      loadAvailableServices(formData.fecha);
       loadAvailableSlots(formData.fecha);
-      // Reset hora when fecha changes
-      setFormData(prev => ({ ...prev, hora: '' }));
+      // Reset hora and servicio when fecha changes
+      setFormData(prev => ({ ...prev, hora: '', servicio: '' }));
     } else {
       setAvailableSlots([]);
+      setAvailableServices(masajes); // Reset to all services when no date selected
     }
   }, [formData.fecha]);
+
+  const loadAvailableServices = async (dateString) => {
+    try {
+      const services = await getAvailableServices(dateString, masajes);
+      setAvailableServices(services);
+      // If current servicio is not available and it's not "Otro", reset it
+      if (formData.servicio && formData.servicio !== 'Otro' && !services.find(s => s.nombre === formData.servicio)) {
+        setFormData(prev => ({ ...prev, servicio: '' }));
+      }
+    } catch (err) {
+      console.error('Error loading available services:', err);
+      setAvailableServices(masajes); // On error, show all services
+    }
+  };
 
   const loadAvailableDates = async () => {
     setLoadingDates(true);
@@ -446,21 +465,27 @@ const ReservationForm = ({ masajes }) => {
 
       <div className="form-group">
         <label htmlFor="servicio">Tipo de servicio *</label>
-        <select
-          id="servicio"
-          name="servicio"
-          value={formData.servicio}
-          onChange={handleChange}
-          required
-        >
-          <option value="">Selecciona un servicio</option>
-          {masajes.map((masaje, i) => (
-            <option key={i} value={masaje.nombre}>
-              {masaje.nombre} - {masaje.duracion} - {masaje.precio}
-            </option>
-          ))}
-          <option value="Otro">Otro</option>
-        </select>
+        {!formData.fecha ? (
+          <select id="servicio" name="servicio" disabled>
+            <option value="">Primero selecciona una fecha</option>
+          </select>
+        ) : (
+          <select
+            id="servicio"
+            name="servicio"
+            value={formData.servicio}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Selecciona un servicio</option>
+            {availableServices.map((masaje, i) => (
+              <option key={i} value={masaje.nombre}>
+                {masaje.nombre} - {masaje.duracion} - {masaje.precio}
+              </option>
+            ))}
+            <option value="Otro">Otro</option>
+          </select>
+        )}
       </div>
 
       <div className="form-row">
@@ -562,6 +587,7 @@ const ManageReservation = () => {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [loadingDates, setLoadingDates] = useState(false);
   const [loadingSlots, setLoadingSlots] = useState(false);
+  const [availableServices, setAvailableServices] = useState(masajes); // Start with all services
 
   const handleLookup = async (e) => {
     e.preventDefault();
@@ -578,6 +604,10 @@ const ManageReservation = () => {
         setReservation(found);
         setEditData(found);
         setEditMode(false);
+        // Load available services for the reservation date
+        if (found.fecha) {
+          loadAvailableServices(found.fecha);
+        }
       } else {
         setError('No se encontró ninguna reserva con ese código.');
         setReservation(null);
@@ -610,7 +640,7 @@ const ManageReservation = () => {
         ? reservations.filter(r => r.id !== reservation.id)
         : reservations;
       
-      const slotAvailability = await getAvailableSlots(editData.fecha, filteredReservations);
+      const slotAvailability = await getAvailableSlots(editData.fecha, filteredReservations, editData.servicio);
       
       if (!slotAvailability.available || !slotAvailability.slots.includes(editData.hora)) {
         setError('Lo sentimos, este horario ya no está disponible. Por favor, selecciona otro.');
@@ -689,9 +719,12 @@ const ManageReservation = () => {
       endDate.setMonth(endDate.getMonth() + 2); // Load next 2 months
       endDate.setHours(23, 59, 59, 999); // End of day
       
+      // Get service from editData if in edit mode, otherwise null
+      const serviceName = editData?.servicio || null;
       const dates = await getAvailableDatesInRange(
         today.toISOString().split('T')[0],
-        endDate.toISOString().split('T')[0]
+        endDate.toISOString().split('T')[0],
+        serviceName
       );
       // Map to array of date strings (getAvailableDatesInRange returns objects with {date, slots})
       setAvailableDates(dates.map(d => d.date));
@@ -729,6 +762,19 @@ const ManageReservation = () => {
     return false;
   };
 
+  // Load available services for a date
+  const loadAvailableServices = async (dateString) => {
+    try {
+      // Always include current service if editing (so user can keep it or change to another)
+      const currentService = editData.servicio && editData.servicio !== 'Otro' ? editData.servicio : null;
+      const services = await getAvailableServices(dateString, masajes, currentService);
+      setAvailableServices(services);
+    } catch (err) {
+      console.error('Error loading available services:', err);
+      setAvailableServices(masajes); // On error, show all services
+    }
+  };
+
   // Load available slots for a date
   const loadAvailableSlots = async (dateString) => {
     setLoadingSlots(true);
@@ -741,7 +787,9 @@ const ManageReservation = () => {
         ? reservations.filter(r => r.id !== reservation.id)
         : reservations;
       
-      const result = await getAvailableSlots(dateString, filteredReservations);
+      // Get service from editData if in edit mode, otherwise null
+      const serviceName = editData?.servicio || null;
+      const result = await getAvailableSlots(dateString, filteredReservations, serviceName);
       
       if (result.available) {
         // Filter out past times if it's today
@@ -767,6 +815,15 @@ const ManageReservation = () => {
       setLoadingSlots(false);
     }
   };
+
+  // Load available services when date changes in edit mode
+  useEffect(() => {
+    if (editData.fecha && editMode) {
+      loadAvailableServices(editData.fecha);
+    } else if (!editData.fecha) {
+      setAvailableServices(masajes); // Reset to all services when no date selected
+    }
+  }, [editData.fecha, editMode]);
 
   // Filter dates to only show available ones
   const isDateAvailable = (date) => {
@@ -797,10 +854,12 @@ const ManageReservation = () => {
     setEditData({ 
       ...editData, 
       fecha: dateString,
-      hora: '' // Reset hour when date changes
+      hora: '', // Reset hour when date changes
+      servicio: '' // Reset servicio when fecha changes to reload available services
     });
     setError('');
     if (dateString) {
+      loadAvailableServices(dateString);
       loadAvailableSlots(dateString);
     }
   };
@@ -810,6 +869,7 @@ const ManageReservation = () => {
     if (editMode) {
       loadAvailableDates();
       if (editData.fecha) {
+        loadAvailableServices(editData.fecha);
         loadAvailableSlots(editData.fecha);
       }
     }
@@ -918,6 +978,28 @@ const ManageReservation = () => {
                   </p>
                 )}
               </>
+            )}
+          </div>
+          <div className="form-group">
+            <label>Servicio *</label>
+            {!editData.fecha ? (
+              <select disabled>
+                <option value="">Primero selecciona una fecha</option>
+              </select>
+            ) : (
+              <select
+                value={editData.servicio || ''}
+                onChange={(e) => setEditData({ ...editData, servicio: e.target.value })}
+                required
+              >
+                <option value="">Selecciona un servicio</option>
+                {availableServices.map((masaje, i) => (
+                  <option key={i} value={masaje.nombre}>
+                    {masaje.nombre} - {masaje.duracion} - {masaje.precio}
+                  </option>
+                ))}
+                <option value="Otro">Otro</option>
+              </select>
             )}
           </div>
           <div className="form-group">
@@ -1214,13 +1296,24 @@ const AvailabilityManager = () => {
 
   // Specific Date Configuration Component
   const SpecificDateForm = ({ onSave, onCancel, initialData }) => {
-    const [formData, setFormData] = useState(initialData || {
-      name: '',
-      dateRange: { start: '', end: '' },
-      available: false,
-      slots: [],
-      reason: '',
-      isSingleDate: true
+    const [formData, setFormData] = useState(() => {
+      if (initialData) {
+        return {
+          ...initialData,
+          blockedServices: initialData.blockedServices && initialData.blockedServices.length > 0 
+            ? initialData.blockedServices 
+            : ['ALL']
+        };
+      }
+      return {
+        name: '',
+        dateRange: { start: '', end: '' },
+        available: false,
+        slots: [],
+        reason: '',
+        isSingleDate: true,
+        blockedServices: ['ALL'] // Por defecto, bloquear todos los servicios
+      };
     });
     const [saving, setSaving] = useState(false);
 
@@ -1236,6 +1329,11 @@ const AvailabilityManager = () => {
       }
 
       setSaving(true);
+      // Si no hay servicios seleccionados, bloquear todos (array vacío o con "ALL")
+      const blockedServices = (!formData.blockedServices || formData.blockedServices.length === 0) 
+        ? ['ALL'] 
+        : formData.blockedServices;
+      
       const config = {
         type: 'specific',
         name: formData.name || 'Configuración específica',
@@ -1245,7 +1343,8 @@ const AvailabilityManager = () => {
         },
         available: formData.available,
         slots: formData.available ? formData.slots : [],
-        reason: formData.reason
+        reason: formData.reason,
+        blockedServices: blockedServices // Array de servicios bloqueados
       };
 
       try {
@@ -1394,6 +1493,54 @@ const AvailabilityManager = () => {
             <button type="button" onClick={addSlot} className="btn-secondary">Agregar hora</button>
           </div>
         )}
+
+        <div className="form-group">
+          <label>Servicios afectados *</label>
+          <div className="services-checkboxes">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={formData.blockedServices && formData.blockedServices.includes('ALL')}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setFormData({ ...formData, blockedServices: ['ALL'] });
+                  } else {
+                    setFormData({ ...formData, blockedServices: [] });
+                  }
+                }}
+              />
+              <span>Todos los servicios</span>
+            </label>
+            {masajes.map((masaje, i) => (
+              <label key={i} className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={formData.blockedServices && formData.blockedServices.includes(masaje.nombre)}
+                  onChange={(e) => {
+                    const current = formData.blockedServices || [];
+                    let newSelection;
+                    if (e.target.checked) {
+                      // Si se marca un servicio específico, remover "ALL" si está presente
+                      newSelection = current.filter(s => s !== 'ALL');
+                      newSelection.push(masaje.nombre);
+                    } else {
+                      // Si se desmarca, remover el servicio
+                      newSelection = current.filter(s => s !== masaje.nombre);
+                    }
+                    setFormData({ ...formData, blockedServices: newSelection.length > 0 ? newSelection : ['ALL'] });
+                  }}
+                  disabled={formData.blockedServices && formData.blockedServices.includes('ALL')}
+                />
+                <span>{masaje.nombre}</span>
+              </label>
+            ))}
+          </div>
+          <small style={{ display: 'block', marginTop: '0.5rem', color: '#666' }}>
+            Selecciona los servicios que quieres bloquear en estas fechas. 
+            Si seleccionas "Todos los servicios", se bloquearán todos. 
+            Si seleccionas servicios específicos, solo esos quedarán bloqueados.
+          </small>
+        </div>
 
         <div className="form-group">
           <label>Motivo (opcional)</label>
@@ -1568,6 +1715,14 @@ const AvailabilityManager = () => {
                         </button>
                       </div>
                       <div className="config-info">
+                        {config.blockedServices && config.blockedServices.length > 0 && (
+                          <p>
+                            <strong>Servicios bloqueados:</strong>{' '}
+                            {config.blockedServices.includes('ALL') 
+                              ? 'Todos los servicios' 
+                              : config.blockedServices.join(', ')}
+                          </p>
+                        )}
                         {config.dateRange && (
                           <p>
                             <strong>Fechas:</strong>{' '}
