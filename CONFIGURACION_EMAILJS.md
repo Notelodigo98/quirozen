@@ -45,7 +45,12 @@ EmailJS es un servicio gratuito que permite enviar correos electrónicos directa
 
 1. Ve a **Email Templates** → **Create New Template**
 2. Nombre: "Nueva Reserva"
-3. Usa este contenido:
+3. **IMPORTANTE**: En la sección "To Email" (destinatario), escribe: `{{to_email}}`
+   - Esto hará que el correo se envíe al email del cliente
+   - Si no configuras esto, el correo se enviará a tu email por defecto
+4. En "From Name" puedes poner: `Quirozen`
+5. En "From Email" pon tu email (el que configuraste en SMTP)
+6. Usa este contenido para el cuerpo del email:
 
 ```
 Asunto: Confirmación de Reserva - Quirozen
@@ -76,7 +81,12 @@ Equipo Quirozen
 #### Template para Modificación de Reserva:
 
 1. Crea otro template: "Modificación de Reserva"
-2. Usa este contenido:
+2. **IMPORTANTE**: En la sección "To Email" (destinatario), escribe: `{{to_email}}`
+   - Esto hará que el correo se envíe al email del cliente
+   - Si no configuras esto, el correo se enviará a tu email por defecto
+3. En "From Name" puedes poner: `Quirozen`
+4. En "From Email" pon tu email (el que configuraste en SMTP)
+5. Usa este contenido para el cuerpo del email:
 
 ```
 Asunto: Reserva Modificada - Quirozen
