@@ -17,10 +17,8 @@
   font-weight: 400;
 
   color: var(--text-black);
-  background: linear-gradient(135deg, var(--sea-blue-dark) 0%, var(--sea-blue) 50%, var(--sea-blue-light) 100%),
-              url('/fondo.png') no-repeat center center fixed;
-  background-size: cover, cover;
-  background-blend-mode: overlay;
+  background: url('/fondofinal.png') no-repeat center center fixed;
+  background-size: cover;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;

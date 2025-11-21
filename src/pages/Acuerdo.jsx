@@ -15,7 +15,7 @@ function Acuerdo() {
         <div className="legal-content">
           <h3>1. Registro y uso del sistema</h3>
           <p>
-            El sistema de reservas de Quirozen by Laura Escribano no requiere registro previo. Se te proporcionará 
+            El sistema de reservas de Quirozen no requiere registro previo. Se te proporcionará 
             un código único de reserva que te permitirá gestionar tu cita de forma segura y sencilla.
           </p>
 

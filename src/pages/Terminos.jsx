@@ -21,7 +21,7 @@ function Terminos() {
 
           <h3>2. Servicios ofrecidos</h3>
           <p>
-            Quirozen by Laura Escribano ofrece servicios de masajes terapéuticos y tratamientos de bienestar. 
+            Quirozen ofrece servicios de masajes terapéuticos y tratamientos de bienestar. 
             Todos los servicios están sujetos a disponibilidad y deben ser reservados con antelación.
           </p>
 
@@ -40,7 +40,7 @@ function Terminos() {
 
           <h3>5. Limitación de responsabilidad</h3>
           <p>
-            Quirozen by Laura Escribano no se hace responsable de cualquier lesión o daño que pueda resultar 
+            Quirozen no se hace responsable de cualquier lesión o daño que pueda resultar 
             del uso de nuestros servicios, excepto en casos de negligencia demostrada.
           </p>
 

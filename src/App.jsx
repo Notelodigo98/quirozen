@@ -56,8 +56,6 @@ const masajes = [
   { nombre: 'Masaje con piedras calientes', descripcion: 'Calor profundo y maniobras relajantes que derriten ansiedad y contracturas.', duracion: '50 min', precio: '30€' },
   { nombre: 'Masaje maderoterapia', descripcion: 'Rodillos y copas de madera con ritmo relajante para moldear y liberar ansiedad corporal.', duracion: '50 min', precio: '30€' },
   { nombre: 'Masaje embarazadas', descripcion: 'En camilla o silla terapéutica con apoyo relajante que tranquiliza ansiedad prenatal.', duracion: '50 min', precio: '30€' },
-  { nombre: 'Método Mindfulness', descripcion: 'PENDIENTE', duracion: '50 min', precio: '45€' },
-  { nombre: 'Presoterapia', descripcion: 'PENDIENTE', duracion: '30 min', precio: '30€' },
 ];
 
 const bonos = [
@@ -86,8 +84,8 @@ const bonos = [
     titulo: 'Tarjeta de fidelidad “Tu 6º masaje es GRATIS”',
     descripcion: 'Sellas 5 sesiones → la 6ª es gratis (o al 50%). Válido durante 3 meses.',
     detalles: 'Premia a quien te recomienda: trae a un amigo → ambos tenéis 5€ de descuento en la siguiente sesión de descontracturante, relajante o deportivo.',
-    precio: 'Promoción por tiempo limitado o permanente',
-    regalo: ''
+    precio: '',
+    regalo: 'Promoción por tiempo limitado'
   },
   {
     titulo: 'Bono “Mindfulness para niños”',
@@ -120,14 +118,14 @@ const bonos = [
   {
     titulo: 'Bono FCSE + bomberos y sanitarios con acreditación demostrable',
     descripcion: 'Para aliviar tensiones por carga física o emocional.',
-    detalles: 'Descuento de 5€ a cualquier terapia',
+    detalles: 'Descuento de 5€ a cualquier terapia, no aplicable a bonos de masajes.',
     precio: '',
     regalo: ''
   },
   {
     titulo: 'Bono Presoterapia',
-    descripcion: 'Para aliviar tensiones por carga física o emocional.',
-    detalles: '5 sesiones de 40 minutos',
+    descripcion: 'Tratamiento de presoterapia para mejorar drenaje linfático, circulación y reducir celulitis.',
+    detalles: '5 sesiones de  minutos',
     precio: '150€',
     regalo: ''
   },
@@ -1572,6 +1570,34 @@ const AdminPanel = ({ masajes }) => {
   );
 };
 
+// Gift Box Component
+const GiftBox = ({ regalo }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  if (!regalo) return null;
+
+  return (
+    <div className="gift-box-container">
+      {!isOpen && (
+        <div 
+          className="gift-box"
+          onClick={() => setIsOpen(true)}
+        >
+          <div className="gift-box-lid"></div>
+          <div className="gift-box-body">
+            <span className="gift-icon">🎁</span>
+          </div>
+        </div>
+      )}
+      {isOpen && (
+        <div className="gift-content">
+          <p><em>{regalo}</em></p>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Home Component
 function Home() {
   const [activeTab, setActiveTab] = useState('reservar'); // reservar, gestionar, admin
@@ -1597,6 +1623,55 @@ function Home() {
                 <p><strong>Precio:</strong> {m.precio}</p>
               </div>
             ))}
+          </div>
+        </section>
+        <section id="mindfulness" className="section">
+          <h2>Mindfulness</h2>
+          
+          <h3>¿Qué es Mindfulness?</h3>
+          <p>
+            Mindfulness es la práctica de estar presente en el momento, sin juzgar ni distraerse. 
+            Se trata de prestar atención a tus pensamientos, sentimientos y sensaciones físicas sin 
+            intentar cambiarlos o juzgarlos.
+          </p>
+
+          <h3>¿Por qué Mindfulness es importante?</h3>
+          <ul className="horarios-list">
+            <li>
+              <strong>Mejora la salud mental y física:</strong> Mindfulness puede ayudar a reducir 
+              el estrés, la ansiedad y la depresión.
+            </li>
+            <li>
+              <strong>Aumenta la productividad y la creatividad:</strong> Al estar más enfocado y 
+              presente, puedes ser más productivo y creativo.
+            </li>
+            <li>
+              <strong>Fomenta la conexión con uno mismo y con los demás:</strong> Mindfulness te 
+              ayuda a entender mejor a ti mismo y a los demás, lo que puede mejorar tus relaciones 
+              y tu bienestar general.
+            </li>
+          </ul>
+        </section>
+        <section id="estetica" className="section">
+          <h2>Estética y belleza</h2>
+          <div className="masajes-list">
+            <div className="masaje-card">
+              <h4>Presoterapia</h4>
+              <p>
+                La presoterapia es un tratamiento que aplica presión de aire para mejorar el drenaje 
+                linfático y la circulación.
+              </p>
+              <p>
+                Ayuda a reducir la retención de líquidos, disminuir la celulitis y aliviar la pesadez 
+                en piernas.
+              </p>
+              <p>
+                Es un procedimiento indoloro, relajante y complementario para mejorar bienestar y 
+                estética corporal.
+              </p>
+              <p><strong>Duración:</strong> 45 min</p>
+              <p><strong>Precio:</strong> 30€</p>
+            </div>
           </div>
         </section>
         <section id="reservas" className="section">
@@ -1632,7 +1707,7 @@ function Home() {
           <div className="about-content">
             <div className="about-text">
               <p className="intro-text">
-                Desde <strong>Quirozen by Laura Escribano</strong> ofrecemos una amplia gama de masajes y tratamientos 
+                Desde <strong>Quirozen</strong> ofrecemos una amplia gama de masajes y tratamientos 
                 terapéuticos diseñados para tu bienestar físico y mental. Con años de experiencia y dedicación, 
                 nos especializamos en proporcionar servicios personalizados que se adaptan a tus necesidades específicas.
               </p>
@@ -1700,8 +1775,8 @@ function Home() {
                 <h4>{b.titulo}</h4>
                 <p>{b.descripcion}</p>
                 <p><strong>{b.detalles}</strong></p>
-                <p><strong>Precio: {b.precio}</strong></p>
-                {b.regalo && <p><em>{b.regalo}</em></p>}
+                {b.precio && <p><strong>Precio: {b.precio}</strong></p>}
+                {b.regalo && <GiftBox regalo={b.regalo} />}
               </div>
             ))}
           </div>
