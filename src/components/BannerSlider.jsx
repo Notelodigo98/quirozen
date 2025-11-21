@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react';
 import '../App.css';
 
 const bannerImages = [
-  '/interior/maquina1.jpeg',
   '/interior/banner2.jpg',
-  '/interior/banner3.jpg',
-  '/interior/banner4.avif',
-  '/interior/banner5.webp'
+  '/interior/maquina1.jpeg',
+  '/interior/im1.jpeg',
+  '/interior/im2.jpeg',
+  '/interior/im3.jpeg',
+  '/interior/im4.jpeg',
+  '/interior/im5.jpeg',
+  '/interior/im6.jpeg'
 ];
 
 function BannerSlider() {

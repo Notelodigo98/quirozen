@@ -16,9 +16,9 @@ function Layout({ children }) {
               <li><a href="#info" onClick={() => setMenuOpen(false)}>Información principal</a></li>
               <li><a href="#mindfulness" onClick={() => setMenuOpen(false)}>Mindfulness</a></li>
               <li><a href="#estetica" onClick={() => setMenuOpen(false)}>Estética y belleza</a></li>
+              <li><a href="#promos" onClick={() => setMenuOpen(false)}>Promociones/Bonos</a></li>
               <li><a href="#reservas" onClick={() => setMenuOpen(false)}>Reservas</a></li>
               <li><a href="#sobre" onClick={() => setMenuOpen(false)}>Sobre nosotros</a></li>
-              <li><a href="#promos" onClick={() => setMenuOpen(false)}>Promociones/Bonos</a></li>
             </ul>
           </nav>
           <button className="hamburger" onClick={() => setMenuOpen(!menuOpen)} aria-label="Abrir menú">
@@ -82,9 +82,9 @@ function Layout({ children }) {
                 <li><a href="#info" onClick={() => setMenuOpen(false)}>Información principal</a></li>
                 <li><a href="#mindfulness" onClick={() => setMenuOpen(false)}>Mindfulness</a></li>
                 <li><a href="#estetica" onClick={() => setMenuOpen(false)}>Estética y belleza</a></li>
+                <li><a href="#promos" onClick={() => setMenuOpen(false)}>Promociones</a></li>
                 <li><a href="#reservas" onClick={() => setMenuOpen(false)}>Reservas</a></li>
                 <li><a href="#sobre" onClick={() => setMenuOpen(false)}>Sobre nosotros</a></li>
-                <li><a href="#promos" onClick={() => setMenuOpen(false)}>Promociones</a></li>
               </ul>
             </div>
 

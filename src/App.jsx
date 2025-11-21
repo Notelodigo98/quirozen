@@ -249,6 +249,49 @@ const ReservationForm = ({ masajes }) => {
     return false;
   };
 
+  // Helper: Check if a time slot is an emergency/urgency slot
+  const isUrgencySlot = (dateString, timeString) => {
+    if (!dateString || !timeString) return false;
+    
+    try {
+      const date = new Date(dateString + 'T00:00:00');
+      if (isNaN(date.getTime())) return false;
+      
+      const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+      const [hour, minute] = timeString.split(':').map(Number);
+      
+      if (isNaN(hour) || isNaN(minute)) return false;
+      
+      const totalMinutes = hour * 60 + minute;
+      
+      // Lunes a Viernes (1-5): 20:00 a 21:00
+      if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+        const startMinutes = 20 * 60; // 20:00
+        const endMinutes = 21 * 60; // 21:00
+        return totalMinutes >= startMinutes && totalMinutes < endMinutes;
+      }
+      
+      // Sábado (6): 16:00 a 21:00
+      if (dayOfWeek === 6) {
+        const startMinutes = 16 * 60; // 16:00
+        const endMinutes = 21 * 60; // 21:00
+        return totalMinutes >= startMinutes && totalMinutes < endMinutes;
+      }
+      
+      // Domingo (0): 09:00 a 21:00
+      if (dayOfWeek === 0) {
+        const startMinutes = 9 * 60; // 09:00
+        const endMinutes = 21 * 60; // 21:00
+        return totalMinutes >= startMinutes && totalMinutes < endMinutes;
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('Error checking urgency slot:', error);
+      return false;
+    }
+  };
+
   const loadAvailableSlots = async (dateString) => {
     setLoadingSlots(true);
     setError(''); // Clear previous errors when loading new slots
@@ -540,18 +583,34 @@ const ReservationForm = ({ masajes }) => {
               <p className="warning-text">Esta fecha no tiene horarios disponibles.</p>
             </>
           ) : (
-            <select
-              id="hora"
-              name="hora"
-              value={formData.hora}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Selecciona una hora</option>
-              {availableSlots.map((slot, i) => (
-                <option key={i} value={slot}>{slot}</option>
-              ))}
-            </select>
+            <>
+              <select
+                id="hora"
+                name="hora"
+                value={formData.hora}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Selecciona una hora</option>
+                {availableSlots.map((slot, i) => (
+                  <option key={i} value={slot}>{slot}</option>
+                ))}
+              </select>
+              {formData.hora && isUrgencySlot(formData.fecha, formData.hora) && (
+                <p className="urgency-warning" style={{ 
+                  marginTop: '0.5rem', 
+                  color: '#ff6b35', 
+                  fontSize: '0.9rem',
+                  fontWeight: '600',
+                  padding: '0.5rem',
+                  background: 'rgba(255, 107, 53, 0.1)',
+                  borderRadius: '4px',
+                  border: '1px solid rgba(255, 107, 53, 0.3)'
+                }}>
+                  ⚠️ Está seleccionando horario de urgencias, ten en cuenta que se le hará un cargo adicional
+                </p>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -760,6 +819,49 @@ const ManageReservation = () => {
     }
     
     return false;
+  };
+
+  // Helper: Check if a time slot is an emergency/urgency slot
+  const isUrgencySlot = (dateString, timeString) => {
+    if (!dateString || !timeString) return false;
+    
+    try {
+      const date = new Date(dateString + 'T00:00:00');
+      if (isNaN(date.getTime())) return false;
+      
+      const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+      const [hour, minute] = timeString.split(':').map(Number);
+      
+      if (isNaN(hour) || isNaN(minute)) return false;
+      
+      const totalMinutes = hour * 60 + minute;
+      
+      // Lunes a Viernes (1-5): 20:00 a 21:00
+      if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+        const startMinutes = 20 * 60; // 20:00
+        const endMinutes = 21 * 60; // 21:00
+        return totalMinutes >= startMinutes && totalMinutes < endMinutes;
+      }
+      
+      // Sábado (6): 16:00 a 21:00
+      if (dayOfWeek === 6) {
+        const startMinutes = 16 * 60; // 16:00
+        const endMinutes = 21 * 60; // 21:00
+        return totalMinutes >= startMinutes && totalMinutes < endMinutes;
+      }
+      
+      // Domingo (0): 09:00 a 21:00
+      if (dayOfWeek === 0) {
+        const startMinutes = 9 * 60; // 09:00
+        const endMinutes = 21 * 60; // 21:00
+        return totalMinutes >= startMinutes && totalMinutes < endMinutes;
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('Error checking urgency slot:', error);
+      return false;
+    }
   };
 
   // Load available services for a date
@@ -1018,16 +1120,32 @@ const ManageReservation = () => {
                 <p className="warning-text">Esta fecha no tiene horarios disponibles.</p>
               </>
             ) : (
-              <select
-                value={editData.hora}
-                onChange={(e) => setEditData({ ...editData, hora: e.target.value })}
-                required
-              >
-                <option value="">Selecciona una hora</option>
-                {availableSlots.map((slot, i) => (
-                  <option key={i} value={slot}>{slot}</option>
-                ))}
-              </select>
+              <>
+                <select
+                  value={editData.hora}
+                  onChange={(e) => setEditData({ ...editData, hora: e.target.value })}
+                  required
+                >
+                  <option value="">Selecciona una hora</option>
+                  {availableSlots.map((slot, i) => (
+                    <option key={i} value={slot}>{slot}</option>
+                  ))}
+                </select>
+                {editData.hora && isUrgencySlot(editData.fecha, editData.hora) && (
+                  <p className="urgency-warning" style={{ 
+                    marginTop: '0.5rem', 
+                    color: '#ff6b35', 
+                    fontSize: '0.9rem',
+                    fontWeight: '600',
+                    padding: '0.5rem',
+                    background: 'rgba(255, 107, 53, 0.1)',
+                    borderRadius: '4px',
+                    border: '1px solid rgba(255, 107, 53, 0.3)'
+                  }}>
+                    ⚠️ Está seleccionando horario de urgencias, ten en cuenta que se le hará un cargo adicional
+                  </p>
+                )}
+              </>
             )}
           </div>
           <div className="form-group">
@@ -2080,6 +2198,20 @@ function Home() {
             </div>
           </div>
         </section>
+        <section id="promos" className="section">
+          <h2>Promociones y Bonos</h2>
+          <div className="bonos-list">
+            {bonos.map((b, i) => (
+              <div className="bono-card" key={i}>
+                <h4>{b.titulo}</h4>
+                <p>{b.descripcion}</p>
+                <p><strong>{b.detalles}</strong></p>
+                {b.precio && <p><strong>Precio: {b.precio}</strong></p>}
+                {b.regalo && <GiftBox regalo={b.regalo} />}
+              </div>
+            ))}
+          </div>
+        </section>
         <section id="reservas" className="section">
           <h2>Reservas</h2>
           <div className="reservation-tabs">
@@ -2171,20 +2303,6 @@ function Home() {
                 </a>
               </p>
             </div>
-          </div>
-        </section>
-        <section id="promos" className="section">
-          <h2>Promociones y Bonos</h2>
-          <div className="bonos-list">
-            {bonos.map((b, i) => (
-              <div className="bono-card" key={i}>
-                <h4>{b.titulo}</h4>
-                <p>{b.descripcion}</p>
-                <p><strong>{b.detalles}</strong></p>
-                {b.precio && <p><strong>Precio: {b.precio}</strong></p>}
-                {b.regalo && <GiftBox regalo={b.regalo} />}
-              </div>
-            ))}
           </div>
         </section>
     </>
