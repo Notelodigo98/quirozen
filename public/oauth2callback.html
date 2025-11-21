@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Autorización Completada</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        button {
+            background: #088395;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Procesando autorización...</h1>
+    <div id="result"></div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const error = urlParams.get('error');
+        
+        if (error) {
+            document.getElementById('result').innerHTML = `
+                <div class="error">
+                    <h2>Error de autorización</h2>
+                    <p>${error}</p>
+                    <button onclick="window.location.href='/setup-calendar.html'">Volver</button>
+                </div>
+            `;
+        } else if (code) {
+            const clientId = sessionStorage.getItem('clientId');
+            const clientSecret = sessionStorage.getItem('clientSecret');
+            
+            if (!clientId || !clientSecret) {
+                document.getElementById('result').innerHTML = `
+                    <div class="error">
+                        <h2>Error</h2>
+                        <p>No se encontraron las credenciales. Por favor, vuelve a intentar.</p>
+                        <button onclick="window.location.href='/setup-calendar.html'">Volver</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Intercambiar código por tokens
+            fetch('https://oauth2.googleapis.com/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    code: code,
+                    client_id: clientId,
+                    client_secret: clientSecret,
+                    redirect_uri: window.location.origin + '/oauth2callback.html',
+                    grant_type: 'authorization_code'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.access_token) {
+                    // Guardar tokens en localStorage automáticamente
+                    const tokens = {
+                        access_token: data.access_token,
+                        refresh_token: data.refresh_token || null,
+                        expires_at: Date.now() + (data.expires_in * 1000),
+                        expires_in: data.expires_in
+                    };
+                    
+                    const clientConfig = {
+                        client_id: clientId,
+                        client_secret: clientSecret
+                    };
+                    
+                    try {
+                        localStorage.setItem('google_calendar_tokens', JSON.stringify(tokens));
+                        localStorage.setItem('google_calendar_client_config', JSON.stringify(clientConfig));
+                        
+                        document.getElementById('result').innerHTML = `
+                            <div class="success">
+                                <h2>✅ ¡Configuración exitosa y guardada!</h2>
+                                <p>Los tokens se han guardado automáticamente en localStorage.</p>
+                                <p><strong>✅ Refresh automático habilitado:</strong> El token se renovará automáticamente cuando expire.</p>
+                                
+                                <div style="background: #d4edda; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                                    <h3>🎉 ¡Listo!</h3>
+                                    <p>Ahora puedes:</p>
+                                    <ol>
+                                        <li>Recargar la aplicación</li>
+                                        <li>Hacer una reserva de prueba</li>
+                                        <li>Verificar que aparezca en tu Google Calendar</li>
+                                    </ol>
+                                    <p><strong>El token se renovará automáticamente</strong> - no necesitas hacer nada más.</p>
+                                </div>
+                                
+                                <details style="margin-top: 20px;">
+                                    <summary style="cursor: pointer; font-weight: bold;">Ver tokens (para referencia)</summary>
+                                    <p><strong>Access Token:</strong></p>
+                                    <textarea id="accessToken" readonly style="font-size: 10px;">${data.access_token}</textarea>
+                                    
+                                    ${data.refresh_token ? `
+                                        <p><strong>Refresh Token:</strong></p>
+                                        <textarea id="refreshToken" readonly style="font-size: 10px;">${data.refresh_token}</textarea>
+                                    ` : '<p class="warning">⚠️ No se obtuvo refresh token. El access token expirará en 1 hora.</p>'}
+                                    
+                                    <p><strong>Expira en:</strong> ${data.expires_in} segundos (${Math.round(data.expires_in / 3600)} horas)</p>
+                                </details>
+                                
+                                <button onclick="window.location.href='/'" style="margin-top: 20px; background: #088395; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">
+                                    Ir a la aplicación
+                                </button>
+                            </div>
+                        `;
+                    } catch (error) {
+                        // Si localStorage no está disponible, mostrar tokens para copiar manualmente
+                        document.getElementById('result').innerHTML = `
+                            <div class="success">
+                                <h2>✅ ¡Configuración exitosa!</h2>
+                                <p class="warning">⚠️ No se pudo guardar en localStorage. Copia los tokens manualmente:</p>
+                                
+                                <p><strong>Access Token:</strong></p>
+                                <textarea id="accessToken" readonly>${data.access_token}</textarea>
+                                <button onclick="copyToClipboard('accessToken')">Copiar Access Token</button>
+                                
+                                ${data.refresh_token ? `
+                                    <p><strong>Refresh Token:</strong></p>
+                                    <textarea id="refreshToken" readonly>${data.refresh_token}</textarea>
+                                    <button onclick="copyToClipboard('refreshToken')">Copiar Refresh Token</button>
+                                ` : '<p class="warning">⚠️ No se obtuvo refresh token.</p>'}
+                                
+                                <h3>📝 Código para calendarConfig.js:</h3>
+                                <textarea id="configCode" readonly>import { initializeCalendar } from '../firebase/googleCalendar';
+
+const CALENDAR_CONFIG = {
+  access_token: '${data.access_token}',
+  refresh_token: '${data.refresh_token || 'NO_REFRESH_TOKEN'}'
+};
+
+const CLIENT_CONFIG = {
+  client_id: '${clientId}',
+  client_secret: '${clientSecret}'
+};
+
+initializeCalendar(CALENDAR_CONFIG, CLIENT_CONFIG);
+
+export default CALENDAR_CONFIG;</textarea>
+                                <button onclick="copyToClipboard('configCode')">Copiar Código Completo</button>
+                            </div>
+                        `;
+                    }
+                } else {
+                    document.getElementById('result').innerHTML = `
+                        <div class="error">
+                            <h2>Error obteniendo tokens</h2>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                            <button onclick="window.location.href='/setup-calendar.html'">Volver</button>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                document.getElementById('result').innerHTML = `
+                    <div class="error">
+                        <h2>Error</h2>
+                        <pre>${error.message}</pre>
+                        <button onclick="window.location.href='/setup-calendar.html'">Volver</button>
+                    </div>
+                `;
+            });
+        } else {
+            document.getElementById('result').innerHTML = `
+                <div class="error">
+                    <p>No se recibió código de autorización.</p>
+                    <button onclick="window.location.href='/setup-calendar.html'">Volver</button>
+                </div>
+            `;
+        }
+        
+        function copyToClipboard(elementId) {
+            const textarea = document.getElementById(elementId);
+            textarea.select();
+            document.execCommand('copy');
+            alert('¡Copiado al portapapeles!');
+        }
+    </script>
+</body>
+</html>
+

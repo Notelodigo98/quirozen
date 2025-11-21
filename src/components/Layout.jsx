@@ -75,24 +75,26 @@ function Layout({ children }) {
             </div>
           </div>
 
-          <div className="footer-section footer-links">
-            <h3>Enlaces</h3>
-            <ul>
-              <li><a href="#info" onClick={() => setMenuOpen(false)}>Información principal</a></li>
-              <li><a href="#mindfulness" onClick={() => setMenuOpen(false)}>Mindfulness</a></li>
-              <li><a href="#estetica" onClick={() => setMenuOpen(false)}>Estética y belleza</a></li>
-              <li><a href="#reservas" onClick={() => setMenuOpen(false)}>Reservas</a></li>
-              <li><a href="#sobre" onClick={() => setMenuOpen(false)}>Sobre nosotros</a></li>
-              <li><a href="#promos" onClick={() => setMenuOpen(false)}>Promociones</a></li>
-            </ul>
-          </div>
+          <div className="footer-section footer-links-legal">
+            <div className="footer-links">
+              <h3>Enlaces</h3>
+              <ul>
+                <li><a href="#info" onClick={() => setMenuOpen(false)}>Información principal</a></li>
+                <li><a href="#mindfulness" onClick={() => setMenuOpen(false)}>Mindfulness</a></li>
+                <li><a href="#estetica" onClick={() => setMenuOpen(false)}>Estética y belleza</a></li>
+                <li><a href="#reservas" onClick={() => setMenuOpen(false)}>Reservas</a></li>
+                <li><a href="#sobre" onClick={() => setMenuOpen(false)}>Sobre nosotros</a></li>
+                <li><a href="#promos" onClick={() => setMenuOpen(false)}>Promociones</a></li>
+              </ul>
+            </div>
 
-          <div className="footer-section footer-legal">
-            <h3>Legal</h3>
-            <ul>
-              <li><Link to="/terminos" onClick={() => setMenuOpen(false)}>Términos y condiciones</Link></li>
-              <li><Link to="/acuerdo" onClick={() => setMenuOpen(false)}>Acuerdo de usuario</Link></li>
-            </ul>
+            <div className="footer-legal">
+              <h3>Legal</h3>
+              <ul>
+                <li><Link to="/terminos" onClick={() => setMenuOpen(false)}>Términos y condiciones</Link></li>
+                <li><Link to="/acuerdo" onClick={() => setMenuOpen(false)}>Acuerdo de usuario</Link></li>
+              </ul>
+            </div>
           </div>
         </div>
 
