@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import '../App.css';
 
 const bannerImages = [
-  '/interior/banner1.png',
+  '/interior/maquina1.jpeg',
   '/interior/banner2.jpg',
   '/interior/banner3.jpg',
   '/interior/banner4.avif',

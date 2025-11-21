@@ -110,7 +110,8 @@ export const getDefaultGenericConfig = async () => {
 };
 
 // Get availability for a specific date
-export const getAvailabilityForDate = async (dateString) => {
+// serviceName: optional, if provided, checks if this specific service is blocked
+export const getAvailabilityForDate = async (dateString, serviceName = null) => {
   try {
     const date = new Date(dateString);
     const dayOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'][date.getDay()];
@@ -127,11 +128,24 @@ export const getAvailabilityForDate = async (dateString) => {
         
         // Check if date falls within range
         if (checkDate >= startDate && checkDate <= endDate) {
-          if (!config.available) {
-            return { available: false, slots: [], reason: config.reason || 'Fecha bloqueada' };
+          // Check if this service is blocked by this config
+          const blockedServices = config.blockedServices || [];
+          const blocksAll = blockedServices.length === 0 || blockedServices.includes('ALL');
+          const blocksThisService = blocksAll || (serviceName && blockedServices.includes(serviceName));
+          
+          // If service is specified and this config doesn't block it, skip this config
+          if (serviceName && !blocksThisService) {
+            continue;
           }
-          if (config.slots && config.slots.length > 0) {
-            return { available: true, slots: config.slots, reason: config.reason || 'Horario especial' };
+          
+          // If service is specified and this config blocks it, or if no service specified and config blocks all
+          if (blocksThisService || (!serviceName && blocksAll)) {
+            if (!config.available) {
+              return { available: false, slots: [], reason: config.reason || 'Fecha bloqueada' };
+            }
+            if (config.slots && config.slots.length > 0) {
+              return { available: true, slots: config.slots, reason: config.reason || 'Horario especial' };
+            }
           }
         }
       }
@@ -160,7 +174,8 @@ export const getAvailabilityForDate = async (dateString) => {
 };
 
 // Helper: Get availability for a date using pre-loaded configs (optimized)
-const getAvailabilityForDateWithConfigs = (dateString, allConfigs, genericConfig) => {
+// serviceName: optional, if provided, checks if this specific service is blocked
+const getAvailabilityForDateWithConfigs = (dateString, allConfigs, genericConfig, serviceName = null) => {
   const date = new Date(dateString);
   const dayOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'][date.getDay()];
   
@@ -175,11 +190,24 @@ const getAvailabilityForDateWithConfigs = (dateString, allConfigs, genericConfig
       
       // Check if date falls within range
       if (checkDate >= startDate && checkDate <= endDate) {
-        if (!config.available) {
-          return { available: false, slots: [], reason: config.reason || 'Fecha bloqueada' };
+        // Check if this service is blocked by this config
+        const blockedServices = config.blockedServices || [];
+        const blocksAll = blockedServices.length === 0 || blockedServices.includes('ALL');
+        const blocksThisService = blocksAll || (serviceName && blockedServices.includes(serviceName));
+        
+        // If service is specified and this config doesn't block it, skip this config
+        if (serviceName && !blocksThisService) {
+          continue;
         }
-        if (config.slots && config.slots.length > 0) {
-          return { available: true, slots: config.slots, reason: config.reason || 'Horario especial' };
+        
+        // If service is specified and this config blocks it, or if no service specified and config blocks all
+        if (blocksThisService || (!serviceName && blocksAll)) {
+          if (!config.available) {
+            return { available: false, slots: [], reason: config.reason || 'Fecha bloqueada' };
+          }
+          if (config.slots && config.slots.length > 0) {
+            return { available: true, slots: config.slots, reason: config.reason || 'Horario especial' };
+          }
         }
       }
     }
@@ -203,7 +231,8 @@ const getAvailabilityForDateWithConfigs = (dateString, allConfigs, genericConfig
 };
 
 // Get available dates in a range (OPTIMIZED - single Firestore query)
-export const getAvailableDatesInRange = async (startDate, endDate) => {
+// serviceName: optional, if provided, only returns dates available for this service
+export const getAvailableDatesInRange = async (startDate, endDate, serviceName = null) => {
   try {
     // Load all configurations ONCE (single Firestore query)
     const allConfigs = await getAvailabilityConfigs();
@@ -224,7 +253,7 @@ export const getAvailableDatesInRange = async (startDate, endDate) => {
     
     while (current <= end) {
       const dateString = current.toISOString().split('T')[0];
-      const availability = getAvailabilityForDateWithConfigs(dateString, allConfigs, genericConfig);
+      const availability = getAvailabilityForDateWithConfigs(dateString, allConfigs, genericConfig, serviceName);
       
       if (availability.available) {
         availableDates.push({
@@ -243,9 +272,10 @@ export const getAvailableDatesInRange = async (startDate, endDate) => {
 };
 
 // Check if a specific date/time slot is available
-export const checkSlotAvailability = async (date, time) => {
+// serviceName: optional, if provided, checks if this specific service is available
+export const checkSlotAvailability = async (date, time, serviceName = null) => {
   try {
-    const availability = await getAvailabilityForDate(date);
+    const availability = await getAvailabilityForDate(date, serviceName);
     if (!availability.available) {
       return false;
     }
@@ -284,10 +314,11 @@ export const updateAvailabilityConfig = async (configId, updatedData) => {
 };
 
 // Get available slots for a date, considering existing reservations
-export const getAvailableSlots = async (dateString, reservationsForDate = []) => {
+// serviceName: optional, if provided, only returns slots available for this service
+export const getAvailableSlots = async (dateString, reservationsForDate = [], serviceName = null) => {
   try {
     // Get availability configuration for the date
-    const availability = await getAvailabilityForDate(dateString);
+    const availability = await getAvailabilityForDate(dateString, serviceName);
     
     if (!availability.available) {
       return { available: false, slots: [], reason: availability.reason };
@@ -308,5 +339,52 @@ export const getAvailableSlots = async (dateString, reservationsForDate = []) =>
   } catch (error) {
     console.error('Error getting available slots:', error);
     throw error;
+  }
+};
+
+// Get available services for a specific date (filters out blocked services)
+// currentService: optional, if provided, this service will always be included even if blocked
+export const getAvailableServices = async (dateString, allServices, currentService = null) => {
+  try {
+    const allConfigs = await getAvailabilityConfigs();
+    const specificConfigs = allConfigs.filter(config => config.type === 'specific');
+    
+    const checkDate = new Date(dateString);
+    checkDate.setHours(0, 0, 0, 0);
+    
+    // Collect all blocked services for this date
+    const blockedServices = new Set();
+    
+    for (const config of specificConfigs) {
+      if (config.dateRange) {
+        const startDate = new Date(config.dateRange.start);
+        const endDate = new Date(config.dateRange.end);
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(0, 0, 0, 0);
+        
+        // Check if date falls within range
+        if (checkDate >= startDate && checkDate <= endDate) {
+          const configBlockedServices = config.blockedServices || [];
+          
+          // If "ALL" is in blocked services, all services are blocked
+          if (configBlockedServices.includes('ALL') || configBlockedServices.length === 0) {
+            // Block all services
+            allServices.forEach(service => blockedServices.add(service.nombre));
+          } else {
+            // Block only specific services
+            configBlockedServices.forEach(service => blockedServices.add(service));
+          }
+        }
+      }
+    }
+    
+    // Filter out blocked services, but always include currentService if provided
+    return allServices.filter(service => 
+      !blockedServices.has(service.nombre) || service.nombre === currentService
+    );
+  } catch (error) {
+    console.error('Error getting available services:', error);
+    // On error, return all services
+    return allServices;
   }
 };

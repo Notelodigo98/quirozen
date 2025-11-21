@@ -10,6 +10,7 @@ import {
   orderBy 
 } from 'firebase/firestore';
 import { db } from './config';
+import { createCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from './googleCalendar';
 
 const RESERVATIONS_COLLECTION = 'reservations';
 
@@ -30,6 +31,19 @@ export const saveReservation = async (reservation) => {
       ...reservation,
       createdAt: new Date().toISOString()
     });
+    
+    // Create Google Calendar event
+    try {
+      const calendarEventId = await createCalendarEvent(reservation);
+      if (calendarEventId) {
+        // Store calendar event ID in reservation
+        await updateDoc(docRef, { calendarEventId });
+      }
+    } catch (calendarError) {
+      // Log error but don't fail the reservation save
+      console.warn('Error creating Google Calendar event:', calendarError);
+    }
+    
     return docRef.id;
   } catch (error) {
     console.error('Error saving reservation:', error);
@@ -86,6 +100,17 @@ export const updateReservation = async (code, updatedData) => {
     
     const reservationRef = doc(db, RESERVATIONS_COLLECTION, reservation.id);
     await updateDoc(reservationRef, updatedData);
+    
+    // Update Google Calendar event if it exists
+    if (reservation.calendarEventId) {
+      try {
+        const updatedReservation = { ...reservation, ...updatedData };
+        await updateCalendarEvent(reservation.calendarEventId, updatedReservation);
+      } catch (calendarError) {
+        console.warn('Error updating Google Calendar event:', calendarError);
+      }
+    }
+    
     return true;
   } catch (error) {
     console.error('Error updating reservation:', error);
@@ -99,6 +124,15 @@ export const deleteReservation = async (code) => {
     const reservation = await getReservationByCode(code);
     if (!reservation || !reservation.id) {
       return false;
+    }
+    
+    // Delete Google Calendar event if it exists
+    if (reservation.calendarEventId) {
+      try {
+        await deleteCalendarEvent(reservation.calendarEventId);
+      } catch (calendarError) {
+        console.warn('Error deleting Google Calendar event:', calendarError);
+      }
     }
     
     const reservationRef = doc(db, RESERVATIONS_COLLECTION, reservation.id);

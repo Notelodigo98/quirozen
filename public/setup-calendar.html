@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Google Calendar Setup - Quirozen</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background: #088395;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #05BFDB;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+        textarea {
+            width: 100%;
+            height: 80px;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .step {
+            background: #fff;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #088395;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Configuración de Google Calendar</h1>
+    
+    <div class="step">
+        <h3>Paso 1: Obtén tus credenciales OAuth</h3>
+        <p>Si aún no las tienes, sigue estos pasos:</p>
+        <ol>
+            <li>Ve a <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
+            <li>Crea un proyecto o selecciona uno existente</li>
+            <li>Habilita la API de Google Calendar</li>
+            <li>Crea credenciales OAuth 2.0 (tipo: Web application)</li>
+            <li>Copia el Client ID y Client Secret</li>
+        </ol>
+    </div>
+
+    <div class="step">
+        <h3>Paso 2: Ingresa tus credenciales</h3>
+        <label><strong>Client ID:</strong></label>
+        <input type="text" id="clientId" placeholder="xxxxx.apps.googleusercontent.com" />
+        
+        <label><strong>Client Secret:</strong></label>
+        <input type="text" id="clientSecret" placeholder="GOCSPX-xxxxx" />
+    </div>
+
+    <button onclick="authorize()">🔐 Autorizar y Obtener Tokens</button>
+
+    <div id="result"></div>
+
+    <script>
+        function authorize() {
+            const clientId = document.getElementById('clientId').value.trim();
+            const clientSecret = document.getElementById('clientSecret').value.trim();
+            
+            if (!clientId || !clientSecret) {
+                alert('Por favor, ingresa el Client ID y Client Secret');
+                return;
+            }
+
+            const scopes = 'https://www.googleapis.com/auth/calendar';
+            // Usar el dominio actual (funciona tanto en localhost como en producción)
+            const redirectUri = window.location.origin + '/oauth2callback.html';
+            
+            const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+                `client_id=${encodeURIComponent(clientId)}&` +
+                `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+                `response_type=code&` +
+                `scope=${encodeURIComponent(scopes)}&` +
+                `access_type=offline&` +
+                `prompt=consent`;
+
+            // Guardar credenciales temporalmente
+            sessionStorage.setItem('clientId', clientId);
+            sessionStorage.setItem('clientSecret', clientSecret);
+            
+            window.location.href = authUrl;
+        }
+    </script>
+</body>
+</html>
+
