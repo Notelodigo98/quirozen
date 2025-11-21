@@ -11,6 +11,7 @@ import {
 } from 'firebase/firestore';
 import { db } from './config';
 import { createCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from './googleCalendar';
+import { sendReservationEmail, sendReservationUpdateEmail } from './emailService';
 
 const RESERVATIONS_COLLECTION = 'reservations';
 
@@ -42,6 +43,14 @@ export const saveReservation = async (reservation) => {
     } catch (calendarError) {
       // Log error but don't fail the reservation save
       console.warn('Error creating Google Calendar event:', calendarError);
+    }
+    
+    // Send confirmation email
+    try {
+      await sendReservationEmail(reservation);
+    } catch (emailError) {
+      // Log error but don't fail the reservation save
+      console.warn('Error sending confirmation email:', emailError);
     }
     
     return docRef.id;
@@ -109,6 +118,15 @@ export const updateReservation = async (code, updatedData) => {
       } catch (calendarError) {
         console.warn('Error updating Google Calendar event:', calendarError);
       }
+    }
+    
+    // Send update confirmation email
+    try {
+      const updatedReservation = { ...reservation, ...updatedData };
+      await sendReservationUpdateEmail(updatedReservation);
+    } catch (emailError) {
+      // Log error but don't fail the reservation update
+      console.warn('Error sending update email:', emailError);
     }
     
     return true;
