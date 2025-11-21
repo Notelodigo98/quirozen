@@ -2,9 +2,9 @@ import emailjs from '@emailjs/browser';
 
 // EmailJS configuration
 // These values should be set in environment variables or config
-const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID'; // To be configured
-const EMAILJS_TEMPLATE_ID_NEW = 'YOUR_TEMPLATE_ID_NEW'; // Template for new reservations
-const EMAILJS_TEMPLATE_ID_UPDATE = 'YOUR_TEMPLATE_ID_UPDATE'; // Template for updated reservations
+const EMAILJS_SERVICE_ID = 'service_ljxmqik'; // Service ID de EmailJS
+const EMAILJS_TEMPLATE_ID_NEW = 'template_ggas0sa'; // Template para nuevas reservas
+const EMAILJS_TEMPLATE_ID_UPDATE = 'template_rl4xsby'; // Template para modificaciones de reserva
 const EMAILJS_PUBLIC_KEY = 'LL6OIXIfaRQBCOXxO'; // Public Key de EmailJS
 
 // Initialize EmailJS
