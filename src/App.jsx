@@ -160,6 +160,7 @@ const ReservationForm = ({ masajes }) => {
   const [availableDates, setAvailableDates] = useState([]);
   const [loadingDates, setLoadingDates] = useState(false);
   const [availableServices, setAvailableServices] = useState(masajes); // Start with all services
+  const [urgencyConfig, setUrgencyConfig] = useState(null); // Store urgency configuration
 
   // Calculate max date (2 months from now) - computed once
   const getMaxDate = () => {
@@ -168,10 +169,23 @@ const ReservationForm = ({ masajes }) => {
     return endDate.toISOString().split('T')[0];
   };
 
-  // Load available dates when component mounts
+  // Load available dates and urgency config when component mounts
   useEffect(() => {
     loadAvailableDates();
+    loadUrgencyConfig();
   }, []);
+
+  // Load urgency configuration from Firestore
+  const loadUrgencyConfig = async () => {
+    try {
+      const config = await getDefaultGenericConfig();
+      if (config && config.weeklySchedule) {
+        setUrgencyConfig(config.weeklySchedule);
+      }
+    } catch (err) {
+      console.error('Error loading urgency config:', err);
+    }
+  };
 
   // Load available services and slots when date changes
   useEffect(() => {
@@ -258,12 +272,30 @@ const ReservationForm = ({ masajes }) => {
       if (isNaN(date.getTime())) return false;
       
       const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-      const [hour, minute] = timeString.split(':').map(Number);
+      const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+      const dayName = dayNames[dayOfWeek];
       
+      const [hour, minute] = timeString.split(':').map(Number);
       if (isNaN(hour) || isNaN(minute)) return false;
       
       const totalMinutes = hour * 60 + minute;
       
+      // If urgency config is loaded, use it
+      if (urgencyConfig && urgencyConfig[dayName] && urgencyConfig[dayName].urgencyRanges) {
+        const urgencyRanges = urgencyConfig[dayName].urgencyRanges;
+        if (Array.isArray(urgencyRanges) && urgencyRanges.length > 0) {
+          // Check if time falls within any urgency range
+          return urgencyRanges.some(range => {
+            const [startHour, startMin] = range.start.split(':').map(Number);
+            const [endHour, endMin] = range.end.split(':').map(Number);
+            const startMinutes = startHour * 60 + startMin;
+            const endMinutes = endHour * 60 + endMin;
+            return totalMinutes >= startMinutes && totalMinutes < endMinutes;
+          });
+        }
+      }
+      
+      // Fallback to hardcoded values if config not loaded yet
       // Lunes a Viernes (1-5): 20:00 a 21:00
       if (dayOfWeek >= 1 && dayOfWeek <= 5) {
         const startMinutes = 20 * 60; // 20:00
@@ -647,6 +679,23 @@ const ManageReservation = () => {
   const [loadingDates, setLoadingDates] = useState(false);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [availableServices, setAvailableServices] = useState(masajes); // Start with all services
+  const [urgencyConfig, setUrgencyConfig] = useState(null); // Store urgency configuration
+
+  // Load urgency configuration from Firestore
+  useEffect(() => {
+    loadUrgencyConfig();
+  }, []);
+
+  const loadUrgencyConfig = async () => {
+    try {
+      const config = await getDefaultGenericConfig();
+      if (config && config.weeklySchedule) {
+        setUrgencyConfig(config.weeklySchedule);
+      }
+    } catch (err) {
+      console.error('Error loading urgency config:', err);
+    }
+  };
 
   const handleLookup = async (e) => {
     e.preventDefault();
@@ -830,12 +879,30 @@ const ManageReservation = () => {
       if (isNaN(date.getTime())) return false;
       
       const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-      const [hour, minute] = timeString.split(':').map(Number);
+      const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+      const dayName = dayNames[dayOfWeek];
       
+      const [hour, minute] = timeString.split(':').map(Number);
       if (isNaN(hour) || isNaN(minute)) return false;
       
       const totalMinutes = hour * 60 + minute;
       
+      // If urgency config is loaded, use it
+      if (urgencyConfig && urgencyConfig[dayName] && urgencyConfig[dayName].urgencyRanges) {
+        const urgencyRanges = urgencyConfig[dayName].urgencyRanges;
+        if (Array.isArray(urgencyRanges) && urgencyRanges.length > 0) {
+          // Check if time falls within any urgency range
+          return urgencyRanges.some(range => {
+            const [startHour, startMin] = range.start.split(':').map(Number);
+            const [endHour, endMin] = range.end.split(':').map(Number);
+            const startMinutes = startHour * 60 + startMin;
+            const endMinutes = endHour * 60 + endMin;
+            return totalMinutes >= startMinutes && totalMinutes < endMinutes;
+          });
+        }
+      }
+      
+      // Fallback to hardcoded values if config not loaded yet
       // Lunes a Viernes (1-5): 20:00 a 21:00
       if (dayOfWeek >= 1 && dayOfWeek <= 5) {
         const startMinutes = 20 * 60; // 20:00
@@ -1174,13 +1241,13 @@ const ManageReservation = () => {
 const AvailabilityManager = () => {
   const [activeSubTab, setActiveSubTab] = useState('generic'); // generic, specific
   const [weeklySchedule, setWeeklySchedule] = useState({
-    monday: { available: false, ranges: [] },
-    tuesday: { available: false, ranges: [] },
-    wednesday: { available: false, ranges: [] },
-    thursday: { available: false, ranges: [] },
-    friday: { available: false, ranges: [] },
-    saturday: { available: false, ranges: [] },
-    sunday: { available: false, ranges: [] }
+    monday: { available: false, ranges: [], urgencyRanges: [] },
+    tuesday: { available: false, ranges: [], urgencyRanges: [] },
+    wednesday: { available: false, ranges: [], urgencyRanges: [] },
+    thursday: { available: false, ranges: [], urgencyRanges: [] },
+    friday: { available: false, ranges: [], urgencyRanges: [] },
+    saturday: { available: false, ranges: [], urgencyRanges: [] },
+    sunday: { available: false, ranges: [], urgencyRanges: [] }
   });
   const [editingDay, setEditingDay] = useState(null);
   const [specificConfigs, setSpecificConfigs] = useState([]);
@@ -1210,13 +1277,13 @@ const AvailabilityManager = () => {
       if (config && config.weeklySchedule) {
         // Ensure all days have the correct structure with ranges array
         const defaultSchedule = {
-          monday: { available: false, ranges: [] },
-          tuesday: { available: false, ranges: [] },
-          wednesday: { available: false, ranges: [] },
-          thursday: { available: false, ranges: [] },
-          friday: { available: false, ranges: [] },
-          saturday: { available: false, ranges: [] },
-          sunday: { available: false, ranges: [] }
+          monday: { available: false, ranges: [], urgencyRanges: [] },
+          tuesday: { available: false, ranges: [], urgencyRanges: [] },
+          wednesday: { available: false, ranges: [], urgencyRanges: [] },
+          thursday: { available: false, ranges: [], urgencyRanges: [] },
+          friday: { available: false, ranges: [], urgencyRanges: [] },
+          saturday: { available: false, ranges: [], urgencyRanges: [] },
+          sunday: { available: false, ranges: [], urgencyRanges: [] }
         };
         
         // Merge with loaded config, converting slots to ranges if needed
@@ -1225,6 +1292,7 @@ const AvailabilityManager = () => {
           if (config.weeklySchedule[day]) {
             const dayConfig = config.weeklySchedule[day];
             let ranges = [];
+            let urgencyRanges = [];
             
             // If ranges exist, use them directly
             if (Array.isArray(dayConfig.ranges) && dayConfig.ranges.length > 0) {
@@ -1235,9 +1303,15 @@ const AvailabilityManager = () => {
               ranges = convertSlotsToRanges(dayConfig.slots);
             }
             
+            // Load urgency ranges if they exist
+            if (Array.isArray(dayConfig.urgencyRanges) && dayConfig.urgencyRanges.length > 0) {
+              urgencyRanges = dayConfig.urgencyRanges;
+            }
+            
             loadedSchedule[day] = {
               available: dayConfig.available || false,
-              ranges: ranges
+              ranges: ranges,
+              urgencyRanges: urgencyRanges
             };
           }
         });
@@ -1297,6 +1371,33 @@ const AvailabilityManager = () => {
     setWeeklySchedule({
       ...weeklySchedule,
       [day]: { ...weeklySchedule[day], ranges: newRanges }
+    });
+  };
+
+  const addUrgencyRange = (day) => {
+    setWeeklySchedule({
+      ...weeklySchedule,
+      [day]: {
+        ...weeklySchedule[day],
+        urgencyRanges: [...(weeklySchedule[day].urgencyRanges || []), { start: '20:00', end: '21:00' }]
+      }
+    });
+  };
+
+  const updateUrgencyRange = (day, index, field, value) => {
+    const newRanges = [...(weeklySchedule[day].urgencyRanges || [])];
+    newRanges[index][field] = value;
+    setWeeklySchedule({
+      ...weeklySchedule,
+      [day]: { ...weeklySchedule[day], urgencyRanges: newRanges }
+    });
+  };
+
+  const removeUrgencyRange = (day, index) => {
+    const newRanges = (weeklySchedule[day].urgencyRanges || []).filter((_, i) => i !== index);
+    setWeeklySchedule({
+      ...weeklySchedule,
+      [day]: { ...weeklySchedule[day], urgencyRanges: newRanges }
     });
   };
 
@@ -1379,7 +1480,8 @@ const AvailabilityManager = () => {
           available: dayData.available,
           slots: dayData.available && dayData.ranges.length > 0 
             ? generateSlotsFromRanges(dayData.ranges)
-            : []
+            : [],
+          urgencyRanges: dayData.urgencyRanges || []
         };
       });
 
@@ -1775,6 +1877,45 @@ const AvailabilityManager = () => {
                       >
                         Agregar rango de horas
                       </button>
+                      
+                      <div className="urgency-ranges-section" style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '2px solid #ff6b35' }}>
+                        <h4 style={{ color: '#ff6b35', marginBottom: '0.5rem' }}>Horarios de Urgencia</h4>
+                        <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '1rem' }}>
+                          Configura los horarios de urgencia para este día. Cuando un cliente seleccione estos horarios, verá un aviso de cargo adicional.
+                        </p>
+                        {(Array.isArray(daySchedule.urgencyRanges) ? daySchedule.urgencyRanges : []).map((range, index) => {
+                          return (
+                            <div key={index} className="time-range-item" style={{ marginBottom: '0.5rem' }}>
+                              <div className="time-range-inputs">
+                                <input
+                                  type="time"
+                                  value={range.start}
+                                  onChange={(e) => updateUrgencyRange(key, index, 'start', e.target.value)}
+                                />
+                                <span>a</span>
+                                <input
+                                  type="time"
+                                  value={range.end}
+                                  onChange={(e) => updateUrgencyRange(key, index, 'end', e.target.value)}
+                                />
+                                <button
+                                  onClick={() => removeUrgencyRange(key, index)}
+                                  className="btn-danger-small"
+                                >
+                                  Eliminar
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                        <button
+                          onClick={() => addUrgencyRange(key)}
+                          className="btn-secondary-small"
+                          style={{ backgroundColor: '#ff6b35', color: 'white', borderColor: '#ff6b35' }}
+                        >
+                          Agregar horario de urgencia
+                        </button>
+                      </div>
                     </div>
                   )}
 
@@ -2124,7 +2265,7 @@ const GiftBox = ({ regalo }) => {
 
 // Home Component
 function Home() {
-  const [activeTab, setActiveTab] = useState('reservar'); // reservar, gestionar, admin
+  const [activeTab, setActiveTab] = useState('reservar'); // reservar, gestionar
 
   return (
     <>
@@ -2227,17 +2368,10 @@ function Home() {
             >
               Gestionar mi reserva
             </button>
-            <button
-              className={activeTab === 'admin' ? 'active' : ''}
-              onClick={() => setActiveTab('admin')}
-            >
-              Admin
-            </button>
           </div>
 
           {activeTab === 'reservar' && <ReservationForm masajes={masajes} />}
           {activeTab === 'gestionar' && <ManageReservation />}
-          {activeTab === 'admin' && <AdminPanel masajes={masajes} />}
         </section>
         <section id="sobre" className="section">
           <h2>Sobre nosotros</h2>
@@ -2314,6 +2448,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout><Home /></Layout>} />
+      <Route path="/admin" element={<Layout><AdminPanel masajes={masajes} /></Layout>} />
       <Route path="/terminos" element={<Terminos />} />
       <Route path="/acuerdo" element={<Acuerdo />} />
     </Routes>
