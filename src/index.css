@@ -17,8 +17,7 @@
   font-weight: 400;
 
   color: var(--text-black);
-  background: url('/fondofinal.png') no-repeat center center fixed;
-  background-size: cover;
+  background: white;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
