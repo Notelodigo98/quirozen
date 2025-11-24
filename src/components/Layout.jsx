@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 function Layout({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+  const isAdminPage = location.pathname === '/admin';
 
   return (
-    <div className="main-container">
+    <div className={`main-container ${isAdminPage ? 'admin-page' : ''}`}>
       <header className="fixed-header">
         <div className="header-content">
           <Link to="/">

@@ -65,6 +65,10 @@
   width: 100%;
 }
 
+.main-container.admin-page {
+  background: white;
+}
+
 /* ============================================
    HEADER & NAVIGATION
    ============================================ */
