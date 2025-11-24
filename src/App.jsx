@@ -125,7 +125,7 @@ const bonos = [
     titulo: 'Bono Presoterapia',
     descripcion: 'Tratamiento de presoterapia para mejorar drenaje linfático, circulación y reducir celulitis.',
     detalles: '5 sesiones de 45 minutos',
-    precio: '150€',
+    precio: '100€ (Precio de apertura, oferta limitada)',
     regalo: ''
   },
   {
@@ -2334,7 +2334,7 @@ function Home() {
                 estética corporal.
               </p>
               <p><strong>Duración:</strong> 45 min</p>
-              <p><strong>Precio:</strong> 30€</p>
+              <p><strong>Precio:</strong> 35€ (Precio de apertura, oferta limitada)</p>
             </div>
           </div>
         </section>
