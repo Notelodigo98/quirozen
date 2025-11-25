@@ -2891,6 +2891,8 @@ main {
     flex-direction: column;
     gap: 1.5rem;
     text-align: center;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   .footer-logo {
@@ -2902,29 +2904,48 @@ main {
     text-align: center;
   }
 
-  .footer-links-legal > .footer-links,
-  .footer-links-legal > .footer-legal {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .footer-links-legal > .footer-links ul,
-  .footer-links-legal > .footer-legal ul {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+  .footer-content > .footer-links-legal > .footer-links,
+  .footer-content > .footer-links-legal > .footer-legal {
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: none !important;
     width: 100%;
   }
 
-  .footer-links-legal > .footer-links li,
-  .footer-links-legal > .footer-legal li {
-    text-align: center;
+  .footer-content > .footer-links-legal > .footer-links h3,
+  .footer-content > .footer-links-legal > .footer-legal h3 {
+    text-align: center !important;
     width: 100%;
-    display: flex;
-    justify-content: center;
+  }
+
+  .footer-content > .footer-links-legal > .footer-links ul,
+  .footer-content > .footer-links-legal > .footer-legal ul {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+  }
+
+  .footer-content > .footer-links-legal > .footer-links li,
+  .footer-content > .footer-links-legal > .footer-legal li {
+    text-align: center !important;
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .footer-content > .footer-links-legal > .footer-links a,
+  .footer-content > .footer-links-legal > .footer-legal a {
+    text-align: center !important;
+    display: inline-block !important;
+    width: auto !important;
   }
 
   .footer-section h3::after {
