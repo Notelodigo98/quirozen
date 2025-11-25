@@ -57,6 +57,8 @@ const masajes = [
   { nombre: 'Masaje con piedras calientes', descripcion: 'Calor profundo y maniobras relajantes que derriten ansiedad y contracturas.', duracion: '50 min', precio: '30€' },
   { nombre: 'Masaje maderoterapia', descripcion: 'Rodillos y copas de madera con ritmo relajante para moldear y liberar ansiedad corporal.', duracion: '50 min', precio: '30€' },
   { nombre: 'Masaje embarazadas', descripcion: 'En camilla o silla terapéutica con apoyo relajante que tranquiliza ansiedad prenatal.', duracion: '50 min', precio: '30€' },
+  { nombre: 'Mindfulness', descripcion: 'Práctica de estar presente en el momento, sin juzgar ni distraerse. Ayuda a reducir el estrés, la ansiedad y mejora el bienestar general.', duracion: '50 min', precio: '40€' },
+  { nombre: 'Presoterapia', descripcion: 'Tratamiento que aplica presión de aire para mejorar el drenaje linfático y la circulación. Ayuda a reducir la retención de líquidos y disminuir la celulitis.', duracion: '45 min', precio: '35€' },
 ];
 
 const bonos = [
