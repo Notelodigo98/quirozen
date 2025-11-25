@@ -313,9 +313,23 @@ export const updateAvailabilityConfig = async (configId, updatedData) => {
   }
 };
 
+// Helper: Extract minutes from duration string (e.g., "50 min" -> 50)
+const extractMinutesFromDuration = (durationString) => {
+  if (!durationString) return 30; // Default to 30 minutes
+  const match = durationString.match(/(\d+)\s*min/i);
+  return match ? parseInt(match[1], 10) : 30;
+};
+
+// Helper: Convert time string to minutes since midnight (e.g., "10:30" -> 630)
+const timeToMinutes = (timeString) => {
+  const [hours, mins] = timeString.split(':').map(Number);
+  return hours * 60 + mins;
+};
+
 // Get available slots for a date, considering existing reservations
 // serviceName: optional, if provided, only returns slots available for this service
-export const getAvailableSlots = async (dateString, reservationsForDate = [], serviceName = null) => {
+// allServices: optional, array of all services to look up durations
+export const getAvailableSlots = async (dateString, reservationsForDate = [], serviceName = null, allServices = []) => {
   try {
     // Get availability configuration for the date
     const availability = await getAvailabilityForDate(dateString, serviceName);
@@ -324,12 +338,46 @@ export const getAvailableSlots = async (dateString, reservationsForDate = [], se
       return { available: false, slots: [], reason: availability.reason };
     }
     
-    // Filter out booked slots
-    const bookedSlots = reservationsForDate
-      .filter(r => r.estado !== 'cancelada') // Don't count canceled reservations
-      .map(r => r.hora);
+    // Filter out canceled reservations
+    const activeReservations = reservationsForDate.filter(r => r.estado !== 'cancelada');
     
-    const freeSlots = availability.slots.filter(slot => !bookedSlots.includes(slot));
+    // If we don't have service definitions, fallback to basic behavior
+    if (!allServices || allServices.length === 0) {
+      const bookedSlots = activeReservations.map(r => r.hora);
+      const freeSlots = availability.slots.filter(slot => !bookedSlots.includes(slot));
+      
+      return {
+        available: true,
+        slots: freeSlots,
+        reason: availability.reason
+      };
+    }
+    
+    // Build blocking windows based on each existing reservation
+    const reservationBlocks = activeReservations.map(reservation => {
+      const service = allServices.find(s => s.nombre === reservation.servicio);
+      const reservationDuration = service ? extractMinutesFromDuration(service.duracion) : 30; // Default to 30 min
+      
+      // Determine how long to block after the reservation starts
+      const blockGap = reservationDuration <= 30 ? 30 : 60;
+      const startMinutes = timeToMinutes(reservation.hora);
+      const blockEndMinutes = startMinutes + blockGap;
+      
+      return { startMinutes, blockEndMinutes };
+    });
+    
+    const freeSlots = availability.slots.filter(slot => {
+      const slotMinutes = timeToMinutes(slot);
+      
+      for (const block of reservationBlocks) {
+        const withinReservationWindow = slotMinutes >= block.startMinutes && slotMinutes < block.blockEndMinutes;
+        if (withinReservationWindow) {
+          return false;
+        }
+      }
+      
+      return true;
+    });
     
     return {
       available: true,

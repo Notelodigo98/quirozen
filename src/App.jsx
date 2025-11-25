@@ -190,7 +190,7 @@ const ReservationForm = ({ masajes }) => {
   useEffect(() => {
     if (formData.fecha) {
       loadAvailableServices(formData.fecha);
-      loadAvailableSlots(formData.fecha);
+      loadAvailableSlots(formData.fecha, formData.servicio);
       // Reset hora and servicio when fecha changes
       setFormData(prev => ({ ...prev, hora: '', servicio: '' }));
     } else {
@@ -198,6 +198,13 @@ const ReservationForm = ({ masajes }) => {
       setAvailableServices(masajes); // Reset to all services when no date selected
     }
   }, [formData.fecha]);
+
+  // Reload slots when service changes (to apply duration-based filtering)
+  useEffect(() => {
+    if (formData.fecha && formData.servicio) {
+      loadAvailableSlots(formData.fecha, formData.servicio);
+    }
+  }, [formData.servicio]);
 
   const loadAvailableServices = async (dateString) => {
     try {
@@ -323,7 +330,7 @@ const ReservationForm = ({ masajes }) => {
     }
   };
 
-  const loadAvailableSlots = async (dateString) => {
+  const loadAvailableSlots = async (dateString, selectedServiceName = null) => {
     setLoadingSlots(true);
     setError(''); // Clear previous errors when loading new slots
     try {
@@ -331,7 +338,7 @@ const ReservationForm = ({ masajes }) => {
       const reservations = await getReservationsByDate(dateString);
       
       // Get available slots considering reservations
-      const result = await getAvailableSlots(dateString, reservations);
+      const result = await getAvailableSlots(dateString, reservations, null, masajes);
       
       if (result.available) {
         // Filter out past times if it's today
@@ -442,12 +449,13 @@ const ReservationForm = ({ masajes }) => {
     try {
       // Final validation: check if slot is still available
       const reservations = await getReservationsByDate(formData.fecha);
-      const slotAvailability = await getAvailableSlots(formData.fecha, reservations);
+      
+      const slotAvailability = await getAvailableSlots(formData.fecha, reservations, null, masajes);
       
       if (!slotAvailability.available || !slotAvailability.slots.includes(formData.hora)) {
         setError('Lo sentimos, este horario ya no está disponible. Por favor, selecciona otro.');
         // Reload slots
-        await loadAvailableSlots(formData.fecha);
+        await loadAvailableSlots(formData.fecha, formData.servicio);
         setLoading(false);
         return;
       }
@@ -747,12 +755,12 @@ const ManageReservation = () => {
         ? reservations.filter(r => r.id !== reservation.id)
         : reservations;
       
-      const slotAvailability = await getAvailableSlots(editData.fecha, filteredReservations, editData.servicio);
+      const slotAvailability = await getAvailableSlots(editData.fecha, filteredReservations, editData.servicio, masajes);
       
       if (!slotAvailability.available || !slotAvailability.slots.includes(editData.hora)) {
         setError('Lo sentimos, este horario ya no está disponible. Por favor, selecciona otro.');
         // Reload slots
-        await loadAvailableSlots(editData.fecha);
+        await loadAvailableSlots(editData.fecha, editData.servicio);
         setLoading(false);
         return;
       }
@@ -944,7 +952,7 @@ const ManageReservation = () => {
   };
 
   // Load available slots for a date
-  const loadAvailableSlots = async (dateString) => {
+  const loadAvailableSlots = async (dateString, selectedServiceName = null) => {
     setLoadingSlots(true);
     setError('');
     try {
@@ -955,9 +963,10 @@ const ManageReservation = () => {
         ? reservations.filter(r => r.id !== reservation.id)
         : reservations;
       
-      // Get service from editData if in edit mode, otherwise null
-      const serviceName = editData?.servicio || null;
-      const result = await getAvailableSlots(dateString, filteredReservations, serviceName);
+      // Get service from editData if in edit mode, otherwise use selectedServiceName
+      const serviceName = editData?.servicio || selectedServiceName || null;
+      
+      const result = await getAvailableSlots(dateString, filteredReservations, serviceName, masajes);
       
       if (result.available) {
         // Filter out past times if it's today
@@ -988,10 +997,18 @@ const ManageReservation = () => {
   useEffect(() => {
     if (editData.fecha && editMode) {
       loadAvailableServices(editData.fecha);
+      loadAvailableSlots(editData.fecha, editData.servicio);
     } else if (!editData.fecha) {
       setAvailableServices(masajes); // Reset to all services when no date selected
     }
   }, [editData.fecha, editMode]);
+
+  // Reload slots when service changes (to apply duration-based filtering)
+  useEffect(() => {
+    if (editData.fecha && editMode && editData.servicio) {
+      loadAvailableSlots(editData.fecha, editData.servicio);
+    }
+  }, [editData.servicio]);
 
   // Filter dates to only show available ones
   const isDateAvailable = (date) => {
@@ -1028,7 +1045,7 @@ const ManageReservation = () => {
     setError('');
     if (dateString) {
       loadAvailableServices(dateString);
-      loadAvailableSlots(dateString);
+      loadAvailableSlots(dateString, editData.servicio);
     }
   };
 
@@ -1038,7 +1055,7 @@ const ManageReservation = () => {
       loadAvailableDates();
       if (editData.fecha) {
         loadAvailableServices(editData.fecha);
-        loadAvailableSlots(editData.fecha);
+        loadAvailableSlots(editData.fecha, editData.servicio);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1104,7 +1121,7 @@ const ManageReservation = () => {
               setEditMode(true);
               loadAvailableDates();
               if (reservation.fecha) {
-                loadAvailableSlots(reservation.fecha);
+                loadAvailableSlots(reservation.fecha, reservation.servicio);
               }
             }} className="btn-secondary">Modificar</button>
             <button onClick={handleCancel} className="btn-danger">Cancelar reserva</button>
