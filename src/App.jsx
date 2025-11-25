@@ -2056,6 +2056,14 @@ const AdminPanel = ({ masajes }) => {
   // Simple password check - in production, use proper authentication
   const ADMIN_PASSWORD = 'admin123'; // Change this to a secure password
 
+  // Check if user is already authenticated from sessionStorage
+  useEffect(() => {
+    const savedAuth = sessionStorage.getItem('adminAuthenticated');
+    if (savedAuth === 'true') {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
   useEffect(() => {
     if (isAuthenticated) {
       loadReservations();
@@ -2085,10 +2093,16 @@ const AdminPanel = ({ masajes }) => {
     e.preventDefault();
     if (adminPassword === ADMIN_PASSWORD) {
       setIsAuthenticated(true);
+      sessionStorage.setItem('adminAuthenticated', 'true');
       setAdminPassword('');
     } else {
       alert('Contraseña incorrecta');
     }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    sessionStorage.removeItem('adminAuthenticated');
   };
 
   const updateReservationStatus = async (code, newStatus) => {
@@ -2141,7 +2155,7 @@ const AdminPanel = ({ masajes }) => {
     <div className="admin-panel">
       <div className="admin-header">
         <h3>Panel de administración</h3>
-        <button onClick={() => setIsAuthenticated(false)} className="btn-secondary">Cerrar sesión</button>
+        <button onClick={handleLogout} className="btn-secondary">Cerrar sesión</button>
       </div>
 
       <div className="admin-main-tabs">
