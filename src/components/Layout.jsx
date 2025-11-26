@@ -11,7 +11,8 @@ function Layout({ children }) {
     setMenuOpen(false);
     if (isAdminPage) {
       // If on admin page, navigate to home with hash
-      navigate(`/${hash}`);
+      // Use window.location to properly handle hash navigation
+      window.location.href = '/' + hash;
     } else {
       // If on home page, scroll to section
       const element = document.getElementById(hash.substring(1));

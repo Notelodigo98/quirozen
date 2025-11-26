@@ -495,9 +495,7 @@ const ReservationForm = ({ masajes }) => {
         estado: 'pendiente'
       };
 
-      // Determine which services array to use for calendar event duration
-      const categoria = formData.categoriaServicio || '';
-      const allServices = categoria === 'estetica' ? serviciosEstetica : masajes;
+      // Use all services for calendar event duration calculation
       const todosLosServicios = [...masajes, ...serviciosEstetica];
 
       await saveReservationDB(reservation, todosLosServicios);
@@ -829,8 +827,7 @@ const ManageReservation = () => {
         return;
       }
 
-      // Determine which services array to use for calendar event duration
-      const categoria = editData.categoriaServicio || getCategoryFromService(editData.servicio);
+      // Use all services for calendar event duration calculation
       const todosLosServicios = [...masajes, ...serviciosEstetica];
       
       const success = await updateReservationDB(code, { ...editData, serviciosList: todosLosServicios });
