@@ -26,7 +26,7 @@ export const generateReservationCode = () => {
 };
 
 // Save a new reservation
-export const saveReservation = async (reservation) => {
+export const saveReservation = async (reservation, serviciosList = []) => {
   try {
     const docRef = await addDoc(collection(db, RESERVATIONS_COLLECTION), {
       ...reservation,
@@ -35,14 +35,18 @@ export const saveReservation = async (reservation) => {
     
     // Create Google Calendar event
     try {
-      const calendarEventId = await createCalendarEvent(reservation);
+      const calendarEventId = await createCalendarEvent(reservation, serviciosList);
       if (calendarEventId) {
         // Store calendar event ID in reservation
         await updateDoc(docRef, { calendarEventId });
+        console.log('✅ Evento creado en Google Calendar:', calendarEventId);
+      } else {
+        console.warn('⚠️ No se pudo crear el evento en Google Calendar (puede que no esté configurado)');
       }
     } catch (calendarError) {
       // Log error but don't fail the reservation save
-      console.warn('Error creating Google Calendar event:', calendarError);
+      console.error('❌ Error creating Google Calendar event:', calendarError);
+      console.error('   Detalles:', calendarError.message);
     }
     
     // Send confirmation email
@@ -100,7 +104,7 @@ export const getReservationByCode = async (code) => {
 };
 
 // Update a reservation
-export const updateReservation = async (code, updatedData) => {
+export const updateReservation = async (code, updatedData, serviciosList = []) => {
   try {
     const reservation = await getReservationByCode(code);
     if (!reservation || !reservation.id) {
@@ -108,15 +112,34 @@ export const updateReservation = async (code, updatedData) => {
     }
     
     const reservationRef = doc(db, RESERVATIONS_COLLECTION, reservation.id);
-    await updateDoc(reservationRef, updatedData);
+    
+    // Remove serviciosList from updatedData before saving to Firestore
+    const { serviciosList, ...dataToSave } = updatedData;
+    await updateDoc(reservationRef, dataToSave);
     
     // Update Google Calendar event if it exists
     if (reservation.calendarEventId) {
       try {
-        const updatedReservation = { ...reservation, ...updatedData };
-        await updateCalendarEvent(reservation.calendarEventId, updatedReservation);
+        const updatedReservation = { ...reservation, ...dataToSave };
+        const serviciosListToUse = serviciosList || [];
+        await updateCalendarEvent(reservation.calendarEventId, updatedReservation, serviciosListToUse);
+        console.log('✅ Evento actualizado en Google Calendar');
       } catch (calendarError) {
-        console.warn('Error updating Google Calendar event:', calendarError);
+        console.error('❌ Error updating Google Calendar event:', calendarError);
+        console.error('   Detalles:', calendarError.message);
+      }
+    } else {
+      // If no calendar event ID exists, try to create one
+      try {
+        const updatedReservation = { ...reservation, ...dataToSave };
+        const serviciosListToUse = serviciosList || [];
+        const calendarEventId = await createCalendarEvent(updatedReservation, serviciosListToUse);
+        if (calendarEventId) {
+          await updateDoc(reservationRef, { calendarEventId });
+          console.log('✅ Evento creado en Google Calendar después de actualizar:', calendarEventId);
+        }
+      } catch (calendarError) {
+        console.warn('⚠️ No se pudo crear el evento en Google Calendar al actualizar:', calendarError);
       }
     }
     

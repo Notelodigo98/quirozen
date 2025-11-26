@@ -157,10 +157,26 @@ const isTokenExpired = () => {
 
 // Make API request with automatic token refresh
 const makeCalendarRequest = async (url, options = {}) => {
+  // Ensure tokens are loaded
+  if (!accessToken) {
+    const loaded = loadTokensFromStorage();
+    if (!loaded || !accessToken) {
+      throw new Error('Google Calendar not initialized. Please set up OAuth tokens.');
+    }
+  }
+
+  // Ensure client config is loaded
+  if (!clientId || !clientSecret) {
+    loadClientConfig();
+  }
+
   // Check if token needs refresh before making request
   if (isTokenExpired()) {
-    console.log('Token expired or about to expire, refreshing...');
-    await refreshAccessToken();
+    console.log('🔄 Token expired or about to expire, refreshing...');
+    const refreshed = await refreshAccessToken();
+    if (!refreshed) {
+      throw new Error('Failed to refresh access token. Please re-authenticate.');
+    }
   }
 
   const headers = {
@@ -175,7 +191,7 @@ const makeCalendarRequest = async (url, options = {}) => {
 
   // If unauthorized, try refreshing token once
   if (response.status === 401) {
-    console.log('Received 401, refreshing token and retrying...');
+    console.log('🔄 Received 401, refreshing token and retrying...');
     const refreshed = await refreshAccessToken();
     
     if (refreshed) {
@@ -185,16 +201,33 @@ const makeCalendarRequest = async (url, options = {}) => {
         ...options,
         headers
       });
+    } else {
+      throw new Error('Failed to refresh access token after 401. Please re-authenticate.');
     }
   }
 
   return response;
 };
 
+// Helper: Extract minutes from duration string (e.g., "50 min" -> 50)
+const extractMinutesFromDuration = (durationString) => {
+  if (!durationString) return 50; // Default 50 minutes
+  const match = durationString.match(/(\d+)\s*min/);
+  return match ? parseInt(match[1], 10) : 50;
+};
+
 // Helper: Calculate end time based on service duration
-const getEndTime = (startTime, servicio) => {
-  // Default duration: 50 minutes (adjust based on your services)
-  const duration = 50; // minutes
+const getEndTime = (startTime, servicio, serviciosList = []) => {
+  // Try to find the service in the list to get its actual duration
+  let duration = 50; // Default duration: 50 minutes
+  
+  if (servicio && serviciosList.length > 0) {
+    const service = serviciosList.find(s => s.nombre === servicio);
+    if (service && service.duracion) {
+      duration = extractMinutesFromDuration(service.duracion);
+    }
+  }
+  
   const [hours, minutes] = startTime.split(':').map(Number);
   const totalMinutes = hours * 60 + minutes + duration;
   const endHours = Math.floor(totalMinutes / 60);
@@ -203,15 +236,25 @@ const getEndTime = (startTime, servicio) => {
 };
 
 // Create a calendar event for a reservation
-export const createCalendarEvent = async (reservation) => {
+export const createCalendarEvent = async (reservation, serviciosList = []) => {
+  // Ensure tokens are loaded before making request
   if (!accessToken) {
-    console.error('Google Calendar not initialized. Please set up OAuth tokens.');
-    return null;
+    const loaded = loadTokensFromStorage();
+    if (!loaded || !accessToken) {
+      console.error('Google Calendar not initialized. Please set up OAuth tokens.');
+      console.error('Visit /setup-calendar.html to configure Google Calendar.');
+      return null;
+    }
+  }
+
+  // Ensure client config is loaded
+  if (!clientId || !clientSecret) {
+    loadClientConfig();
   }
 
   try {
     const startDateTime = `${reservation.fecha}T${reservation.hora}:00`;
-    const endTime = getEndTime(reservation.hora, reservation.servicio);
+    const endTime = getEndTime(reservation.hora, reservation.servicio, serviciosList);
     const endDateTime = `${reservation.fecha}T${endTime}:00`;
 
     const event = {
@@ -259,15 +302,24 @@ export const createCalendarEvent = async (reservation) => {
 };
 
 // Update a calendar event
-export const updateCalendarEvent = async (eventId, reservation) => {
+export const updateCalendarEvent = async (eventId, reservation, serviciosList = []) => {
+  // Ensure tokens are loaded before making request
   if (!accessToken) {
-    console.error('Google Calendar not initialized.');
-    return false;
+    const loaded = loadTokensFromStorage();
+    if (!loaded || !accessToken) {
+      console.error('Google Calendar not initialized.');
+      return false;
+    }
+  }
+
+  // Ensure client config is loaded
+  if (!clientId || !clientSecret) {
+    loadClientConfig();
   }
 
   try {
     const startDateTime = `${reservation.fecha}T${reservation.hora}:00`;
-    const endTime = getEndTime(reservation.hora, reservation.servicio);
+    const endTime = getEndTime(reservation.hora, reservation.servicio, serviciosList);
     const endDateTime = `${reservation.fecha}T${endTime}:00`;
 
     const event = {

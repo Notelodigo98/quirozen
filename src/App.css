@@ -59,14 +59,15 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  background: transparent;
+  background: url('/fondofinal.png') no-repeat center center fixed;
+  background-size: cover;
   padding-bottom: 0;
   margin: 0;
   width: 100%;
 }
 
 .main-container.admin-page {
-  background: white;
+  background: white !important;
 }
 
 /* ============================================

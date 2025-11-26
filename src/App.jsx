@@ -495,7 +495,12 @@ const ReservationForm = ({ masajes }) => {
         estado: 'pendiente'
       };
 
-      await saveReservationDB(reservation);
+      // Determine which services array to use for calendar event duration
+      const categoria = formData.categoriaServicio || '';
+      const allServices = categoria === 'estetica' ? serviciosEstetica : masajes;
+      const todosLosServicios = [...masajes, ...serviciosEstetica];
+
+      await saveReservationDB(reservation, todosLosServicios);
       setReservationCode(code);
       setSubmitted(true);
       setFormData({
@@ -824,7 +829,11 @@ const ManageReservation = () => {
         return;
       }
 
-      const success = await updateReservationDB(code, editData);
+      // Determine which services array to use for calendar event duration
+      const categoria = editData.categoriaServicio || getCategoryFromService(editData.servicio);
+      const todosLosServicios = [...masajes, ...serviciosEstetica];
+      
+      const success = await updateReservationDB(code, { ...editData, serviciosList: todosLosServicios });
       if (success) {
         setReservation(editData);
         setEditMode(false);
@@ -2227,7 +2236,9 @@ const AdminPanel = ({ masajes }) => {
     try {
       const reservation = await getReservationByCodeDB(code);
       if (reservation) {
-        await updateReservationDB(code, { ...reservation, estado: newStatus });
+        // Get all services for calendar event
+        const todosLosServicios = [...masajes, ...serviciosEstetica];
+        await updateReservationDB(code, { ...reservation, estado: newStatus, serviciosList: todosLosServicios });
         await loadReservations();
       }
     } catch (err) {
@@ -2416,6 +2427,20 @@ const GiftBox = ({ regalo }) => {
 // Home Component
 function Home() {
   const [activeTab, setActiveTab] = useState('reservar'); // reservar, gestionar
+
+  // Handle hash navigation when coming from other pages
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash) {
+      // Small delay to ensure page is rendered
+      setTimeout(() => {
+        const element = document.getElementById(hash.substring(1));
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  }, []);
 
   return (
     <>

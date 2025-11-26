@@ -1,10 +1,25 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 function Layout({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const isAdminPage = location.pathname === '/admin';
+
+  const handleNavClick = (hash) => {
+    setMenuOpen(false);
+    if (isAdminPage) {
+      // If on admin page, navigate to home with hash
+      navigate(`/${hash}`);
+    } else {
+      // If on home page, scroll to section
+      const element = document.getElementById(hash.substring(1));
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
 
   return (
     <div className={`main-container ${isAdminPage ? 'admin-page' : ''}`}>
@@ -15,12 +30,12 @@ function Layout({ children }) {
           </Link>
           <nav className={`main-nav ${menuOpen ? 'open' : ''}`}>
             <ul>
-              <li><a href="#info" onClick={() => setMenuOpen(false)}>Información principal</a></li>
-              <li><a href="#mindfulness" onClick={() => setMenuOpen(false)}>Mindfulness</a></li>
-              <li><a href="#estetica" onClick={() => setMenuOpen(false)}>Estética y belleza</a></li>
-              <li><a href="#promos" onClick={() => setMenuOpen(false)}>Promociones/Bonos</a></li>
-              <li><a href="#reservas" onClick={() => setMenuOpen(false)}>Reservas</a></li>
-              <li><a href="#sobre" onClick={() => setMenuOpen(false)}>Sobre nosotros</a></li>
+              <li><a href={isAdminPage ? "/#info" : "#info"} onClick={(e) => { e.preventDefault(); handleNavClick('#info'); }}>Información principal</a></li>
+              <li><a href={isAdminPage ? "/#mindfulness" : "#mindfulness"} onClick={(e) => { e.preventDefault(); handleNavClick('#mindfulness'); }}>Mindfulness</a></li>
+              <li><a href={isAdminPage ? "/#estetica" : "#estetica"} onClick={(e) => { e.preventDefault(); handleNavClick('#estetica'); }}>Estética y belleza</a></li>
+              <li><a href={isAdminPage ? "/#promos" : "#promos"} onClick={(e) => { e.preventDefault(); handleNavClick('#promos'); }}>Promociones/Bonos</a></li>
+              <li><a href={isAdminPage ? "/#reservas" : "#reservas"} onClick={(e) => { e.preventDefault(); handleNavClick('#reservas'); }}>Reservas</a></li>
+              <li><a href={isAdminPage ? "/#sobre" : "#sobre"} onClick={(e) => { e.preventDefault(); handleNavClick('#sobre'); }}>Sobre nosotros</a></li>
             </ul>
           </nav>
           <button className="hamburger" onClick={() => setMenuOpen(!menuOpen)} aria-label="Abrir menú">
@@ -81,12 +96,12 @@ function Layout({ children }) {
             <div className="footer-links">
               <h3>Enlaces</h3>
               <ul>
-                <li><a href="#info" onClick={() => setMenuOpen(false)}>Información principal</a></li>
-                <li><a href="#mindfulness" onClick={() => setMenuOpen(false)}>Mindfulness</a></li>
-                <li><a href="#estetica" onClick={() => setMenuOpen(false)}>Estética y belleza</a></li>
-                <li><a href="#promos" onClick={() => setMenuOpen(false)}>Promociones</a></li>
-                <li><a href="#reservas" onClick={() => setMenuOpen(false)}>Reservas</a></li>
-                <li><a href="#sobre" onClick={() => setMenuOpen(false)}>Sobre nosotros</a></li>
+                <li><a href={isAdminPage ? "/#info" : "#info"} onClick={(e) => { e.preventDefault(); handleNavClick('#info'); }}>Información principal</a></li>
+                <li><a href={isAdminPage ? "/#mindfulness" : "#mindfulness"} onClick={(e) => { e.preventDefault(); handleNavClick('#mindfulness'); }}>Mindfulness</a></li>
+                <li><a href={isAdminPage ? "/#estetica" : "#estetica"} onClick={(e) => { e.preventDefault(); handleNavClick('#estetica'); }}>Estética y belleza</a></li>
+                <li><a href={isAdminPage ? "/#promos" : "#promos"} onClick={(e) => { e.preventDefault(); handleNavClick('#promos'); }}>Promociones</a></li>
+                <li><a href={isAdminPage ? "/#reservas" : "#reservas"} onClick={(e) => { e.preventDefault(); handleNavClick('#reservas'); }}>Reservas</a></li>
+                <li><a href={isAdminPage ? "/#sobre" : "#sobre"} onClick={(e) => { e.preventDefault(); handleNavClick('#sobre'); }}>Sobre nosotros</a></li>
               </ul>
             </div>
 
