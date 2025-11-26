@@ -17,8 +17,7 @@
   font-weight: 400;
 
   color: var(--text-black);
-  background: url('/fondofinal.png') no-repeat center center fixed;
-  background-size: cover;
+  /* Background moved to .main-container in App.css */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -49,6 +48,9 @@ body {
   padding: 0;
   min-width: 320px;
   min-height: 100vh;
+  background: url('/fondofinal.png') no-repeat center center fixed;
+  background-size: cover;
+  background-attachment: fixed;
 }
 
 h1, h2, h3, h4, h5, h6 {
