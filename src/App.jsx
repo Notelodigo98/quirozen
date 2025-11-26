@@ -58,8 +58,14 @@ const masajes = [
   { nombre: 'Masaje maderoterapia', descripcion: 'Rodillos y copas de madera con ritmo relajante para moldear y liberar ansiedad corporal.', duracion: '50 min', precio: '30€' },
   { nombre: 'Masaje embarazadas', descripcion: 'En camilla o silla terapéutica con apoyo relajante que tranquiliza ansiedad prenatal.', duracion: '50 min', precio: '30€' },
   { nombre: 'Mindfulness', descripcion: 'Práctica de estar presente en el momento, sin juzgar ni distraerse. Ayuda a reducir el estrés, la ansiedad y mejora el bienestar general.', duracion: '50 min', precio: '40€' },
+];
+
+const serviciosEstetica = [
   { nombre: 'Presoterapia', descripcion: 'Tratamiento que aplica presión de aire para mejorar el drenaje linfático y la circulación. Ayuda a reducir la retención de líquidos y disminuir la celulitis.', duracion: '45 min', precio: '35€' },
 ];
+
+// Combined array for backward compatibility
+const todosLosServicios = [...masajes, ...serviciosEstetica];
 
 const bonos = [
   {
@@ -147,6 +153,7 @@ const ReservationForm = ({ masajes }) => {
     nombre: '',
     email: '',
     telefono: '',
+    categoriaServicio: '',
     servicio: '',
     fecha: '',
     hora: '',
@@ -160,7 +167,7 @@ const ReservationForm = ({ masajes }) => {
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [availableDates, setAvailableDates] = useState([]);
   const [loadingDates, setLoadingDates] = useState(false);
-  const [availableServices, setAvailableServices] = useState(masajes); // Start with all services
+  const [availableServices, setAvailableServices] = useState([]); // Will be filtered based on category
   const [urgencyConfig, setUrgencyConfig] = useState(null); // Store urgency configuration
 
   // Calculate max date (2 months from now) - computed once
@@ -188,18 +195,25 @@ const ReservationForm = ({ masajes }) => {
     }
   };
 
-  // Load available services and slots when date changes
+  // Load available services and slots when date or category changes
   useEffect(() => {
-    if (formData.fecha) {
-      loadAvailableServices(formData.fecha);
-      loadAvailableSlots(formData.fecha, formData.servicio);
-      // Reset hora and servicio when fecha changes
-      setFormData(prev => ({ ...prev, hora: '', servicio: '' }));
+    if (formData.fecha && formData.categoriaServicio) {
+      loadAvailableServices(formData.fecha, formData.categoriaServicio);
+      if (formData.servicio) {
+        loadAvailableSlots(formData.fecha, formData.servicio);
+      }
     } else {
       setAvailableSlots([]);
-      setAvailableServices(masajes); // Reset to all services when no date selected
+      setAvailableServices([]);
     }
-  }, [formData.fecha]);
+  }, [formData.fecha, formData.categoriaServicio]);
+
+  // Reset servicio when categoriaServicio changes
+  useEffect(() => {
+    if (formData.categoriaServicio) {
+      setFormData(prev => ({ ...prev, servicio: '', hora: '' }));
+    }
+  }, [formData.categoriaServicio]);
 
   // Reload slots when service changes (to apply duration-based filtering)
   useEffect(() => {
@@ -208,9 +222,11 @@ const ReservationForm = ({ masajes }) => {
     }
   }, [formData.servicio]);
 
-  const loadAvailableServices = async (dateString) => {
+  const loadAvailableServices = async (dateString, categoria) => {
     try {
-      const services = await getAvailableServices(dateString, masajes);
+      // Determine which services array to use based on category
+      const allServices = categoria === 'masajes' ? masajes : serviciosEstetica;
+      const services = await getAvailableServices(dateString, allServices);
       setAvailableServices(services);
       // If current servicio is not available and it's not "Otro", reset it
       if (formData.servicio && formData.servicio !== 'Otro' && !services.find(s => s.nombre === formData.servicio)) {
@@ -218,7 +234,8 @@ const ReservationForm = ({ masajes }) => {
       }
     } catch (err) {
       console.error('Error loading available services:', err);
-      setAvailableServices(masajes); // On error, show all services
+      const allServices = categoria === 'masajes' ? masajes : serviciosEstetica;
+      setAvailableServices(allServices); // On error, show all services for category
     }
   };
 
@@ -339,8 +356,12 @@ const ReservationForm = ({ masajes }) => {
       // Get reservations for this date
       const reservations = await getReservationsByDate(dateString);
       
+      // Determine which services array to use based on category
+      const categoria = formData.categoriaServicio || '';
+      const allServices = categoria === 'estetica' ? serviciosEstetica : masajes;
+      
       // Get available slots considering reservations
-      const result = await getAvailableSlots(dateString, reservations, null, masajes);
+      const result = await getAvailableSlots(dateString, reservations, null, allServices);
       
       if (result.available) {
         // Filter out past times if it's today
@@ -442,7 +463,7 @@ const ReservationForm = ({ masajes }) => {
     setLoading(true);
 
     // Validation
-    if (!formData.nombre || !formData.email || !formData.telefono || !formData.servicio || !formData.fecha || !formData.hora) {
+    if (!formData.nombre || !formData.email || !formData.telefono || !formData.categoriaServicio || !formData.servicio || !formData.fecha || !formData.hora) {
       setError('Por favor, completa todos los campos obligatorios.');
       setLoading(false);
       return;
@@ -452,7 +473,11 @@ const ReservationForm = ({ masajes }) => {
       // Final validation: check if slot is still available
       const reservations = await getReservationsByDate(formData.fecha);
       
-      const slotAvailability = await getAvailableSlots(formData.fecha, reservations, null, masajes);
+      // Determine which services array to use based on category
+      const categoria = formData.categoriaServicio || '';
+      const allServices = categoria === 'estetica' ? serviciosEstetica : masajes;
+      
+      const slotAvailability = await getAvailableSlots(formData.fecha, reservations, null, allServices);
       
       if (!slotAvailability.available || !slotAvailability.slots.includes(formData.hora)) {
         setError('Lo sentimos, este horario ya no está disponible. Por favor, selecciona otro.');
@@ -548,12 +573,31 @@ const ReservationForm = ({ masajes }) => {
       </div>
 
       <div className="form-group">
-        <label htmlFor="servicio">Tipo de servicio *</label>
+        <label htmlFor="categoriaServicio">Servicio *</label>
         {!formData.fecha ? (
-          <select id="servicio" name="servicio" disabled>
+          <select id="categoriaServicio" name="categoriaServicio" disabled>
             <option value="">Primero selecciona una fecha</option>
           </select>
         ) : (
+          <select
+            id="categoriaServicio"
+            name="categoriaServicio"
+            value={formData.categoriaServicio}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Selecciona una categoría</option>
+            <option value="masajes">Masajes</option>
+            <option value="estetica">Estética</option>
+          </select>
+        )}
+      </div>
+
+      {formData.categoriaServicio && (
+        <div className="form-group">
+          <label htmlFor="servicio">
+            {formData.categoriaServicio === 'masajes' ? 'Tipo de masaje *' : 'Tipo de tratamiento *'}
+          </label>
           <select
             id="servicio"
             name="servicio"
@@ -561,16 +605,16 @@ const ReservationForm = ({ masajes }) => {
             onChange={handleChange}
             required
           >
-            <option value="">Selecciona un servicio</option>
-            {availableServices.map((masaje, i) => (
-              <option key={i} value={masaje.nombre}>
-                {masaje.nombre} - {masaje.duracion} - {masaje.precio}
+            <option value="">Selecciona un {formData.categoriaServicio === 'masajes' ? 'masaje' : 'tratamiento'}</option>
+            {availableServices.map((servicio, i) => (
+              <option key={i} value={servicio.nombre}>
+                {servicio.nombre} - {servicio.duracion} - {servicio.precio}
               </option>
             ))}
             <option value="Otro">Otro</option>
           </select>
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="form-row">
         <div className="form-group">
@@ -687,8 +731,15 @@ const ManageReservation = () => {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [loadingDates, setLoadingDates] = useState(false);
   const [loadingSlots, setLoadingSlots] = useState(false);
-  const [availableServices, setAvailableServices] = useState(masajes); // Start with all services
+  const [availableServices, setAvailableServices] = useState([]); // Will be filtered based on category
   const [urgencyConfig, setUrgencyConfig] = useState(null); // Store urgency configuration
+
+  // Helper: Determine category from service name
+  const getCategoryFromService = (serviceName) => {
+    if (!serviceName || serviceName === 'Otro') return '';
+    const esteticaService = serviciosEstetica.find(s => s.nombre === serviceName);
+    return esteticaService ? 'estetica' : 'masajes';
+  };
 
   // Load urgency configuration from Firestore
   useEffect(() => {
@@ -719,11 +770,13 @@ const ManageReservation = () => {
       const found = await getReservationByCodeDB(code);
       if (found) {
         setReservation(found);
-        setEditData(found);
+        // Determine category from service
+        const categoria = getCategoryFromService(found.servicio);
+        setEditData({ ...found, categoriaServicio: categoria });
         setEditMode(false);
         // Load available services for the reservation date
         if (found.fecha) {
-          loadAvailableServices(found.fecha);
+          loadAvailableServices(found.fecha, categoria);
         }
       } else {
         setError('No se encontró ninguna reserva con ese código.');
@@ -757,7 +810,11 @@ const ManageReservation = () => {
         ? reservations.filter(r => r.id !== reservation.id)
         : reservations;
       
-      const slotAvailability = await getAvailableSlots(editData.fecha, filteredReservations, editData.servicio, masajes);
+      // Determine which services array to use
+      const categoria = editData.categoriaServicio || getCategoryFromService(editData.servicio);
+      const allServices = categoria === 'estetica' ? serviciosEstetica : masajes;
+      
+      const slotAvailability = await getAvailableSlots(editData.fecha, filteredReservations, editData.servicio, allServices);
       
       if (!slotAvailability.available || !slotAvailability.slots.includes(editData.hora)) {
         setError('Lo sentimos, este horario ya no está disponible. Por favor, selecciona otro.');
@@ -941,15 +998,28 @@ const ManageReservation = () => {
   };
 
   // Load available services for a date
-  const loadAvailableServices = async (dateString) => {
+  const loadAvailableServices = async (dateString, categoria = null) => {
     try {
+      // Determine category if not provided
+      if (!categoria && editData.servicio) {
+        categoria = getCategoryFromService(editData.servicio);
+      }
+      // If still no category, try to infer from editData
+      if (!categoria && editData.categoriaServicio) {
+        categoria = editData.categoriaServicio;
+      }
+      
+      // Determine which services array to use based on category
+      const allServices = categoria === 'estetica' ? serviciosEstetica : masajes;
       // Always include current service if editing (so user can keep it or change to another)
       const currentService = editData.servicio && editData.servicio !== 'Otro' ? editData.servicio : null;
-      const services = await getAvailableServices(dateString, masajes, currentService);
+      const services = await getAvailableServices(dateString, allServices, currentService);
       setAvailableServices(services);
     } catch (err) {
       console.error('Error loading available services:', err);
-      setAvailableServices(masajes); // On error, show all services
+      const categoria = editData.categoriaServicio || getCategoryFromService(editData.servicio);
+      const allServices = categoria === 'estetica' ? serviciosEstetica : masajes;
+      setAvailableServices(allServices); // On error, show all services for category
     }
   };
 
@@ -968,7 +1038,10 @@ const ManageReservation = () => {
       // Get service from editData if in edit mode, otherwise use selectedServiceName
       const serviceName = editData?.servicio || selectedServiceName || null;
       
-      const result = await getAvailableSlots(dateString, filteredReservations, serviceName, masajes);
+      // Determine which services array to use
+      const categoria = editData.categoriaServicio || getCategoryFromService(serviceName);
+      const allServices = categoria === 'estetica' ? serviciosEstetica : masajes;
+      const result = await getAvailableSlots(dateString, filteredReservations, serviceName, allServices);
       
       if (result.available) {
         // Filter out past times if it's today
@@ -995,15 +1068,32 @@ const ManageReservation = () => {
     }
   };
 
-  // Load available services when date changes in edit mode
+  // Load available services when date or category changes in edit mode
   useEffect(() => {
-    if (editData.fecha && editMode) {
-      loadAvailableServices(editData.fecha);
-      loadAvailableSlots(editData.fecha, editData.servicio);
+    if (editData.fecha && editMode && editData.categoriaServicio) {
+      loadAvailableServices(editData.fecha, editData.categoriaServicio);
+      if (editData.servicio) {
+        loadAvailableSlots(editData.fecha, editData.servicio);
+      }
     } else if (!editData.fecha) {
-      setAvailableServices(masajes); // Reset to all services when no date selected
+      setAvailableServices([]); // Reset when no date selected
     }
-  }, [editData.fecha, editMode]);
+  }, [editData.fecha, editData.categoriaServicio, editMode]);
+
+  // Reset servicio when categoriaServicio changes (but not on initial load)
+  useEffect(() => {
+    if (editData.categoriaServicio && editMode) {
+      // Only reset if the current servicio doesn't belong to the new category
+      const currentService = editData.servicio;
+      if (currentService && currentService !== 'Otro') {
+        const currentCategory = getCategoryFromService(currentService);
+        if (currentCategory !== editData.categoriaServicio) {
+          // Service doesn't match the category, reset it
+          setEditData(prev => ({ ...prev, servicio: '', hora: '' }));
+        }
+      }
+    }
+  }, [editData.categoriaServicio]);
 
   // Reload slots when service changes (to apply duration-based filtering)
   useEffect(() => {
@@ -1041,13 +1131,15 @@ const ManageReservation = () => {
     setEditData({ 
       ...editData, 
       fecha: dateString,
-      hora: '', // Reset hour when date changes
-      servicio: '' // Reset servicio when fecha changes to reload available services
+      hora: '' // Reset hour when date changes (but keep servicio if categoriaServicio is set)
     });
     setError('');
-    if (dateString) {
-      loadAvailableServices(dateString);
-      loadAvailableSlots(dateString, editData.servicio);
+    if (dateString && editData.categoriaServicio) {
+      loadAvailableServices(dateString, editData.categoriaServicio);
+      // Only load slots if servicio is still set, otherwise it will be loaded when servicio is selected
+      if (editData.servicio) {
+        loadAvailableSlots(dateString, editData.servicio);
+      }
     }
   };
 
@@ -1055,8 +1147,8 @@ const ManageReservation = () => {
   useEffect(() => {
     if (editMode) {
       loadAvailableDates();
-      if (editData.fecha) {
-        loadAvailableServices(editData.fecha);
+      if (editData.fecha && editData.categoriaServicio) {
+        loadAvailableServices(editData.fecha, editData.categoriaServicio);
         loadAvailableSlots(editData.fecha, editData.servicio);
       }
     }
@@ -1121,8 +1213,17 @@ const ManageReservation = () => {
           <div className="reservation-actions">
             <button onClick={() => {
               setEditMode(true);
+              // Ensure categoriaServicio is set when entering edit mode
+              if (!editData.categoriaServicio && reservation.servicio) {
+                const categoria = getCategoryFromService(reservation.servicio);
+                setEditData(prev => ({ ...prev, categoriaServicio: categoria }));
+              }
               loadAvailableDates();
               if (reservation.fecha) {
+                const categoria = editData.categoriaServicio || getCategoryFromService(reservation.servicio);
+                if (categoria) {
+                  loadAvailableServices(reservation.fecha, categoria);
+                }
                 loadAvailableSlots(reservation.fecha, reservation.servicio);
               }
             }} className="btn-secondary">Modificar</button>
@@ -1175,20 +1276,37 @@ const ManageReservation = () => {
               </select>
             ) : (
               <select
+                value={editData.categoriaServicio || ''}
+                onChange={(e) => setEditData({ ...editData, categoriaServicio: e.target.value, servicio: '', hora: '' })}
+                required
+              >
+                <option value="">Selecciona una categoría</option>
+                <option value="masajes">Masajes</option>
+                <option value="estetica">Estética</option>
+              </select>
+            )}
+          </div>
+
+          {editData.categoriaServicio && (
+            <div className="form-group">
+              <label>
+                {editData.categoriaServicio === 'masajes' ? 'Tipo de masaje *' : 'Tipo de tratamiento *'}
+              </label>
+              <select
                 value={editData.servicio || ''}
                 onChange={(e) => setEditData({ ...editData, servicio: e.target.value })}
                 required
               >
-                <option value="">Selecciona un servicio</option>
-                {availableServices.map((masaje, i) => (
-                  <option key={i} value={masaje.nombre}>
-                    {masaje.nombre} - {masaje.duracion} - {masaje.precio}
+                <option value="">Selecciona un {editData.categoriaServicio === 'masajes' ? 'masaje' : 'tratamiento'}</option>
+                {availableServices.map((servicio, i) => (
+                  <option key={i} value={servicio.nombre}>
+                    {servicio.nombre} - {servicio.duracion} - {servicio.precio}
                   </option>
                 ))}
                 <option value="Otro">Otro</option>
               </select>
-            )}
-          </div>
+            </div>
+          )}
           <div className="form-group">
             <label>Hora *</label>
             {!editData.fecha ? (
@@ -1749,7 +1867,7 @@ const AvailabilityManager = () => {
               />
               <span>Todos los servicios</span>
             </label>
-            {masajes.map((masaje, i) => (
+            {todosLosServicios.map((masaje, i) => (
               <label key={i} className="checkbox-label">
                 <input
                   type="checkbox"
@@ -2480,7 +2598,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout><Home /></Layout>} />
-      <Route path="/admin" element={<Layout><AdminPanel masajes={masajes} /></Layout>} />
+      <Route path="/admin" element={<Layout><AdminPanel masajes={todosLosServicios} /></Layout>} />
       <Route path="/terminos" element={<Terminos />} />
       <Route path="/acuerdo" element={<Acuerdo />} />
     </Routes>
