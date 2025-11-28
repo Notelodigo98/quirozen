@@ -1376,6 +1376,10 @@ main {
    RESERVATION SYSTEM
    ============================================ */
 
+#reservas {
+  min-height: 1225.05px;
+}
+
 .reservation-tabs {
   display: flex;
   gap: 1rem;

@@ -79,3 +79,4 @@ Después de ver los logs, comparte conmigo:
 - ¿Aparece "Missing environment variables"?
 - ¿Hay algún error específico de Google Calendar API?
 
+

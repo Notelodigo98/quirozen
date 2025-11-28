@@ -61,7 +61,7 @@ const masajes = [
 ];
 
 const serviciosEstetica = [
-  { nombre: 'Presoterapia', descripcion: 'Tratamiento que aplica presión de aire para mejorar el drenaje linfático y la circulación. Ayuda a reducir la retención de líquidos y disminuir la celulitis.', duracion: '45 min', precio: '35€' },
+  { nombre: 'Presoterapia', descripcion: 'Tratamiento que aplica presión de aire para mejorar el drenaje linfático y la circulación. Ayuda a reducir la retención de líquidos y disminuir la celulitis.', duracion: '45 min', precio: '25€' },
 ];
 
 // Combined array for backward compatibility
@@ -69,17 +69,17 @@ const todosLosServicios = [...masajes, ...serviciosEstetica];
 
 const bonos = [
   {
-    titulo: 'Bono 5 sesiones',
+    titulo: 'Bono 5 Sesiones',
     descripcion: 'Ideal para quienes vienen una vez por semana o cada 15 días.',
     detalles: '5 masajes de 50 min',
     precio: '125€',
     regalo: '1 desayuno en cafetería Novara'
   },
   {
-    titulo: 'Bono 10 sesiones',
+    titulo: 'Bono 10 Sesiones',
     descripcion: 'Para clientes constantes o con tratamiento prolongado (espalda, cervicales, estrés).',
     detalles: '10 masajes de 50 min',
-    precio: '250€',
+    precio: '175€ (Oferta limitada por apertura)',
     regalo: '1 masaje facial o podal de 20 min'
   },
   {
@@ -136,13 +136,13 @@ const bonos = [
     precio: '100€ (Precio de apertura, oferta limitada)',
     regalo: ''
   },
-  {
-    titulo: 'Bono 10 Sesiones',
-    descripcion: 'Para aliviar tensiones por carga física o emocional.',
-    detalles: '10 sesiones de 50 minutos',
-    precio: '300€',
-    regalo: ''
-  },
+  // {
+  //   titulo: 'Bono 10 Sesiones',
+  //   descripcion: 'Para aliviar tensiones por carga física o emocional.',
+  //   detalles: '10 sesiones de 50 minutos',
+  //   precio: '300€',
+  //   regalo: ''
+  // },
 ];
 
 // Reservation utility functions now use Firebase (imported from firebase/reservations.js)
@@ -2508,7 +2508,7 @@ function Home() {
                 estética corporal.
               </p>
               <p><strong>Duración:</strong> 45 min</p>
-              <p><strong>Precio:</strong> 35€ (Precio de apertura, oferta limitada)</p>
+              <p><strong>Precio:</strong> 25€ (Precio de apertura, oferta limitada)</p>
             </div>
           </div>
         </section>

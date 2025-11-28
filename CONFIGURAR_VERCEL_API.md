@@ -32,8 +32,8 @@ He creado **Vercel Serverless Functions** que se ejecutan en el servidor. Esto p
 ```
 GOOGLE_CLIENT_ID = 496869168104-m3n1059e2m87a46l6vrlpooitoobk1oq.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET = 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
-GOOGLE_ACCESS_TOKEN = TU_ACCESS_TOKEN_AQUI
-GOOGLE_REFRESH_TOKEN = TU_REFRESH_TOKEN_AQUI
+GOOGLE_ACCESS_TOKEN = ya29a0ATi6K2v3y4HPacZ6yHrw319WoT9xtJibQE1EXXZXUSQGEsiTt4bvlCBF-okuJMVoKQS1lnaQBAqYUTfaZ2dIq8csX2mTX0mI8jo-YRZp8NTojOuD9obhHarL1yury_JJMkIUVs8Rg-EZwl_5YdB2sfeeLVICGU0truUhJHQtTfuDV5S_w-RjinJpwnKi3fTjhK8vFDcaCgYKAdISARYSFQHGX2MiKlNk5r8sQnjf2cJPw8PXzQ0206
+GOOGLE_REFRESH_TOKEN = 1//03GszI__IVq_FCgYIARAAGAMSNwF-L9IrteWcSMo7urnsw3vKbn6BziDyB8SBaeMkza6HDnAuOzh0unaP44BIIhv3lmxQLgSsITQ
 ```
 
 5. Selecciona **Production**, **Preview**, y **Development**
