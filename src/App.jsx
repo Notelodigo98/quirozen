@@ -1614,12 +1614,13 @@ const AvailabilityManager = () => {
     setMessage({ type: '', text: '' });
     
     try {
-      // Convert ranges to slots for each day
+      // Convert ranges to slots for each day, but also keep the ranges
       const scheduleWithSlots = {};
       Object.keys(weeklySchedule).forEach(day => {
         const dayData = weeklySchedule[day];
         scheduleWithSlots[day] = {
           available: dayData.available,
+          ranges: dayData.ranges || [], // IMPORTANTE: Guardar los ranges originales
           slots: dayData.available && dayData.ranges.length > 0 
             ? generateSlotsFromRanges(dayData.ranges)
             : [],
