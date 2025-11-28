@@ -147,6 +147,23 @@
                                 </div>
                                 
                                 <details style="margin-top: 20px;">
+                                    <summary style="cursor: pointer; font-weight: bold;">📋 Comandos para Firebase Functions (Recomendado)</summary>
+                                    <div style="background: #e7f3ff; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                                        <p><strong>Para que funcione desde cualquier dispositivo, configura Firebase Functions:</strong></p>
+                                        <p style="font-size: 12px; color: #666;">Copia y ejecuta este comando en tu terminal:</p>
+                                        <textarea id="firebaseCommand" readonly style="font-size: 11px; height: 120px; font-family: monospace;">firebase functions:config:set \\
+  google.client_id="${clientId}" \\
+  google.client_secret="${clientSecret}" \\
+  google.redirect_uri="${window.location.origin}/oauth2callback.html" \\
+  google.access_token="${data.access_token}" \\
+  google.refresh_token="${data.refresh_token || 'NO_REFRESH_TOKEN'}"</textarea>
+                                        <button onclick="copyToClipboard('firebaseCommand')" style="margin-top: 5px;">📋 Copiar Comando</button>
+                                        <p style="font-size: 12px; margin-top: 10px; color: #666;">Después ejecuta: <code>firebase deploy --only functions</code></p>
+                                        <p style="font-size: 11px; color: #888; margin-top: 10px;">📖 Ver guía completa en: FIREBASE_FUNCTIONS_SETUP.md</p>
+                                    </div>
+                                </details>
+                                
+                                <details style="margin-top: 20px;">
                                     <summary style="cursor: pointer; font-weight: bold;">Ver tokens (para referencia)</summary>
                                     <p><strong>Access Token:</strong></p>
                                     <textarea id="accessToken" readonly style="font-size: 10px;">${data.access_token}</textarea>

@@ -10,7 +10,8 @@ import {
   orderBy 
 } from 'firebase/firestore';
 import { db } from './config';
-import { createCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from './googleCalendar';
+// Google Calendar ahora se maneja desde Firebase Functions (backend)
+// No necesitamos importar las funciones del cliente
 import { sendReservationEmail, sendReservationUpdateEmail } from './emailService';
 
 const RESERVATIONS_COLLECTION = 'reservations';
@@ -33,21 +34,9 @@ export const saveReservation = async (reservation, serviciosList = []) => {
       createdAt: new Date().toISOString()
     });
     
-    // Create Google Calendar event
-    try {
-      const calendarEventId = await createCalendarEvent(reservation, serviciosList);
-      if (calendarEventId) {
-        // Store calendar event ID in reservation
-        await updateDoc(docRef, { calendarEventId });
-        console.log('✅ Evento creado en Google Calendar:', calendarEventId);
-      } else {
-        console.warn('⚠️ No se pudo crear el evento en Google Calendar (puede que no esté configurado)');
-      }
-    } catch (calendarError) {
-      // Log error but don't fail the reservation save
-      console.error('❌ Error creating Google Calendar event:', calendarError);
-      console.error('   Detalles:', calendarError.message);
-    }
+    // Google Calendar event se creará automáticamente desde Firebase Functions
+    // cuando se detecte la nueva reserva en Firestore
+    console.log('✅ Reserva guardada. El evento de Google Calendar se creará automáticamente desde el servidor.');
     
     // Send confirmation email
     try {
@@ -117,31 +106,9 @@ export const updateReservation = async (code, updatedData, serviciosList = []) =
     const { serviciosList, ...dataToSave } = updatedData;
     await updateDoc(reservationRef, dataToSave);
     
-    // Update Google Calendar event if it exists
-    if (reservation.calendarEventId) {
-      try {
-        const updatedReservation = { ...reservation, ...dataToSave };
-        const serviciosListToUse = serviciosList || [];
-        await updateCalendarEvent(reservation.calendarEventId, updatedReservation, serviciosListToUse);
-        console.log('✅ Evento actualizado en Google Calendar');
-      } catch (calendarError) {
-        console.error('❌ Error updating Google Calendar event:', calendarError);
-        console.error('   Detalles:', calendarError.message);
-      }
-    } else {
-      // If no calendar event ID exists, try to create one
-      try {
-        const updatedReservation = { ...reservation, ...dataToSave };
-        const serviciosListToUse = serviciosList || [];
-        const calendarEventId = await createCalendarEvent(updatedReservation, serviciosListToUse);
-        if (calendarEventId) {
-          await updateDoc(reservationRef, { calendarEventId });
-          console.log('✅ Evento creado en Google Calendar después de actualizar:', calendarEventId);
-        }
-      } catch (calendarError) {
-        console.warn('⚠️ No se pudo crear el evento en Google Calendar al actualizar:', calendarError);
-      }
-    }
+    // Google Calendar event se actualizará automáticamente desde Firebase Functions
+    // cuando se detecte el cambio en Firestore
+    console.log('✅ Reserva actualizada. El evento de Google Calendar se actualizará automáticamente desde el servidor.');
     
     // Send update confirmation email
     try {
@@ -167,17 +134,13 @@ export const deleteReservation = async (code) => {
       return false;
     }
     
-    // Delete Google Calendar event if it exists
-    if (reservation.calendarEventId) {
-      try {
-        await deleteCalendarEvent(reservation.calendarEventId);
-      } catch (calendarError) {
-        console.warn('Error deleting Google Calendar event:', calendarError);
-      }
-    }
-    
     const reservationRef = doc(db, RESERVATIONS_COLLECTION, reservation.id);
     await deleteDoc(reservationRef);
+    
+    // Google Calendar event se eliminará automáticamente desde Firebase Functions
+    // cuando se detecte la eliminación en Firestore
+    console.log('✅ Reserva eliminada. El evento de Google Calendar se eliminará automáticamente desde el servidor.');
+    
     return true;
   } catch (error) {
     console.error('Error deleting reservation:', error);
