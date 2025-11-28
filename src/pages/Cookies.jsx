@@ -217,14 +217,14 @@ const Cookies = () => {
               Si tienes preguntas sobre nuestra política de cookies, puedes contactarnos:
             </p>
             <ul>
-              <li><strong>Email:</strong> info@quirozendh.com</li>
+              <li><strong>Email:</strong> quirozendh1@gmail.com</li>
               <li><strong>Teléfono:</strong> 675 61 07 30</li>
               <li><strong>Dirección:</strong> Calle Leopoldo Arias Clarín, Local 148, Dos Hermanas, Sevilla</li>
             </ul>
           </section>
 
           <div className="cookies-footer">
-            <Link to="/" className="back-link">← Volver al inicio</Link>
+            <Link to="/" className="btn-secondary">← Volver al inicio</Link>
           </div>
         </div>
       </div>

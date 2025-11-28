@@ -188,18 +188,9 @@
   text-align: center;
 }
 
-.back-link {
-  display: inline-block;
-  color: var(--golden);
+.cookies-footer .btn-secondary {
   text-decoration: none;
-  font-weight: 600;
-  font-size: 1.1rem;
-  transition: all 0.3s ease;
-}
-
-.back-link:hover {
-  color: var(--golden-light);
-  transform: translateX(-5px);
+  display: inline-block;
 }
 
 /* Responsive */

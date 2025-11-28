@@ -54,9 +54,6 @@ const CookieBanner = () => {
           </p>
         </div>
         <div className="cookie-banner-buttons">
-          <button onClick={handleReject} className="btn-cookie-reject">
-            Rechazar
-          </button>
           <button onClick={handleManageCookies} className="btn-cookie-manage">
             Gestionar
           </button>
