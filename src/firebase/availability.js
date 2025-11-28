@@ -169,23 +169,28 @@ export const getAvailabilityForDate = async (dateString, serviceName = null) => 
     if (daySchedule.ranges && Array.isArray(daySchedule.ranges) && daySchedule.ranges.length > 0) {
       const rangeSlots = generateTimeSlots(daySchedule.ranges, 30);
       slots = [...slots, ...rangeSlots];
+      console.log(`Generated ${rangeSlots.length} slots from ranges for ${dayOfWeek}:`, rangeSlots);
     }
     
     // 2. Add existing slots if they exist (fallback or additional)
-    if (daySchedule.slots && Array.isArray(daySchedule.slots) && daySchedule.slots.length > 0) {
+    // Only use slots if ranges don't exist (to avoid duplicates and ensure ranges take priority)
+    if (slots.length === 0 && daySchedule.slots && Array.isArray(daySchedule.slots) && daySchedule.slots.length > 0) {
       slots = [...slots, ...daySchedule.slots];
+      console.log(`Using ${daySchedule.slots.length} existing slots for ${dayOfWeek}:`, daySchedule.slots);
     }
     
     // 3. Always add urgency slots if they exist
     if (daySchedule.urgencyRanges && Array.isArray(daySchedule.urgencyRanges) && daySchedule.urgencyRanges.length > 0) {
       const urgencySlots = generateTimeSlots(daySchedule.urgencyRanges, 30);
       slots = [...slots, ...urgencySlots];
+      console.log(`Added ${urgencySlots.length} urgency slots for ${dayOfWeek}:`, urgencySlots);
     }
     
     // Remove duplicates and sort
     slots = [...new Set(slots)].sort();
     
-    // Debug: Log slots for troubleshooting
+    // Debug: Log final slots for troubleshooting
+    console.log(`Final slots for ${dayOfWeek}: ${slots.length} total`, slots);
     if (slots.length === 0) {
       console.warn(`No slots found for ${dayOfWeek}. Schedule:`, daySchedule);
     }
@@ -261,7 +266,8 @@ const getAvailabilityForDateWithConfigs = (dateString, allConfigs, genericConfig
   }
   
   // 2. Add existing slots if they exist (fallback or additional)
-  if (daySchedule.slots && Array.isArray(daySchedule.slots) && daySchedule.slots.length > 0) {
+  // Only use slots if ranges don't exist (to avoid duplicates and ensure ranges take priority)
+  if (slots.length === 0 && daySchedule.slots && Array.isArray(daySchedule.slots) && daySchedule.slots.length > 0) {
     slots = [...slots, ...daySchedule.slots];
   }
   
