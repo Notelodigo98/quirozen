@@ -237,22 +237,48 @@ const getEndTime = (startTime, servicio, serviciosList = []) => {
 
 // Create a calendar event for a reservation
 export const createCalendarEvent = async (reservation, serviciosList = []) => {
-  // Ensure tokens are loaded before making request
-  if (!accessToken) {
-    const loaded = loadTokensFromStorage();
-    if (!loaded || !accessToken) {
-      console.error('Google Calendar not initialized. Please set up OAuth tokens.');
-      console.error('Visit /setup-calendar.html to configure Google Calendar.');
-      return null;
-    }
-  }
-
-  // Ensure client config is loaded
-  if (!clientId || !clientSecret) {
-    loadClientConfig();
-  }
-
   try {
+    // Intentar usar API de Vercel primero (si está disponible)
+    const apiUrl = import.meta.env.VITE_API_URL || '/api';
+    
+    try {
+      const response = await fetch(`${apiUrl}/calendar-event`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ reservation, serviciosList }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.eventId) {
+          console.log('✅ Evento creado en Google Calendar vía API:', data.eventId);
+          return data.eventId;
+        }
+      }
+      // Si falla la API, continuar con el método local
+      console.log('⚠️ API no disponible, usando método local');
+    } catch (apiError) {
+      console.log('⚠️ API no disponible, usando método local:', apiError.message);
+    }
+
+    // Fallback: usar método local (localStorage)
+    // Ensure tokens are loaded before making request
+    if (!accessToken) {
+      const loaded = loadTokensFromStorage();
+      if (!loaded || !accessToken) {
+        console.error('Google Calendar not initialized. Please set up OAuth tokens.');
+        console.error('Visit /setup-calendar.html to configure Google Calendar.');
+        return null;
+      }
+    }
+
+    // Ensure client config is loaded
+    if (!clientId || !clientSecret) {
+      loadClientConfig();
+    }
+
     const startDateTime = `${reservation.fecha}T${reservation.hora}:00`;
     const endTime = getEndTime(reservation.hora, reservation.servicio, serviciosList);
     const endDateTime = `${reservation.fecha}T${endTime}:00`;
@@ -303,21 +329,46 @@ export const createCalendarEvent = async (reservation, serviciosList = []) => {
 
 // Update a calendar event
 export const updateCalendarEvent = async (eventId, reservation, serviciosList = []) => {
-  // Ensure tokens are loaded before making request
-  if (!accessToken) {
-    const loaded = loadTokensFromStorage();
-    if (!loaded || !accessToken) {
-      console.error('Google Calendar not initialized.');
-      return false;
-    }
-  }
-
-  // Ensure client config is loaded
-  if (!clientId || !clientSecret) {
-    loadClientConfig();
-  }
-
   try {
+    // Intentar usar API de Vercel primero
+    const apiUrl = import.meta.env.VITE_API_URL || '/api';
+    
+    try {
+      const response = await fetch(`${apiUrl}/calendar-event-update`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ eventId, reservation, serviciosList }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          console.log('✅ Evento actualizado en Google Calendar vía API');
+          return true;
+        }
+      }
+      console.log('⚠️ API no disponible, usando método local');
+    } catch (apiError) {
+      console.log('⚠️ API no disponible, usando método local:', apiError.message);
+    }
+
+    // Fallback: usar método local
+    // Ensure tokens are loaded before making request
+    if (!accessToken) {
+      const loaded = loadTokensFromStorage();
+      if (!loaded || !accessToken) {
+        console.error('Google Calendar not initialized.');
+        return false;
+      }
+    }
+
+    // Ensure client config is loaded
+    if (!clientId || !clientSecret) {
+      loadClientConfig();
+    }
+
     const startDateTime = `${reservation.fecha}T${reservation.hora}:00`;
     const endTime = getEndTime(reservation.hora, reservation.servicio, serviciosList);
     const endDateTime = `${reservation.fecha}T${endTime}:00`;
@@ -360,12 +411,36 @@ export const updateCalendarEvent = async (eventId, reservation, serviciosList = 
 
 // Delete a calendar event
 export const deleteCalendarEvent = async (eventId) => {
-  if (!accessToken) {
-    console.error('Google Calendar not initialized.');
-    return false;
-  }
-
   try {
+    // Intentar usar API de Vercel primero
+    const apiUrl = import.meta.env.VITE_API_URL || '/api';
+    
+    try {
+      const response = await fetch(`${apiUrl}/calendar-event-delete?eventId=${eventId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          console.log('✅ Evento eliminado de Google Calendar vía API');
+          return true;
+        }
+      }
+      console.log('⚠️ API no disponible, usando método local');
+    } catch (apiError) {
+      console.log('⚠️ API no disponible, usando método local:', apiError.message);
+    }
+
+    // Fallback: usar método local
+    if (!accessToken) {
+      const loaded = loadTokensFromStorage();
+      if (!loaded || !accessToken) {
+        console.error('Google Calendar not initialized.');
+        return false;
+      }
+    }
+
     const response = await makeCalendarRequest(
       `${GOOGLE_CALENDAR_API_URL}/calendars/primary/events/${eventId}`,
       {
