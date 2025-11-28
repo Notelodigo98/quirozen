@@ -6,13 +6,13 @@
     }
   ],
   "functions": {
-    "api/calendar-event.cjs": {
+    "api/calendar-event.js": {
       "maxDuration": 10
     },
-    "api/calendar-event-update.cjs": {
+    "api/calendar-event-update.js": {
       "maxDuration": 10
     },
-    "api/calendar-event-delete.cjs": {
+    "api/calendar-event-delete.js": {
       "maxDuration": 10
     }
   }
