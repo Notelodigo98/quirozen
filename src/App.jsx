@@ -523,20 +523,17 @@ const ReservationForm = ({ masajes }) => {
 
   if (submitted) {
     return (
-      <>
-        <div className="reservation-success-overlay"></div>
-        <div className="reservation-success">
-          <h3>¡Reserva confirmada!</h3>
-          <div className="reservation-code-display">
-            <p>Tu código de reserva es:</p>
-            <div className="code-box">{reservationCode}</div>
-            <p className="code-instruction">Guarda este código para modificar o cancelar tu reserva.</p>
-          </div>
-          <button onClick={() => { setSubmitted(false); setReservationCode(''); }} className="btn-secondary">
-            Hacer otra reserva
-          </button>
+      <div className="reservation-success">
+        <h3>¡Reserva confirmada!</h3>
+        <div className="reservation-code-display">
+          <p>Tu código de reserva es:</p>
+          <div className="code-box">{reservationCode}</div>
+          <p className="code-instruction">Guarda este código para modificar o cancelar tu reserva.</p>
         </div>
-      </>
+        <button onClick={() => { setSubmitted(false); setReservationCode(''); }} className="btn-secondary">
+          Hacer otra reserva
+        </button>
+      </div>
     );
   }
 
