@@ -162,19 +162,32 @@ export const getAvailabilityForDate = async (dateString, serviceName = null) => 
       return { available: false, slots: [], reason: 'Día no disponible' };
     }
     
-    // Get regular slots
-    let slots = daySchedule.slots || [];
+    // Collect all slots from different sources
+    let slots = [];
     
-    // If slots don't exist but ranges do, generate slots from ranges
-    if (slots.length === 0 && daySchedule.ranges && Array.isArray(daySchedule.ranges)) {
-      slots = generateTimeSlots(daySchedule.ranges, 30);
+    // 1. Generate slots from ranges if available (preferred method)
+    if (daySchedule.ranges && Array.isArray(daySchedule.ranges) && daySchedule.ranges.length > 0) {
+      const rangeSlots = generateTimeSlots(daySchedule.ranges, 30);
+      slots = [...slots, ...rangeSlots];
     }
     
-    // Add urgency slots if they exist
+    // 2. Add existing slots if they exist (fallback or additional)
+    if (daySchedule.slots && Array.isArray(daySchedule.slots) && daySchedule.slots.length > 0) {
+      slots = [...slots, ...daySchedule.slots];
+    }
+    
+    // 3. Always add urgency slots if they exist
     if (daySchedule.urgencyRanges && Array.isArray(daySchedule.urgencyRanges) && daySchedule.urgencyRanges.length > 0) {
       const urgencySlots = generateTimeSlots(daySchedule.urgencyRanges, 30);
-      // Merge and remove duplicates
-      slots = [...new Set([...slots, ...urgencySlots])].sort();
+      slots = [...slots, ...urgencySlots];
+    }
+    
+    // Remove duplicates and sort
+    slots = [...new Set(slots)].sort();
+    
+    // Debug: Log slots for troubleshooting
+    if (slots.length === 0) {
+      console.warn(`No slots found for ${dayOfWeek}. Schedule:`, daySchedule);
     }
     
     return {
@@ -238,20 +251,28 @@ const getAvailabilityForDateWithConfigs = (dateString, allConfigs, genericConfig
     return { available: false, slots: [], reason: 'Día no disponible' };
   }
   
-  // Get regular slots
-  let slots = daySchedule.slots || [];
+  // Collect all slots from different sources
+  let slots = [];
   
-  // If slots don't exist but ranges do, generate slots from ranges
-  if (slots.length === 0 && daySchedule.ranges && Array.isArray(daySchedule.ranges)) {
-    slots = generateTimeSlots(daySchedule.ranges, 30);
+  // 1. Generate slots from ranges if available (preferred method)
+  if (daySchedule.ranges && Array.isArray(daySchedule.ranges) && daySchedule.ranges.length > 0) {
+    const rangeSlots = generateTimeSlots(daySchedule.ranges, 30);
+    slots = [...slots, ...rangeSlots];
   }
   
-  // Add urgency slots if they exist
+  // 2. Add existing slots if they exist (fallback or additional)
+  if (daySchedule.slots && Array.isArray(daySchedule.slots) && daySchedule.slots.length > 0) {
+    slots = [...slots, ...daySchedule.slots];
+  }
+  
+  // 3. Always add urgency slots if they exist
   if (daySchedule.urgencyRanges && Array.isArray(daySchedule.urgencyRanges) && daySchedule.urgencyRanges.length > 0) {
     const urgencySlots = generateTimeSlots(daySchedule.urgencyRanges, 30);
-    // Merge and remove duplicates
-    slots = [...new Set([...slots, ...urgencySlots])].sort();
+    slots = [...slots, ...urgencySlots];
   }
+  
+  // Remove duplicates and sort
+  slots = [...new Set(slots)].sort();
   
   return {
     available: true,
@@ -411,6 +432,11 @@ export const getAvailableSlots = async (dateString, reservationsForDate = [], se
       
       return true;
     });
+    
+    // Debug: Log filtering results
+    if (availability.slots.length > 0 && freeSlots.length === 0 && activeReservations.length > 0) {
+      console.log(`All slots blocked for ${dateString}. Total slots: ${availability.slots.length}, Reservations: ${activeReservations.length}`);
+    }
     
     return {
       available: true,
