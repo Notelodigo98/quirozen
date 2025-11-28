@@ -57,6 +57,18 @@ module.exports = async function handler(req, res) {
       refresh_token: REFRESH_TOKEN
     });
 
+    // Configurar refresh automático del token
+    oauth2Client.on('tokens', (tokens) => {
+      if (tokens.refresh_token) {
+        // Si hay un nuevo refresh_token, deberías guardarlo en Vercel
+        console.log('New refresh token received');
+      }
+      if (tokens.access_token) {
+        // El access_token se refresca automáticamente
+        console.log('Access token refreshed');
+      }
+    });
+
     // Obtener duración del servicio
     let duration = 50;
     if (reservation.servicio && serviciosList.length > 0) {
@@ -104,9 +116,39 @@ module.exports = async function handler(req, res) {
 
   } catch (error) {
     console.error('Error creating calendar event:', error);
+    
+    // Si el error es de autenticación, intentar refrescar el token
+    if (error.code === 401 || error.message?.includes('Invalid Credentials')) {
+      try {
+        const { tokens } = await oauth2Client.refreshAccessToken();
+        console.log('Token refreshed, retrying...');
+        
+        // Reintentar con el nuevo token
+        oauth2Client.setCredentials(tokens);
+        const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+        const response = await calendar.events.insert({
+          calendarId: 'primary',
+          resource: event,
+        });
+        
+        return res.status(200).json({ 
+          success: true, 
+          eventId: response.data.id 
+        });
+      } catch (refreshError) {
+        console.error('Error refreshing token:', refreshError);
+        return res.status(500).json({ 
+          error: 'Error refreshing access token',
+          message: refreshError.message,
+          details: 'El token de acceso ha expirado y no se pudo refrescar. Actualiza las variables de entorno en Vercel.'
+        });
+      }
+    }
+    
     return res.status(500).json({ 
       error: 'Error creating calendar event',
-      message: error.message 
+      message: error.message,
+      code: error.code || 'UNKNOWN'
     });
   }
 }
