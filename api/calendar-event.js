@@ -26,54 +26,64 @@ const extractMinutes = (durationString) => {
 };
 
 module.exports = async function handler(req, res) {
+  // Agregar headers CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  
+  // Manejar preflight
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  
   // Solo permitir POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Verificar que los tokens estén configurados
-  const missingVars = [];
-  if (!CLIENT_ID) missingVars.push('GOOGLE_CLIENT_ID');
-  if (!CLIENT_SECRET) missingVars.push('GOOGLE_CLIENT_SECRET');
-  if (!ACCESS_TOKEN) missingVars.push('GOOGLE_ACCESS_TOKEN');
-  if (!REFRESH_TOKEN) missingVars.push('GOOGLE_REFRESH_TOKEN');
-  
-  if (missingVars.length > 0) {
-    console.error('Missing environment variables:', missingVars);
-    return res.status(500).json({ 
-      error: 'Google Calendar no configurado',
-      missing: missingVars,
-      message: 'Configura las siguientes variables de entorno en Vercel: ' + missingVars.join(', ')
-    });
-  }
-  
-  console.log('✅ All environment variables are set');
-
-  // Configurar OAuth2 (fuera del try para que esté disponible en el catch)
-  const oauth2Client = new google.auth.OAuth2(
-    CLIENT_ID,
-    CLIENT_SECRET,
-    'https://www.quirozendh.com/oauth2callback.html'
-  );
-
-  oauth2Client.setCredentials({
-    access_token: ACCESS_TOKEN,
-    refresh_token: REFRESH_TOKEN
-  });
-
-  // Configurar refresh automático del token
-  oauth2Client.on('tokens', (tokens) => {
-    if (tokens.refresh_token) {
-      // Si hay un nuevo refresh_token, deberías guardarlo en Vercel
-      console.log('New refresh token received');
-    }
-    if (tokens.access_token) {
-      // El access_token se refresca automáticamente
-      console.log('Access token refreshed');
-    }
-  });
-
   try {
+    // Verificar que los tokens estén configurados
+    const missingVars = [];
+    if (!CLIENT_ID) missingVars.push('GOOGLE_CLIENT_ID');
+    if (!CLIENT_SECRET) missingVars.push('GOOGLE_CLIENT_SECRET');
+    if (!ACCESS_TOKEN) missingVars.push('GOOGLE_ACCESS_TOKEN');
+    if (!REFRESH_TOKEN) missingVars.push('GOOGLE_REFRESH_TOKEN');
+    
+    if (missingVars.length > 0) {
+      console.error('Missing environment variables:', missingVars);
+      return res.status(500).json({ 
+        error: 'Google Calendar no configurado',
+        missing: missingVars,
+        message: 'Configura las siguientes variables de entorno en Vercel: ' + missingVars.join(', ')
+      });
+    }
+    
+    console.log('✅ All environment variables are set');
+    console.log('CLIENT_ID exists:', !!CLIENT_ID);
+    console.log('ACCESS_TOKEN exists:', !!ACCESS_TOKEN);
+    console.log('REFRESH_TOKEN exists:', !!REFRESH_TOKEN);
+
+    // Configurar OAuth2
+    const oauth2Client = new google.auth.OAuth2(
+      CLIENT_ID,
+      CLIENT_SECRET,
+      'https://www.quirozendh.com/oauth2callback.html'
+    );
+
+    oauth2Client.setCredentials({
+      access_token: ACCESS_TOKEN,
+      refresh_token: REFRESH_TOKEN
+    });
+
+    // Configurar refresh automático del token
+    oauth2Client.on('tokens', (tokens) => {
+      if (tokens.refresh_token) {
+        console.log('New refresh token received');
+      }
+      if (tokens.access_token) {
+        console.log('Access token refreshed');
+      }
+    });
     const { reservation, serviciosList = [] } = req.body;
 
     if (!reservation || !reservation.fecha || !reservation.hora) {
