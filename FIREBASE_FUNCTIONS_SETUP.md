@@ -73,7 +73,7 @@ firebase functions:config:set \
 **Ejemplo** (reemplaza con tus valores reales):
 ```bash
 firebase functions:config:set \
-  google.client_id="496869168104-m3n1059e2m87a46l6vrlpooitoobk1oq.apps.googleusercontent.com" \
+  google.client_id="TU_CLIENT_ID_AQUI" \
   google.client_secret="TU_CLIENT_SECRET_AQUI" \
   google.redirect_uri="https://www.quirozendh.com/oauth2callback.html" \
   google.access_token="TU_ACCESS_TOKEN_AQUI" \

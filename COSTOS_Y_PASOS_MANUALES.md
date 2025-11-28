@@ -64,7 +64,7 @@ cd ..
 **Opción A: Usar setup-calendar.html (Más fácil)**
 1. Ve a: `https://www.quirozendh.com/setup-calendar.html`
 2. Ingresa:
-   - **Client ID**: `496869168104-m3n1059e2m87a46l6vrlpooitoobk1oq.apps.googleusercontent.com`
+   - **Client ID**: (obtén desde Google Cloud Console)
    - **Client Secret**: (obtén desde Google Cloud Console)
 3. Haz clic en "Authorize APIs"
 4. Autoriza con tu cuenta de Google
@@ -83,14 +83,14 @@ Ejecuta el comando que copiaste (o usa este formato):
 
 ```bash
 firebase functions:config:set \
-  google.client_id="496869168104-m3n1059e2m87a46l6vrlpooitoobk1oq.apps.googleusercontent.com" \
+  google.client_id="TU_CLIENT_ID_AQUI" \
   google.client_secret="TU_CLIENT_SECRET_AQUI" \
   google.redirect_uri="https://www.quirozendh.com/oauth2callback.html" \
   google.access_token="TU_ACCESS_TOKEN_AQUI" \
   google.refresh_token="TU_REFRESH_TOKEN_AQUI"
 ```
 
-⚠️ **Reemplaza** `TU_CLIENT_SECRET_AQUI` con tu Client Secret real desde Google Cloud Console.
+⚠️ **Reemplaza** todos los valores `TU_*_AQUI` con tus valores reales desde Google Cloud Console y setup-calendar.html.
 
 **⚠️ IMPORTANTE**: Reemplaza `TU_ACCESS_TOKEN_AQUI` y `TU_REFRESH_TOKEN_AQUI` con los tokens reales que obtuviste en el paso 5.
 
