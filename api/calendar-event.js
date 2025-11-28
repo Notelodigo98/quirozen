@@ -32,11 +32,22 @@ module.exports = async function handler(req, res) {
   }
 
   // Verificar que los tokens estén configurados
-  if (!CLIENT_ID || !CLIENT_SECRET || !ACCESS_TOKEN || !REFRESH_TOKEN) {
+  const missingVars = [];
+  if (!CLIENT_ID) missingVars.push('GOOGLE_CLIENT_ID');
+  if (!CLIENT_SECRET) missingVars.push('GOOGLE_CLIENT_SECRET');
+  if (!ACCESS_TOKEN) missingVars.push('GOOGLE_ACCESS_TOKEN');
+  if (!REFRESH_TOKEN) missingVars.push('GOOGLE_REFRESH_TOKEN');
+  
+  if (missingVars.length > 0) {
+    console.error('Missing environment variables:', missingVars);
     return res.status(500).json({ 
-      error: 'Google Calendar no configurado. Configura las variables de entorno en Vercel.' 
+      error: 'Google Calendar no configurado',
+      missing: missingVars,
+      message: 'Configura las siguientes variables de entorno en Vercel: ' + missingVars.join(', ')
     });
   }
+  
+  console.log('✅ All environment variables are set');
 
   // Configurar OAuth2 (fuera del try para que esté disponible en el catch)
   const oauth2Client = new google.auth.OAuth2(
@@ -116,9 +127,14 @@ module.exports = async function handler(req, res) {
 
   } catch (error) {
     console.error('Error creating calendar event:', error);
+    console.error('Error details:', {
+      code: error.code,
+      message: error.message,
+      response: error.response?.data
+    });
     
     // Si el error es de autenticación, intentar refrescar el token
-    if (error.code === 401 || error.message?.includes('Invalid Credentials') || error.message?.includes('unauthorized')) {
+    if (error.code === 401 || error.message?.includes('Invalid Credentials') || error.message?.includes('unauthorized') || error.response?.status === 401) {
       try {
         const { tokens } = await oauth2Client.refreshAccessToken();
         console.log('Token refreshed, retrying...');
@@ -181,7 +197,8 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ 
       error: 'Error creating calendar event',
       message: error.message,
-      code: error.code || 'UNKNOWN'
+      code: error.code || 'UNKNOWN',
+      details: error.response?.data || error.stack
     });
   }
 }
