@@ -70,15 +70,17 @@ firebase functions:config:set \
   google.refresh_token="TU_REFRESH_TOKEN"
 ```
 
-**Ejemplo con valores reales**:
+**Ejemplo** (reemplaza con tus valores reales):
 ```bash
 firebase functions:config:set \
   google.client_id="496869168104-m3n1059e2m87a46l6vrlpooitoobk1oq.apps.googleusercontent.com" \
-  google.client_secret="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" \
+  google.client_secret="TU_CLIENT_SECRET_AQUI" \
   google.redirect_uri="https://www.quirozendh.com/oauth2callback.html" \
-  google.access_token="ya29.a0AfH6SMC..." \
-  google.refresh_token="1//0g..."
+  google.access_token="TU_ACCESS_TOKEN_AQUI" \
+  google.refresh_token="TU_REFRESH_TOKEN_AQUI"
 ```
+
+⚠️ **Obtén los valores reales** desde Google Cloud Console y setup-calendar.html
 
 ## 🚀 Paso 4: Desplegar Firebase Functions
 
