@@ -2,13 +2,16 @@
 
 ## ✅ Credenciales del Nuevo Proyecto (quirozenapp)
 
+⚠️ **IMPORTANTE**: Estas credenciales son públicas y seguras de compartir. 
+Los valores reales los obtienes desde Firebase Console → Project Settings → Your apps
+
 ```javascript
-apiKey: "AIzaSyCk4_1vG5Wp7bGZu1_fNrKlIuIsRwZpv4o"
+apiKey: "TU_API_KEY_AQUI" // Obtén desde Firebase Console
 authDomain: "quirozenapp.firebaseapp.com"
 projectId: "quirozenapp"
 storageBucket: "quirozenapp.firebasestorage.app"
 messagingSenderId: "992779516038"
-appId: "1:992779516038:web:e5d795590c711522f7b907"
+appId: "TU_APP_ID_AQUI" // Obtén desde Firebase Console
 ```
 
 ## 📝 Variables de Entorno a Actualizar

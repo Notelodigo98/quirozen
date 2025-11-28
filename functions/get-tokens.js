@@ -12,9 +12,11 @@ const readline = require('readline');
 const { google } = require('googleapis');
 
 // ⚠️ CONFIGURA ESTOS VALORES
-const CLIENT_ID = '496869168104-m3n1059e2m87a46l6vrlpooitoobk1oq.apps.googleusercontent.com';
-const CLIENT_SECRET = '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';
-const REDIRECT_URI = 'https://www.quirozendh.com/oauth2callback.html';
+// Obtén estos valores desde: https://console.cloud.google.com/
+// O desde el archivo client_secret_*.json (NO subas ese archivo a Git)
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID || 'TU_CLIENT_ID_AQUI';
+const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || 'TU_CLIENT_SECRET_AQUI';
+const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || 'https://www.quirozendh.com/oauth2callback.html';
 
 const oauth2Client = new google.auth.OAuth2(
   CLIENT_ID,
