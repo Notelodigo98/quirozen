@@ -239,9 +239,12 @@ const getEndTime = (startTime, servicio, serviciosList = []) => {
 export const createCalendarEvent = async (reservation, serviciosList = []) => {
   try {
     // Intentar usar API de Vercel primero (si está disponible)
-    const apiUrl = import.meta.env.VITE_API_URL || '/api';
+    // En producción, usar la URL absoluta del dominio
+    const isProduction = window.location.hostname === 'www.quirozendh.com' || window.location.hostname === 'quirozendh.com';
+    const apiUrl = import.meta.env.VITE_API_URL || (isProduction ? 'https://www.quirozendh.com/api' : '/api');
     
     try {
+      console.log('🔄 Intentando crear evento vía API:', `${apiUrl}/calendar-event`);
       const response = await fetch(`${apiUrl}/calendar-event`, {
         method: 'POST',
         headers: {
@@ -255,12 +258,18 @@ export const createCalendarEvent = async (reservation, serviciosList = []) => {
         if (data.success && data.eventId) {
           console.log('✅ Evento creado en Google Calendar vía API:', data.eventId);
           return data.eventId;
+        } else {
+          console.warn('⚠️ API respondió pero sin eventId:', data);
         }
+      } else {
+        const errorText = await response.text();
+        console.error('❌ Error en API:', response.status, errorText);
       }
       // Si falla la API, continuar con el método local
       console.log('⚠️ API no disponible, usando método local');
     } catch (apiError) {
-      console.log('⚠️ API no disponible, usando método local:', apiError.message);
+      console.error('❌ Error llamando a la API:', apiError.message);
+      console.log('⚠️ API no disponible, usando método local');
     }
 
     // Fallback: usar método local (localStorage)
@@ -331,9 +340,11 @@ export const createCalendarEvent = async (reservation, serviciosList = []) => {
 export const updateCalendarEvent = async (eventId, reservation, serviciosList = []) => {
   try {
     // Intentar usar API de Vercel primero
-    const apiUrl = import.meta.env.VITE_API_URL || '/api';
+    const isProduction = window.location.hostname === 'www.quirozendh.com' || window.location.hostname === 'quirozendh.com';
+    const apiUrl = import.meta.env.VITE_API_URL || (isProduction ? 'https://www.quirozendh.com/api' : '/api');
     
     try {
+      console.log('🔄 Intentando actualizar evento vía API:', `${apiUrl}/calendar-event-update`);
       const response = await fetch(`${apiUrl}/calendar-event-update`, {
         method: 'PUT',
         headers: {
@@ -347,11 +358,17 @@ export const updateCalendarEvent = async (eventId, reservation, serviciosList = 
         if (data.success) {
           console.log('✅ Evento actualizado en Google Calendar vía API');
           return true;
+        } else {
+          console.warn('⚠️ API respondió pero sin success:', data);
         }
+      } else {
+        const errorText = await response.text();
+        console.error('❌ Error en API:', response.status, errorText);
       }
       console.log('⚠️ API no disponible, usando método local');
     } catch (apiError) {
-      console.log('⚠️ API no disponible, usando método local:', apiError.message);
+      console.error('❌ Error llamando a la API:', apiError.message);
+      console.log('⚠️ API no disponible, usando método local');
     }
 
     // Fallback: usar método local
@@ -413,11 +430,17 @@ export const updateCalendarEvent = async (eventId, reservation, serviciosList = 
 export const deleteCalendarEvent = async (eventId) => {
   try {
     // Intentar usar API de Vercel primero
-    const apiUrl = import.meta.env.VITE_API_URL || '/api';
+    const isProduction = window.location.hostname === 'www.quirozendh.com' || window.location.hostname === 'quirozendh.com';
+    const apiUrl = import.meta.env.VITE_API_URL || (isProduction ? 'https://www.quirozendh.com/api' : '/api');
     
     try {
-      const response = await fetch(`${apiUrl}/calendar-event-delete?eventId=${eventId}`, {
+      console.log('🔄 Intentando eliminar evento vía API:', `${apiUrl}/calendar-event-delete`);
+      const response = await fetch(`${apiUrl}/calendar-event-delete`, {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ eventId }),
       });
 
       if (response.ok) {
@@ -425,11 +448,17 @@ export const deleteCalendarEvent = async (eventId) => {
         if (data.success) {
           console.log('✅ Evento eliminado de Google Calendar vía API');
           return true;
+        } else {
+          console.warn('⚠️ API respondió pero sin success:', data);
         }
+      } else {
+        const errorText = await response.text();
+        console.error('❌ Error en API:', response.status, errorText);
       }
       console.log('⚠️ API no disponible, usando método local');
     } catch (apiError) {
-      console.log('⚠️ API no disponible, usando método local:', apiError.message);
+      console.error('❌ Error llamando a la API:', apiError.message);
+      console.log('⚠️ API no disponible, usando método local');
     }
 
     // Fallback: usar método local
