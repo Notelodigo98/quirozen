@@ -162,9 +162,24 @@ export const getAvailabilityForDate = async (dateString, serviceName = null) => 
       return { available: false, slots: [], reason: 'Día no disponible' };
     }
     
+    // Get regular slots
+    let slots = daySchedule.slots || [];
+    
+    // If slots don't exist but ranges do, generate slots from ranges
+    if (slots.length === 0 && daySchedule.ranges && Array.isArray(daySchedule.ranges)) {
+      slots = generateTimeSlots(daySchedule.ranges, 30);
+    }
+    
+    // Add urgency slots if they exist
+    if (daySchedule.urgencyRanges && Array.isArray(daySchedule.urgencyRanges) && daySchedule.urgencyRanges.length > 0) {
+      const urgencySlots = generateTimeSlots(daySchedule.urgencyRanges, 30);
+      // Merge and remove duplicates
+      slots = [...new Set([...slots, ...urgencySlots])].sort();
+    }
+    
     return {
       available: true,
-      slots: daySchedule.slots || [],
+      slots: slots,
       reason: null
     };
   } catch (error) {
@@ -223,9 +238,24 @@ const getAvailabilityForDateWithConfigs = (dateString, allConfigs, genericConfig
     return { available: false, slots: [], reason: 'Día no disponible' };
   }
   
+  // Get regular slots
+  let slots = daySchedule.slots || [];
+  
+  // If slots don't exist but ranges do, generate slots from ranges
+  if (slots.length === 0 && daySchedule.ranges && Array.isArray(daySchedule.ranges)) {
+    slots = generateTimeSlots(daySchedule.ranges, 30);
+  }
+  
+  // Add urgency slots if they exist
+  if (daySchedule.urgencyRanges && Array.isArray(daySchedule.urgencyRanges) && daySchedule.urgencyRanges.length > 0) {
+    const urgencySlots = generateTimeSlots(daySchedule.urgencyRanges, 30);
+    // Merge and remove duplicates
+    slots = [...new Set([...slots, ...urgencySlots])].sort();
+  }
+  
   return {
     available: true,
-    slots: daySchedule.slots || [],
+    slots: slots,
     reason: null
   };
 };
@@ -358,10 +388,13 @@ export const getAvailableSlots = async (dateString, reservationsForDate = [], se
       const service = allServices.find(s => s.nombre === reservation.servicio);
       const reservationDuration = service ? extractMinutesFromDuration(service.duracion) : 30; // Default to 30 min
       
-      // Determine how long to block after the reservation starts
-      const blockGap = reservationDuration <= 30 ? 30 : 60;
+      // Block time based on service duration:
+      // - Services <= 30 min: block 30 min
+      // - Services > 30 min: block 60 min (1 hour)
+      const blockDuration = reservationDuration <= 30 ? 30 : 60;
+      
       const startMinutes = timeToMinutes(reservation.hora);
-      const blockEndMinutes = startMinutes + blockGap;
+      const blockEndMinutes = startMinutes + blockDuration;
       
       return { startMinutes, blockEndMinutes };
     });
