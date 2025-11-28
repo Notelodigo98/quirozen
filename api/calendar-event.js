@@ -38,36 +38,36 @@ module.exports = async function handler(req, res) {
     });
   }
 
+  // Configurar OAuth2 (fuera del try para que esté disponible en el catch)
+  const oauth2Client = new google.auth.OAuth2(
+    CLIENT_ID,
+    CLIENT_SECRET,
+    'https://www.quirozendh.com/oauth2callback.html'
+  );
+
+  oauth2Client.setCredentials({
+    access_token: ACCESS_TOKEN,
+    refresh_token: REFRESH_TOKEN
+  });
+
+  // Configurar refresh automático del token
+  oauth2Client.on('tokens', (tokens) => {
+    if (tokens.refresh_token) {
+      // Si hay un nuevo refresh_token, deberías guardarlo en Vercel
+      console.log('New refresh token received');
+    }
+    if (tokens.access_token) {
+      // El access_token se refresca automáticamente
+      console.log('Access token refreshed');
+    }
+  });
+
   try {
     const { reservation, serviciosList = [] } = req.body;
 
     if (!reservation || !reservation.fecha || !reservation.hora) {
       return res.status(400).json({ error: 'Reservation data is required' });
     }
-
-    // Configurar OAuth2
-    const oauth2Client = new google.auth.OAuth2(
-      CLIENT_ID,
-      CLIENT_SECRET,
-      'https://www.quirozendh.com/oauth2callback.html'
-    );
-
-    oauth2Client.setCredentials({
-      access_token: ACCESS_TOKEN,
-      refresh_token: REFRESH_TOKEN
-    });
-
-    // Configurar refresh automático del token
-    oauth2Client.on('tokens', (tokens) => {
-      if (tokens.refresh_token) {
-        // Si hay un nuevo refresh_token, deberías guardarlo en Vercel
-        console.log('New refresh token received');
-      }
-      if (tokens.access_token) {
-        // El access_token se refresca automáticamente
-        console.log('Access token refreshed');
-      }
-    });
 
     // Obtener duración del servicio
     let duration = 50;
