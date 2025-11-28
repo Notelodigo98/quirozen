@@ -118,17 +118,50 @@ module.exports = async function handler(req, res) {
     console.error('Error creating calendar event:', error);
     
     // Si el error es de autenticación, intentar refrescar el token
-    if (error.code === 401 || error.message?.includes('Invalid Credentials')) {
+    if (error.code === 401 || error.message?.includes('Invalid Credentials') || error.message?.includes('unauthorized')) {
       try {
         const { tokens } = await oauth2Client.refreshAccessToken();
         console.log('Token refreshed, retrying...');
+        
+        // Recrear el evento para el reintento
+        const { reservation, serviciosList = [] } = req.body;
+        let duration = 50;
+        if (reservation.servicio && serviciosList.length > 0) {
+          const service = serviciosList.find(s => s.nombre === reservation.servicio);
+          if (service && service.duracion) {
+            duration = extractMinutes(service.duracion);
+          }
+        }
+        const startDateTime = `${reservation.fecha}T${reservation.hora}:00`;
+        const endTime = getEndTime(reservation.hora, duration);
+        const endDateTime = `${reservation.fecha}T${endTime}:00`;
+        
+        const retryEvent = {
+          summary: `Cita: ${reservation.nombre} - ${reservation.servicio}`,
+          description: `Cliente: ${reservation.nombre}\nTeléfono: ${reservation.telefono}\nEmail: ${reservation.email}\nCódigo de reserva: ${reservation.code}\n${reservation.notas ? `Notas: ${reservation.notas}` : ''}`,
+          start: {
+            dateTime: startDateTime,
+            timeZone: 'Europe/Madrid',
+          },
+          end: {
+            dateTime: endDateTime,
+            timeZone: 'Europe/Madrid',
+          },
+          reminders: {
+            useDefault: false,
+            overrides: [
+              { method: 'email', minutes: 24 * 60 },
+              { method: 'popup', minutes: 60 },
+            ],
+          },
+        };
         
         // Reintentar con el nuevo token
         oauth2Client.setCredentials(tokens);
         const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
         const response = await calendar.events.insert({
           calendarId: 'primary',
-          resource: event,
+          resource: retryEvent,
         });
         
         return res.status(200).json({ 
