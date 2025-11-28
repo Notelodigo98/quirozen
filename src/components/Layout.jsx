@@ -111,6 +111,7 @@ function Layout({ children }) {
               <ul>
                 <li><Link to="/terminos" onClick={() => setMenuOpen(false)}>Términos y condiciones</Link></li>
                 <li><Link to="/acuerdo" onClick={() => setMenuOpen(false)}>Acuerdo de usuario</Link></li>
+                <li><Link to="/cookies" onClick={() => setMenuOpen(false)}>Política de cookies</Link></li>
               </ul>
             </div>
           </div>

@@ -1,0 +1,229 @@
+.cookies-page {
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 248, 255, 0.95) 100%);
+}
+
+.cookies-container {
+  max-width: 900px;
+  margin: 0 auto;
+  background: white;
+  padding: 3rem;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(212, 175, 55, 0.2);
+}
+
+.cookies-container h1 {
+  color: var(--text-black);
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.last-updated {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  margin-bottom: 3rem;
+  font-size: 0.95rem;
+}
+
+.cookies-section {
+  margin-bottom: 3rem;
+}
+
+.cookies-section h2 {
+  color: var(--text-black);
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+  padding-bottom: 0.5rem;
+}
+
+.cookies-section h3 {
+  color: var(--text-black);
+  font-size: 1.4rem;
+  margin-bottom: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.cookies-section p {
+  color: var(--text-black);
+  line-height: 1.8;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.cookies-section ul {
+  margin-left: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.cookies-section li {
+  color: var(--text-black);
+  line-height: 1.8;
+  margin-bottom: 0.75rem;
+}
+
+.cookies-section a {
+  color: var(--golden);
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.cookies-section a:hover {
+  color: var(--golden-light);
+}
+
+.cookie-types {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.cookie-type-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 248, 255, 0.95) 100%);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.cookie-type-card h3 {
+  color: var(--golden);
+  margin-top: 0;
+}
+
+.cookie-management {
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(32, 201, 151, 0.1) 100%);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 2px solid rgba(40, 167, 69, 0.3);
+  margin-top: 1.5rem;
+}
+
+.preference-status {
+  margin-top: 1rem;
+}
+
+.preference-status p {
+  margin-bottom: 0.5rem;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.status-badge.accepted {
+  background: rgba(40, 167, 69, 0.2);
+  color: #28a745;
+}
+
+.status-badge.rejected {
+  background: rgba(220, 53, 69, 0.2);
+  color: #dc3545;
+}
+
+.preference-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-accept,
+.btn-reject,
+.btn-revoke {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-accept {
+  background: linear-gradient(135deg, var(--golden) 0%, var(--golden-light) 100%);
+  color: var(--text-black);
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
+}
+
+.btn-accept:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+}
+
+.btn-reject {
+  background: #f5f5f5;
+  color: var(--text-black);
+  border: 1px solid #ddd;
+}
+
+.btn-reject:hover {
+  background: #e8e8e8;
+  transform: translateY(-2px);
+}
+
+.btn-revoke {
+  background: #ffc107;
+  color: var(--text-black);
+  border: 1px solid #ff9800;
+}
+
+.btn-revoke:hover {
+  background: #ff9800;
+  transform: translateY(-2px);
+}
+
+.cookies-footer {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 2px solid rgba(212, 175, 55, 0.2);
+  text-align: center;
+}
+
+.back-link {
+  display: inline-block;
+  color: var(--golden);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+}
+
+.back-link:hover {
+  color: var(--golden-light);
+  transform: translateX(-5px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .cookies-container {
+    padding: 2rem 1.5rem;
+  }
+
+  .cookies-container h1 {
+    font-size: 2rem;
+  }
+
+  .cookies-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .preference-actions {
+    flex-direction: column;
+  }
+
+  .btn-accept,
+  .btn-reject,
+  .btn-revoke {
+    width: 100%;
+  }
+}
+

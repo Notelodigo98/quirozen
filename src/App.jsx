@@ -8,8 +8,10 @@ import es from 'date-fns/locale/es';
 import 'react-datepicker/dist/react-datepicker.css';
 import Terminos from './pages/Terminos';
 import Acuerdo from './pages/Acuerdo';
+import Cookies from './pages/Cookies';
 import Layout from './components/Layout';
 import BannerSlider from './components/BannerSlider';
+import CookieBanner from './components/CookieBanner';
 
 // Register Spanish locale
 registerLocale('es', es);
@@ -136,13 +138,13 @@ const bonos = [
     precio: '100€ (Precio de apertura, oferta limitada)',
     regalo: ''
   },
-  // {
-  //   titulo: 'Bono 10 Sesiones',
-  //   descripcion: 'Para aliviar tensiones por carga física o emocional.',
-  //   detalles: '10 sesiones de 50 minutos',
-  //   precio: '300€',
-  //   regalo: ''
-  // },
+  {
+    titulo: 'Bono 10 Sesiones',
+    descripcion: 'Para aliviar tensiones por carga física o emocional.',
+    detalles: '10 sesiones de 50 minutos',
+    precio: '300€',
+    regalo: ''
+  },
 ];
 
 // Reservation utility functions now use Firebase (imported from firebase/reservations.js)
@@ -521,17 +523,20 @@ const ReservationForm = ({ masajes }) => {
 
   if (submitted) {
     return (
-      <div className="reservation-success">
-        <h3>¡Reserva confirmada!</h3>
-        <div className="reservation-code-display">
-          <p>Tu código de reserva es:</p>
-          <div className="code-box">{reservationCode}</div>
-          <p className="code-instruction">Guarda este código para modificar o cancelar tu reserva.</p>
+      <>
+        <div className="reservation-success-overlay"></div>
+        <div className="reservation-success">
+          <h3>¡Reserva confirmada!</h3>
+          <div className="reservation-code-display">
+            <p>Tu código de reserva es:</p>
+            <div className="code-box">{reservationCode}</div>
+            <p className="code-instruction">Guarda este código para modificar o cancelar tu reserva.</p>
+          </div>
+          <button onClick={() => { setSubmitted(false); setReservationCode(''); }} className="btn-secondary">
+            Hacer otra reserva
+          </button>
         </div>
-        <button onClick={() => { setSubmitted(false); setReservationCode(''); }} className="btn-secondary">
-          Hacer otra reserva
-        </button>
-      </div>
+      </>
     );
   }
 
@@ -2619,12 +2624,16 @@ function Home() {
 // App Component with Routes
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Layout><Home /></Layout>} />
-      <Route path="/admin" element={<Layout><AdminPanel masajes={todosLosServicios} /></Layout>} />
-      <Route path="/terminos" element={<Terminos />} />
-      <Route path="/acuerdo" element={<Acuerdo />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/" element={<Layout><Home /></Layout>} />
+        <Route path="/admin" element={<Layout><AdminPanel masajes={todosLosServicios} /></Layout>} />
+        <Route path="/terminos" element={<Terminos />} />
+        <Route path="/acuerdo" element={<Acuerdo />} />
+        <Route path="/cookies" element={<Cookies />} />
+      </Routes>
+      <CookieBanner />
+    </>
   );
 }
 
