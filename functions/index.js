@@ -35,12 +35,9 @@ const initOAuth2 = () => {
         oauth2Client.on('tokens', (tokens) => {
           if (tokens.refresh_token) {
             console.log('🔄 Nuevo refresh token recibido');
-            // Nota: Para actualizar el refresh token en config, necesitarías usar Firebase Admin
-            // Por ahora, el refresh token generalmente no cambia
           }
           if (tokens.access_token) {
             console.log('🔄 Nuevo access token recibido');
-            // El cliente OAuth2 maneja automáticamente el refresh
           }
         });
       } else {
@@ -151,8 +148,6 @@ exports.onCreateReservation = functions.firestore
       console.log(`✅ Evento creado en Google Calendar: ${response.data.id}`);
     } catch (error) {
       console.error('❌ Error creando evento en Google Calendar:', error);
-      // No fallar la creación de la reserva, solo loguear el error
-      // El evento se puede crear manualmente después si es necesario
     }
   });
 
@@ -172,10 +167,7 @@ exports.onUpdateReservation = functions.firestore
       console.log('⚠️ No hay calendarEventId, creando nuevo evento...');
       try {
         const auth = initOAuth2();
-        if (!auth) {
-          console.error('❌ No se pudo inicializar OAuth2.');
-          return;
-        }
+        if (!auth) return;
         
         const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
         const duration = await getServiceDuration(newData.servicio);
@@ -224,10 +216,7 @@ exports.onUpdateReservation = functions.firestore
     if (fechaChanged || horaChanged || servicioChanged || nombreChanged || notasChanged) {
       try {
         const auth = initOAuth2();
-        if (!auth) {
-          console.error('❌ No se pudo inicializar OAuth2.');
-          return;
-        }
+        if (!auth) return;
         
         const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
         const duration = await getServiceDuration(newData.servicio);
@@ -345,4 +334,3 @@ exports.onDeleteReservation = functions.firestore
       }
     }
   });
-
