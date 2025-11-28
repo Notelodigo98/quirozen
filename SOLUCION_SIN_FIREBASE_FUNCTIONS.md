@@ -29,8 +29,8 @@ He restaurado la solución que usa **localStorage** para guardar los tokens de G
 
 1. Abre: `https://www.quirozendh.com/setup-calendar.html`
 2. Ingresa:
-   - **Client ID**: `496869168104-m3n1059e2m87a46l6vrlpooitoobk1oq.apps.googleusercontent.com`
-   - **Client Secret**: `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`
+   - **Client ID**: `TU_CLIENT_ID_AQUI`
+   - **Client Secret**: `TU_CLIENT_SECRET_AQUI`
 3. Haz clic en "Authorize APIs"
 4. Autoriza con tu cuenta de Google
 5. **¡Listo!** Los tokens se guardan automáticamente

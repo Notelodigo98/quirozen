@@ -17,8 +17,8 @@
    - Producción: `https://www.quirozendh.com/setup-calendar.html`
 
 2. **Ingresa tus credenciales:**
-   - **Client ID**: `496869168104-m3n1059e2m87a46l6vrlpooitoobk1oq.apps.googleusercontent.com`
-   - **Client Secret**: (obtén desde Google Cloud Console)
+   - **Client ID**: `TU_CLIENT_ID_AQUI`
+   - **Client Secret**: `TU_CLIENT_SECRET_AQUI` (obtén desde Google Cloud Console)
 
 3. **Haz clic en "Authorize APIs"**
 

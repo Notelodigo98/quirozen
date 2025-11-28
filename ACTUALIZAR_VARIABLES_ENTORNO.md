@@ -19,12 +19,12 @@ appId: "TU_APP_ID_AQUI" // Obtén desde Firebase Console
 Actualiza estas variables en tu plataforma de hosting:
 
 ```env
-VITE_FIREBASE_API_KEY=AIzaSyCk4_1vG5Wp7bGZu1_fNrKlIuIsRwZpv4o
+VITE_FIREBASE_API_KEY=TU_API_KEY_AQUI
 VITE_FIREBASE_AUTH_DOMAIN=quirozenapp.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=quirozenapp
 VITE_FIREBASE_STORAGE_BUCKET=quirozenapp.firebasestorage.app
 VITE_FIREBASE_MESSAGING_SENDER_ID=992779516038
-VITE_FIREBASE_APP_ID=1:992779516038:web:e5d795590c711522f7b907
+VITE_FIREBASE_APP_ID=TU_APP_ID_AQUI
 ```
 
 ## 🚀 Dónde Actualizar
@@ -46,12 +46,12 @@ VITE_FIREBASE_APP_ID=1:992779516038:web:e5d795590c711522f7b907
 ### Si usas archivo .env local:
 Crea/actualiza `.env` en la raíz del proyecto:
 ```env
-VITE_FIREBASE_API_KEY=AIzaSyCk4_1vG5Wp7bGZu1_fNrKlIuIsRwZpv4o
+VITE_FIREBASE_API_KEY=TU_API_KEY_AQUI
 VITE_FIREBASE_AUTH_DOMAIN=quirozenapp.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=quirozenapp
 VITE_FIREBASE_STORAGE_BUCKET=quirozenapp.firebasestorage.app
 VITE_FIREBASE_MESSAGING_SENDER_ID=992779516038
-VITE_FIREBASE_APP_ID=1:992779516038:web:e5d795590c711522f7b907
+VITE_FIREBASE_APP_ID=TU_APP_ID_AQUI
 ```
 
 Luego reinicia tu servidor de desarrollo:

@@ -12,7 +12,7 @@ Puedes crear un archivo `.env` en la raíz del proyecto, pero hay algunas consid
 
 ```env
 # Firebase Configuration
-VITE_FIREBASE_API_KEY=AIzaSyCk4_1vG5Wp7bGZu1_fNrKlIuIsRwZpv4o
+VITE_FIREBASE_API_KEY=TU_API_KEY_AQUI
 VITE_FIREBASE_AUTH_DOMAIN=quirozenapp.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=quirozenapp
 VITE_FIREBASE_STORAGE_BUCKET=quirozenapp.firebasestorage.app
@@ -22,7 +22,7 @@ VITE_FIREBASE_APP_ID=1:992779516038:web:e5d795590c711522f7b907
 # Google Calendar Configuration (para desarrollo local con Vercel CLI)
 # NOTA: Estas variables solo funcionan si usas Vercel CLI localmente
 # Para producción, debes configurarlas en el dashboard de Vercel
-GOOGLE_CLIENT_ID=496869168104-m3n1059e2m87a46l6vrlpooitoobk1oq.apps.googleusercontent.com
+GOOGLE_CLIENT_ID=TU_CLIENT_ID_AQUI
 GOOGLE_CLIENT_SECRET=TU_CLIENT_SECRET_AQUI
 GOOGLE_ACCESS_TOKEN=TU_ACCESS_TOKEN_AQUI
 GOOGLE_REFRESH_TOKEN=TU_REFRESH_TOKEN_AQUI
