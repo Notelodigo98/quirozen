@@ -81,7 +81,7 @@ const bonos = [
     titulo: 'Bono 10 Sesiones',
     descripcion: 'Para clientes constantes o con tratamiento prolongado (espalda, cervicales, estrés).',
     detalles: '10 masajes de 50 min',
-    precio: '175€ (Oferta limitada por apertura)',
+    precio: '250€',
     regalo: '1 masaje facial o podal de 20 min'
   },
   {
@@ -93,8 +93,8 @@ const bonos = [
   },
   {
     titulo: 'Tarjeta de fidelidad "Tu 6º masaje es GRATIS"',
-    descripcion: '',
-    detalles: 'Sellas 5 sesiones → la 6ª es gratis (o al 50%). Válido durante 3 meses.',
+    descripcion: 'Sellas 5 sesiones → la 6ª es gratis* (o al 50%).',
+    detalles: '*gratis masaje relajante o descontracturante.',
     precio: ''
   },
   {
@@ -135,16 +135,16 @@ const bonos = [
     titulo: 'Bono Presoterapia',
     descripcion: 'Tratamiento de presoterapia para mejorar drenaje linfático, circulación y reducir celulitis.',
     detalles: '5 sesiones de 45 minutos',
-    precio: '100€ (Precio de apertura, oferta limitada)',
+    precio: '175€ (Precio de apertura, oferta limitada)',
     regalo: ''
   },
-  {
-    titulo: 'Bono 10 Sesiones',
-    descripcion: 'Para aliviar tensiones por carga física o emocional.',
-    detalles: '10 sesiones de 50 minutos',
-    precio: '300€',
-    regalo: ''
-  },
+  // {
+  //   titulo: 'Bono 10 Sesiones',
+  //   descripcion: 'Para aliviar tensiones por carga física o emocional.',
+  //   detalles: '10 sesiones de 50 minutos',
+  //   precio: '300€',
+  //   regalo: ''
+  // },
 ];
 
 // Reservation utility functions now use Firebase (imported from firebase/reservations.js)
