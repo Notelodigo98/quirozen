@@ -135,16 +135,16 @@ const bonos = [
     titulo: 'Bono Presoterapia',
     descripcion: 'Tratamiento de presoterapia para mejorar drenaje linfático, circulación y reducir celulitis.',
     detalles: '5 sesiones de 45 minutos',
+    precio: '125€ (Precio de apertura, oferta limitada)',
+    regalo: ''
+  },
+  {
+    titulo: 'Bono 10 Sesiones Presoterapia',
+    descripcion: 'Tratamiento de presoterapia para mejorar drenaje linfático, circulación y reducir celulitis.',
+    detalles: '10 sesiones de 45 minutos',
     precio: '175€ (Precio de apertura, oferta limitada)',
     regalo: ''
   },
-  // {
-  //   titulo: 'Bono 10 Sesiones',
-  //   descripcion: 'Para aliviar tensiones por carga física o emocional.',
-  //   detalles: '10 sesiones de 50 minutos',
-  //   precio: '300€',
-  //   regalo: ''
-  // },
 ];
 
 // Reservation utility functions now use Firebase (imported from firebase/reservations.js)
