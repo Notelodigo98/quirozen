@@ -697,7 +697,7 @@ const ReservationForm = ({ masajes }) => {
                   borderRadius: '4px',
                   border: '1px solid rgba(255, 107, 53, 0.3)'
                 }}>
-                  ⚠️ Está seleccionando horario de urgencias, ten en cuenta que se le hará un cargo adicional
+                  ⚠️ Está seleccionando horario de urgencias, ten en cuenta que se le hará un cargo adicional de 20€
                 </p>
               )}
             </>
@@ -2573,7 +2573,7 @@ function Home() {
                 <div className="contact-icon">📍</div>
                 <div className="contact-details">
                   <h3>Dirección</h3>
-                  <p>Calle Leopoldo Arias Clarín, Local 148</p>
+                  <p>Calle Leopoldo Alas Clarín, Local 148</p>
                   <p>Dos Hermanas, Sevilla</p>
                 </div>
               </div>
