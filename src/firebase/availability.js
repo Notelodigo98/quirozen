@@ -386,7 +386,10 @@ const timeToMinutes = (timeString) => {
 // Get available slots for a date, considering existing reservations
 // serviceName: optional, if provided, only returns slots available for this service
 // allServices: optional, array of all services to look up durations
-export const getAvailableSlots = async (dateString, reservationsForDate = [], serviceName = null, allServices = []) => {
+// newServiceDuration: optional, duration in minutes of the new service being booked (to check conflicts)
+const MARGIN_MINUTES = 10; // Margin between appointments
+
+export const getAvailableSlots = async (dateString, reservationsForDate = [], serviceName = null, allServices = [], newServiceDuration = null) => {
   try {
     // Get availability configuration for the date
     const availability = await getAvailabilityForDate(dateString, serviceName);
@@ -411,27 +414,88 @@ export const getAvailableSlots = async (dateString, reservationsForDate = [], se
     }
     
     // Build blocking windows based on each existing reservation
+    // Rules:
+    // - Reservations >= 40 min: block as 1 hour (60 min) with 10 min margin before
+    // - Reservations <= 30 min: block exact duration, no margin
     const reservationBlocks = activeReservations.map(reservation => {
       const service = allServices.find(s => s.nombre === reservation.servicio);
       const reservationDuration = service ? extractMinutesFromDuration(service.duracion) : 30; // Default to 30 min
       
-      // Block time based on service duration:
-      // - Services <= 30 min: block 30 min
-      // - Services > 30 min: block 60 min (1 hour)
-      const blockDuration = reservationDuration <= 30 ? 30 : 60;
-      
       const startMinutes = timeToMinutes(reservation.hora);
-      const blockEndMinutes = startMinutes + blockDuration;
       
-      return { startMinutes, blockEndMinutes };
+      // Determine block duration based on reservation duration
+      let blockDuration;
+      let usesMargin = false;
+      if (reservationDuration >= 40) {
+        // Services >= 40 min: block as 1 hour (60 min)
+        blockDuration = 60;
+        usesMargin = true;
+      } else {
+        // Services <= 30 min: block exact duration
+        blockDuration = reservationDuration;
+        usesMargin = false;
+      }
+      
+      const reservationEndMinutes = startMinutes + blockDuration;
+      
+      // Calculate block start: if we're booking a new service, consider margin only if both are >= 40 min
+      let blockStartMinutes = startMinutes;
+      if (newServiceDuration !== null && newServiceDuration > 0) {
+        // Only apply margin if the new service is >= 40 min AND the existing reservation uses margin
+        if (newServiceDuration >= 40 && usesMargin) {
+          blockStartMinutes = startMinutes - newServiceDuration - MARGIN_MINUTES;
+        } else if (newServiceDuration >= 40 && !usesMargin) {
+          // New service is >= 40 min but existing is <= 30 min: block from (start - newDuration) without margin
+          blockStartMinutes = startMinutes - newServiceDuration;
+        } else {
+          // New service is <= 30 min: block from (start - newDuration) without margin
+          blockStartMinutes = startMinutes - newServiceDuration;
+        }
+        // Don't allow negative times
+        if (blockStartMinutes < 0) blockStartMinutes = 0;
+      }
+      
+      // Block end is the end of the reservation block
+      const blockEndMinutes = reservationEndMinutes;
+      
+      return { 
+        startMinutes: blockStartMinutes, 
+        blockEndMinutes, 
+        reservationStart: startMinutes, 
+        reservationEnd: reservationEndMinutes,
+        reservationDuration: reservationDuration,
+        usesMargin: usesMargin
+      };
     });
     
     const freeSlots = availability.slots.filter(slot => {
       const slotMinutes = timeToMinutes(slot);
       
+      // If we're checking for a specific new service duration, also check if the slot + duration would conflict
+      const newServiceEndMinutes = newServiceDuration ? slotMinutes + newServiceDuration : null;
+      
       for (const block of reservationBlocks) {
-        const withinReservationWindow = slotMinutes >= block.startMinutes && slotMinutes < block.blockEndMinutes;
-        if (withinReservationWindow) {
+        // Check if slot is within the blocked window (before or during reservation)
+        const withinBlockWindow = slotMinutes >= block.startMinutes && slotMinutes < block.blockEndMinutes;
+        
+        // Check if the new service (if specified) would overlap with existing reservation
+        let newServiceOverlaps = false;
+        if (newServiceEndMinutes !== null) {
+          // Margin only applies if both new service and existing reservation are >= 40 min
+          const newServiceUsesMargin = newServiceDuration >= 40;
+          const shouldApplyMargin = newServiceUsesMargin && block.usesMargin;
+          
+          if (shouldApplyMargin) {
+            // Both are >= 40 min: new service must end at least 10 minutes before reservation starts
+            const reservationStartWithMargin = block.reservationStart - MARGIN_MINUTES;
+            newServiceOverlaps = newServiceEndMinutes > reservationStartWithMargin;
+          } else {
+            // At least one is <= 30 min: no margin, just check if they overlap
+            newServiceOverlaps = slotMinutes < block.reservationEnd && newServiceEndMinutes > block.reservationStart;
+          }
+        }
+        
+        if (withinBlockWindow || newServiceOverlaps) {
           return false;
         }
       }

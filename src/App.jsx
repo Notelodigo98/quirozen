@@ -69,6 +69,13 @@ const serviciosEstetica = [
 // Combined array for backward compatibility
 const todosLosServicios = [...masajes, ...serviciosEstetica];
 
+// Helper: Extract minutes from duration string (e.g., "50 min" -> 50)
+const extractMinutesFromDuration = (durationString) => {
+  if (!durationString) return null;
+  const match = durationString.match(/(\d+)\s*min/i);
+  return match ? parseInt(match[1], 10) : null;
+};
+
 const bonos = [
   {
     titulo: 'Bono 5 Sesiones',
@@ -92,9 +99,9 @@ const bonos = [
     regalo: ''
   },
   {
-    titulo: 'Tarjeta de fidelidad "Tu 6º masaje es GRATIS"',
-    descripcion: 'Sellas 5 sesiones → la 6ª es gratis* (o al 50%).',
-    detalles: '*gratis masaje relajante o descontracturante.',
+    titulo: 'Bono Bienestar Compartido',
+    descripcion: 'Comparte bienestar con quiénes más quieres y recibe un beneficio especial de 5€ en tu próxima sesión',
+    detalles: '(* Valido para sesiones individuales. Canjeable solo una vez. No acumulable con otras promociones)',
     precio: ''
   },
   {
@@ -110,13 +117,13 @@ const bonos = [
   //   precio: '65€ (en lugar de 70€)',
   //   regalo: 'Puedes ofrecer ambiente con velas y música suave'
   // },
-  // {
-  //   titulo: 'Bono "Pareja Constante"',
-  //   descripcion: 'Para parejas que quieren cuidarse mes a mes.',
-  //   detalles: '4 sesiones al mes (2 por persona)',
-  //   precio: '120€ (en lugar de 140€)',
-  //   regalo: ''
-  // },
+  {
+    titulo: 'Bono Pareja ',
+    descripcion: 'Compartir bienestar también es una forma de cuidarse Este bono está pensado para disfrutar juntos de un momento de calma, desconexión y relax, lejos de las prisas del día a dia.',
+    detalles: 'Sesión de 45 min de masaje relajante + 45 min de presoterapia ',
+    precio: '90€',
+    regalo: ''
+  },
   {
     titulo: 'Bono "Mimos para mí"',
     descripcion: 'Porque cuidar a otros también merece autocuidado.',
@@ -362,8 +369,17 @@ const ReservationForm = ({ masajes }) => {
       const categoria = formData.categoriaServicio || '';
       const allServices = categoria === 'estetica' ? serviciosEstetica : masajes;
       
-      // Get available slots considering reservations
-      const result = await getAvailableSlots(dateString, reservations, null, allServices);
+      // Get duration of selected service if available
+      let newServiceDuration = null;
+      if (formData.servicio) {
+        const selectedService = allServices.find(s => s.nombre === formData.servicio);
+        if (selectedService && selectedService.duracion) {
+          newServiceDuration = extractMinutesFromDuration(selectedService.duracion);
+        }
+      }
+      
+      // Get available slots considering reservations and new service duration
+      const result = await getAvailableSlots(dateString, reservations, null, allServices, newServiceDuration);
       
       if (result.available) {
         // Filter out past times if it's today
@@ -479,7 +495,16 @@ const ReservationForm = ({ masajes }) => {
       const categoria = formData.categoriaServicio || '';
       const allServices = categoria === 'estetica' ? serviciosEstetica : masajes;
       
-      const slotAvailability = await getAvailableSlots(formData.fecha, reservations, null, allServices);
+      // Get duration of selected service
+      let newServiceDuration = null;
+      if (formData.servicio) {
+        const selectedService = allServices.find(s => s.nombre === formData.servicio);
+        if (selectedService && selectedService.duracion) {
+          newServiceDuration = extractMinutesFromDuration(selectedService.duracion);
+        }
+      }
+      
+      const slotAvailability = await getAvailableSlots(formData.fecha, reservations, null, allServices, newServiceDuration);
       
       if (!slotAvailability.available || !slotAvailability.slots.includes(formData.hora)) {
         setError('Lo sentimos, este horario ya no está disponible. Por favor, selecciona otro.');
@@ -819,7 +844,16 @@ const ManageReservation = () => {
       const categoria = editData.categoriaServicio || getCategoryFromService(editData.servicio);
       const allServices = categoria === 'estetica' ? serviciosEstetica : masajes;
       
-      const slotAvailability = await getAvailableSlots(editData.fecha, filteredReservations, editData.servicio, allServices);
+      // Get duration of selected service
+      let newServiceDuration = null;
+      if (editData.servicio) {
+        const selectedService = allServices.find(s => s.nombre === editData.servicio);
+        if (selectedService && selectedService.duracion) {
+          newServiceDuration = extractMinutesFromDuration(selectedService.duracion);
+        }
+      }
+      
+      const slotAvailability = await getAvailableSlots(editData.fecha, filteredReservations, editData.servicio, allServices, newServiceDuration);
       
       if (!slotAvailability.available || !slotAvailability.slots.includes(editData.hora)) {
         setError('Lo sentimos, este horario ya no está disponible. Por favor, selecciona otro.');
@@ -1049,7 +1083,17 @@ const ManageReservation = () => {
       // Determine which services array to use
       const categoria = editData.categoriaServicio || getCategoryFromService(serviceName);
       const allServices = categoria === 'estetica' ? serviciosEstetica : masajes;
-      const result = await getAvailableSlots(dateString, filteredReservations, serviceName, allServices);
+      
+      // Get duration of selected service if available
+      let newServiceDuration = null;
+      if (serviceName) {
+        const selectedService = allServices.find(s => s.nombre === serviceName);
+        if (selectedService && selectedService.duracion) {
+          newServiceDuration = extractMinutesFromDuration(selectedService.duracion);
+        }
+      }
+      
+      const result = await getAvailableSlots(dateString, filteredReservations, serviceName, allServices, newServiceDuration);
       
       if (result.available) {
         // Filter out past times if it's today
