@@ -387,7 +387,7 @@ const timeToMinutes = (timeString) => {
 // serviceName: optional, if provided, only returns slots available for this service
 // allServices: optional, array of all services to look up durations
 // newServiceDuration: optional, duration in minutes of the new service being booked (to check conflicts)
-const MARGIN_MINUTES = 10; // Margin between appointments
+// Note: Services >= 40 min are blocked as 1 hour (60 min) - this is the "margin" already included
 
 export const getAvailableSlots = async (dateString, reservationsForDate = [], serviceName = null, allServices = [], newServiceDuration = null) => {
   try {
@@ -415,8 +415,8 @@ export const getAvailableSlots = async (dateString, reservationsForDate = [], se
     
     // Build blocking windows based on each existing reservation
     // Rules:
-    // - Reservations >= 40 min: block as 1 hour (60 min) with 10 min margin before
-    // - Reservations <= 30 min: block exact duration, no margin
+    // - Reservations >= 40 min: block as 1 hour (60 min) - the "margin" is already included in the 1-hour block
+    // - Reservations <= 30 min: block exact duration
     const reservationBlocks = activeReservations.map(reservation => {
       const service = allServices.find(s => s.nombre === reservation.servicio);
       const reservationDuration = service ? extractMinutesFromDuration(service.duracion) : 30; // Default to 30 min
@@ -438,22 +438,11 @@ export const getAvailableSlots = async (dateString, reservationsForDate = [], se
       
       const reservationEndMinutes = startMinutes + blockDuration;
       
-      // Calculate block start: if we're booking a new service, consider margin only if both are >= 40 min
+      // Calculate block start: only used when NOT checking for a specific new service duration
+      // When checking for new service duration, we only check direct overlap, not pre-blocking
       let blockStartMinutes = startMinutes;
-      if (newServiceDuration !== null && newServiceDuration > 0) {
-        // Only apply margin if the new service is >= 40 min AND the existing reservation uses margin
-        if (newServiceDuration >= 40 && usesMargin) {
-          blockStartMinutes = startMinutes - newServiceDuration - MARGIN_MINUTES;
-        } else if (newServiceDuration >= 40 && !usesMargin) {
-          // New service is >= 40 min but existing is <= 30 min: block from (start - newDuration) without margin
-          blockStartMinutes = startMinutes - newServiceDuration;
-        } else {
-          // New service is <= 30 min: block from (start - newDuration) without margin
-          blockStartMinutes = startMinutes - newServiceDuration;
-        }
-        // Don't allow negative times
-        if (blockStartMinutes < 0) blockStartMinutes = 0;
-      }
+      // Note: blockStartMinutes is only used when newServiceDuration is null
+      // When newServiceDuration is specified, we check overlap directly in the filter logic
       
       // Block end is the end of the reservation block
       const blockEndMinutes = reservationEndMinutes;
@@ -472,31 +461,36 @@ export const getAvailableSlots = async (dateString, reservationsForDate = [], se
       const slotMinutes = timeToMinutes(slot);
       
       // If we're checking for a specific new service duration, also check if the slot + duration would conflict
-      const newServiceEndMinutes = newServiceDuration ? slotMinutes + newServiceDuration : null;
+      // For services >= 40 min, they block as 1 hour (60 min), so use that for overlap calculation
+      let newServiceEndMinutes = null;
+      if (newServiceDuration) {
+        if (newServiceDuration >= 40) {
+          // Services >= 40 min block as 1 hour
+          newServiceEndMinutes = slotMinutes + 60;
+        } else {
+          // Services <= 30 min use exact duration
+          newServiceEndMinutes = slotMinutes + newServiceDuration;
+        }
+      }
       
       for (const block of reservationBlocks) {
-        // Check if slot is within the blocked window (before or during reservation)
-        const withinBlockWindow = slotMinutes >= block.startMinutes && slotMinutes < block.blockEndMinutes;
-        
-        // Check if the new service (if specified) would overlap with existing reservation
-        let newServiceOverlaps = false;
+        // If we're checking for a specific new service duration, only check overlap
+        // Otherwise, check if slot is within the blocked window
         if (newServiceEndMinutes !== null) {
-          // Margin only applies if both new service and existing reservation are >= 40 min
-          const newServiceUsesMargin = newServiceDuration >= 40;
-          const shouldApplyMargin = newServiceUsesMargin && block.usesMargin;
+          // Check if the new service would overlap with existing reservation
+          // No additional margin needed - the margin is already included in the 1-hour block for >= 40 min services
+          // Just check direct overlap
+          const newServiceOverlaps = slotMinutes < block.reservationEnd && newServiceEndMinutes > block.reservationStart;
           
-          if (shouldApplyMargin) {
-            // Both are >= 40 min: new service must end at least 10 minutes before reservation starts
-            const reservationStartWithMargin = block.reservationStart - MARGIN_MINUTES;
-            newServiceOverlaps = newServiceEndMinutes > reservationStartWithMargin;
-          } else {
-            // At least one is <= 30 min: no margin, just check if they overlap
-            newServiceOverlaps = slotMinutes < block.reservationEnd && newServiceEndMinutes > block.reservationStart;
+          if (newServiceOverlaps) {
+            return false;
           }
-        }
-        
-        if (withinBlockWindow || newServiceOverlaps) {
-          return false;
+        } else {
+          // No new service duration specified, just check if slot is within the blocked window
+          const withinBlockWindow = slotMinutes >= block.startMinutes && slotMinutes < block.blockEndMinutes;
+          if (withinBlockWindow) {
+            return false;
+          }
         }
       }
       
