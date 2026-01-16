@@ -118,7 +118,7 @@ const bonos = [
   //   regalo: 'Puedes ofrecer ambiente con velas y música suave'
   // },
   {
-    titulo: 'Bono Pareja ',
+    titulo: 'Bono Parejas ',
     descripcion: 'Compartir bienestar también es una forma de cuidarse Este bono está pensado para disfrutar juntos de un momento de calma, desconexión y relax, lejos de las prisas del día a dia.',
     detalles: 'Sesión de 45 min de masaje relajante + 45 min de presoterapia ',
     precio: '90€',
