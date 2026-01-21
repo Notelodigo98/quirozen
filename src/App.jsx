@@ -64,7 +64,7 @@ const masajes = [
 
 const serviciosEstetica = [
   { nombre: 'Presoterapia', descripcion: 'Tratamiento que aplica presión de aire para mejorar el drenaje linfático y la circulación. Ayuda a reducir la retención de líquidos y disminuir la celulitis.', duracion: '45 min', precio: '25€' },
-  { nombre: 'Hidrofacial', descripcion: 'en profundidad. Mediante tecnología avanzada, elimina impurezas y células muertas mientras infunde activos hidratantes y antioxidantes, dejando la piel más luminosa,suave y revitalizada desde la primera sesión.', duracion: '1 hora', precio: '1 sesión por 50€, 3 sesiones por 135€, 5 sesiones por 225€' },
+  { nombre: 'Hidrofacial', descripcion: 'La hidrofacial es un tratamiento facial no invasivo que limpia, exfolia e hidrata la piel en profundidad. Mediante tecnología avanzada, elimina impurezas y células muertas mientras infunde activos hidratantes y antioxidantes, dejando la piel más luminosa,suave y revitalizada desde la primera sesión.', duracion: '1 hora', precio: '1 sesión por 50€, 3 sesiones por 135€, 5 sesiones por 225€' },
   { nombre: 'Dermapen', descripcion: 'El Dermapen es un tratamiento de microneedling que estimula la regeneración natural de la piel mediante microperforaciones controladas. Favorece la producción de colágeno y elastina, mejorando la textura, firmeza, manchas, cicatrices y líneas de expresión, logrando una piel más uniforme y rejuvenecida.', duracion: '1 hora', precio: '1 sesión por 65€, 3 sesiones por 180€, 5 sesiones por 300€' },
 ];
 
@@ -175,7 +175,7 @@ const bonos = [
   {
     titulo: 'Bono Relax Drenante',
     descripcion: 'Disfruta de una experiencia completa de bienestar diseñada para relajar, aliviar tensiones y mejorar la circulación. Una combinación perfecta para cuidar cuerpo y mente, recomendada tanto para relajación como para recuperación muscular.',
-    detalles: '40 min de masaje (relajante o descontracturante) + 20 min de presoterapia',
+    detalles: '40 min de masaje (relajante o descontracturante) + 20 min de presoterapia.',
     precio: ' 1 sesión por 40€, 3 sesiones por 120€, 5 sesiones por 200€'
   },
 ];
