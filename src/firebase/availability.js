@@ -385,11 +385,13 @@ const timeToMinutes = (timeString) => {
 
 // Get available slots for a date, considering existing reservations
 // serviceName: optional, if provided, only returns slots available for this service
-// allServices: optional, array of all services to look up durations
+// allServices: optional, array of all services to look up durations (services of the current category)
 // newServiceDuration: optional, duration in minutes of the new service being booked (to check conflicts)
-// Note: Services >= 40 min are blocked as 1 hour (60 min) - this is the "margin" already included
+// categoria: optional, if provided, only considers reservations of the same category (masajes/estetica)
+// esteticaServices: optional, array of estetica services to help determine category of old reservations
+// Note: Services > 30 min block as 1 hour (60 min), services <= 30 min block as 30 min
 
-export const getAvailableSlots = async (dateString, reservationsForDate = [], serviceName = null, allServices = [], newServiceDuration = null) => {
+export const getAvailableSlots = async (dateString, reservationsForDate = [], serviceName = null, allServices = [], newServiceDuration = null, categoria = null, esteticaServices = []) => {
   try {
     // Get availability configuration for the date
     const availability = await getAvailabilityForDate(dateString, serviceName);
@@ -399,7 +401,34 @@ export const getAvailableSlots = async (dateString, reservationsForDate = [], se
     }
     
     // Filter out canceled reservations
-    const activeReservations = reservationsForDate.filter(r => r.estado !== 'cancelada');
+    let activeReservations = reservationsForDate.filter(r => r.estado !== 'cancelada');
+    
+    // Filter reservations by category if categoria is provided
+    // This ensures masajes and estetica are independent
+    if (categoria) {
+      activeReservations = activeReservations.filter(reservation => {
+        // Check if reservation has categoriaServicio field
+        if (reservation.categoriaServicio) {
+          return reservation.categoriaServicio === categoria;
+        }
+        // Fallback: try to determine category from service name
+        // This is for backwards compatibility with old reservations
+        if (reservation.servicio) {
+          // Check if service is in estetica services array
+          const isEstetica = esteticaServices && esteticaServices.length > 0 && 
+            esteticaServices.some(s => s.nombre === reservation.servicio);
+          
+          if (categoria === 'estetica') {
+            return isEstetica;
+          } else {
+            // categoria === 'masajes'
+            return !isEstetica; // If not estetica, assume masajes
+          }
+        }
+        // If no servicio name, exclude it when categoria is specified
+        return false;
+      });
+    }
     
     // If we don't have service definitions, fallback to basic behavior
     if (!allServices || allServices.length === 0) {
@@ -415,25 +444,27 @@ export const getAvailableSlots = async (dateString, reservationsForDate = [], se
     
     // Build blocking windows based on each existing reservation
     // Rules:
-    // - Reservations >= 40 min: block as 1 hour (60 min) - the "margin" is already included in the 1-hour block
-    // - Reservations <= 30 min: block exact duration
+    // - Reservations > 30 min: block as 1 hour (60 min) from start time
+    // - Reservations <= 30 min: block as 30 min from start time
     const reservationBlocks = activeReservations.map(reservation => {
-      const service = allServices.find(s => s.nombre === reservation.servicio);
+      // Find service in allServices first, then in esteticaServices if not found
+      // This is needed because allServices only contains services of the current category
+      let service = allServices.find(s => s.nombre === reservation.servicio);
+      if (!service && esteticaServices && esteticaServices.length > 0) {
+        service = esteticaServices.find(s => s.nombre === reservation.servicio);
+      }
       const reservationDuration = service ? extractMinutesFromDuration(service.duracion) : 30; // Default to 30 min
       
       const startMinutes = timeToMinutes(reservation.hora);
       
       // Determine block duration based on reservation duration
       let blockDuration;
-      let usesMargin = false;
-      if (reservationDuration >= 40) {
-        // Services >= 40 min: block as 1 hour (60 min)
+      if (reservationDuration > 30) {
+        // Services > 30 min: block as 1 hour (60 min) from start
         blockDuration = 60;
-        usesMargin = true;
       } else {
-        // Services <= 30 min: block exact duration
-        blockDuration = reservationDuration;
-        usesMargin = false;
+        // Services <= 30 min: block as 30 min from start
+        blockDuration = 30;
       }
       
       const reservationEndMinutes = startMinutes + blockDuration;
@@ -452,8 +483,7 @@ export const getAvailableSlots = async (dateString, reservationsForDate = [], se
         blockEndMinutes, 
         reservationStart: startMinutes, 
         reservationEnd: reservationEndMinutes,
-        reservationDuration: reservationDuration,
-        usesMargin: usesMargin
+        reservationDuration: reservationDuration
       };
     });
     
@@ -461,15 +491,16 @@ export const getAvailableSlots = async (dateString, reservationsForDate = [], se
       const slotMinutes = timeToMinutes(slot);
       
       // If we're checking for a specific new service duration, also check if the slot + duration would conflict
-      // For services >= 40 min, they block as 1 hour (60 min), so use that for overlap calculation
+      // For services > 30 min, they block as 1 hour (60 min), so use that for overlap calculation
+      // For services <= 30 min, they block as 30 min
       let newServiceEndMinutes = null;
       if (newServiceDuration) {
-        if (newServiceDuration >= 40) {
-          // Services >= 40 min block as 1 hour
+        if (newServiceDuration > 30) {
+          // Services > 30 min block as 1 hour
           newServiceEndMinutes = slotMinutes + 60;
         } else {
-          // Services <= 30 min use exact duration
-          newServiceEndMinutes = slotMinutes + newServiceDuration;
+          // Services <= 30 min block as 30 min
+          newServiceEndMinutes = slotMinutes + 30;
         }
       }
       
@@ -478,7 +509,7 @@ export const getAvailableSlots = async (dateString, reservationsForDate = [], se
         // Otherwise, check if slot is within the blocked window
         if (newServiceEndMinutes !== null) {
           // Check if the new service would overlap with existing reservation
-          // No additional margin needed - the margin is already included in the 1-hour block for >= 40 min services
+          // The block duration already includes the margin (1 hour for >30 min, 30 min for <=30 min)
           // Just check direct overlap
           const newServiceOverlaps = slotMinutes < block.reservationEnd && newServiceEndMinutes > block.reservationStart;
           

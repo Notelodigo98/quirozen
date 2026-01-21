@@ -64,6 +64,8 @@ const masajes = [
 
 const serviciosEstetica = [
   { nombre: 'Presoterapia', descripcion: 'Tratamiento que aplica presión de aire para mejorar el drenaje linfático y la circulación. Ayuda a reducir la retención de líquidos y disminuir la celulitis.', duracion: '45 min', precio: '25€' },
+  { nombre: 'Hidrofacial', descripcion: 'en profundidad. Mediante tecnología avanzada, elimina impurezas y células muertas mientras infunde activos hidratantes y antioxidantes, dejando la piel más luminosa,suave y revitalizada desde la primera sesión.', duracion: '1 hora', precio: '1 sesión por 50€, 3 sesiones por 135€, 5 sesiones por 225€' },
+  { nombre: 'Dermapen', descripcion: 'El Dermapen es un tratamiento de microneedling que estimula la regeneración natural de la piel mediante microperforaciones controladas. Favorece la producción de colágeno y elastina, mejorando la textura, firmeza, manchas, cicatrices y líneas de expresión, logrando una piel más uniforme y rejuvenecida.', duracion: '1 hora', precio: '1 sesión por 65€, 3 sesiones por 180€, 5 sesiones por 300€' },
 ];
 
 // Combined array for backward compatibility
@@ -151,6 +153,30 @@ const bonos = [
     detalles: '10 sesiones de 45 minutos',
     precio: '175€ (Precio de apertura, oferta limitada)',
     regalo: ''
+  },
+  {
+    titulo: 'Bono RITUAL RENOVACIÓN FACIAL - Hidrofacial & Dermapen',
+    descripcion: 'La combinación perfecta para una piel limpia, luminosa y renovada. Resultados visibles desde la primera sesión.',
+    detalles: 'El tiempo de cada sesión de hidrofacial y dermapen es de 1:30 horas aproximadamente.',
+    precio: ' 1 sesión por 90€, 3 sesiones por 230€, 5 sesiones por 360€'
+  },
+  {
+    titulo: 'Bono RITUAL EQUILIBRIO & BIENESTAR - Hidrofacial & Presoterapia',
+    descripcion: 'Un tratamiento que combina el cuidado facial con el bienestar corporal para ayudarte a sentirte mejor por dentro y por fuera.',
+    detalles: 'El tiempo de cada sesión de hidrofacial es de 1:30 horas aproximadamente.',
+    precio: ' 1 sesión por 65€, 3 sesiones por 175€, 5 sesiones por 290€'
+  },
+  {
+    titulo: 'Bono RITUAL ARMONÍA QUIROZEN - Hidrofacial + Dermapen + Presoterapia',
+    descripcion: 'Un tratamiento completo que cuida tu piel y tu cuerpo en una sola sesión. Resultados visibles desde la primera sesión.',
+    detalles: 'El tiempo de cada sesión de hidrofacial y dermapen es de 1:30 horas aproximadamente.',
+    precio: ' 1 sesión por 110€, 3 sesiones por 300€, 5 sesiones por 500€'
+  },
+  {
+    titulo: 'Bono Relax Drenante',
+    descripcion: 'Disfruta de una experiencia completa de bienestar diseñada para relajar, aliviar tensiones y mejorar la circulación. Una combinación perfecta para cuidar cuerpo y mente, recomendada tanto para relajación como para recuperación muscular.',
+    detalles: '40 min de masaje (relajante o descontracturante) + 20 min de presoterapia',
+    precio: ' 1 sesión por 40€, 3 sesiones por 120€, 5 sesiones por 200€'
   },
 ];
 
@@ -379,7 +405,8 @@ const ReservationForm = ({ masajes }) => {
       }
       
       // Get available slots considering reservations and new service duration
-      const result = await getAvailableSlots(dateString, reservations, null, allServices, newServiceDuration);
+      // Pass categoria and esteticaServices to filter reservations by category
+      const result = await getAvailableSlots(dateString, reservations, null, allServices, newServiceDuration, categoria, serviciosEstetica);
       
       if (result.available) {
         // Filter out past times if it's today
@@ -504,7 +531,7 @@ const ReservationForm = ({ masajes }) => {
         }
       }
       
-      const slotAvailability = await getAvailableSlots(formData.fecha, reservations, null, allServices, newServiceDuration);
+      const slotAvailability = await getAvailableSlots(formData.fecha, reservations, null, allServices, newServiceDuration, categoria, serviciosEstetica);
       
       if (!slotAvailability.available || !slotAvailability.slots.includes(formData.hora)) {
         setError('Lo sentimos, este horario ya no está disponible. Por favor, selecciona otro.');
@@ -853,7 +880,7 @@ const ManageReservation = () => {
         }
       }
       
-      const slotAvailability = await getAvailableSlots(editData.fecha, filteredReservations, editData.servicio, allServices, newServiceDuration);
+      const slotAvailability = await getAvailableSlots(editData.fecha, filteredReservations, editData.servicio, allServices, newServiceDuration, categoria, serviciosEstetica);
       
       if (!slotAvailability.available || !slotAvailability.slots.includes(editData.hora)) {
         setError('Lo sentimos, este horario ya no está disponible. Por favor, selecciona otro.');
@@ -1093,7 +1120,7 @@ const ManageReservation = () => {
         }
       }
       
-      const result = await getAvailableSlots(dateString, filteredReservations, serviceName, allServices, newServiceDuration);
+      const result = await getAvailableSlots(dateString, filteredReservations, serviceName, allServices, newServiceDuration, categoria, serviciosEstetica);
       
       if (result.available) {
         // Filter out past times if it's today
