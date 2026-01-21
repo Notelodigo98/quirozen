@@ -2566,23 +2566,14 @@ function Home() {
         <section id="estetica" className="section">
           <h2>Estética y belleza</h2>
           <div className="masajes-list">
-            <div className="masaje-card">
-              <h4>Presoterapia</h4>
-              <p>
-                La presoterapia es un tratamiento que aplica presión de aire para mejorar el drenaje 
-                linfático y la circulación.
-              </p>
-              <p>
-                Ayuda a reducir la retención de líquidos, disminuir la celulitis y aliviar la pesadez 
-                en piernas.
-              </p>
-              <p>
-                Es un procedimiento indoloro, relajante y complementario para mejorar bienestar y 
-                estética corporal.
-              </p>
-              <p><strong>Duración:</strong> 45 min</p>
-              <p><strong>Precio:</strong> 25€ (Precio de apertura, oferta limitada)</p>
-            </div>
+            {serviciosEstetica.map((s, i) => (
+              <div className="masaje-card" key={i}>
+                <h4>{s.nombre}</h4>
+                <p>{s.descripcion}</p>
+                <p><strong>Duración:</strong> {s.duracion}</p>
+                <p><strong>Precio:</strong> {s.precio}</p>
+              </div>
+            ))}
           </div>
         </section>
         <section id="promos" className="section">
