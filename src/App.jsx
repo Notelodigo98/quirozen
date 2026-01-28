@@ -2571,6 +2571,7 @@ function Home() {
                 <h4>{s.nombre}</h4>
                 <p>{s.descripcion}</p>
                 <p><strong>Duración:</strong> {s.duracion}</p>
+                {s.sesiones && <p><strong>Sesiones:</strong> {s.sesiones}</p>}
                 <p><strong>Precio:</strong> {s.precio}</p>
               </div>
             ))}

@@ -67,7 +67,16 @@ function Layout({ children }) {
             </div>
             <div className="footer-contact-item">
               <span className="footer-icon">📞</span>
-              <p><a href="tel:675610730" className="footer-link">675 61 07 30</a></p>
+              <p>
+                <a
+                  href="https://wa.me/34633186752"
+                  className="footer-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  633 18 67 52 (solo WhatsApp)
+                </a>
+              </p>
             </div>
           </div>
 
