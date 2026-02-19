@@ -64,8 +64,8 @@ const masajes = [
 
 const serviciosEstetica = [
   { nombre: 'Presoterapia', descripcion: 'Tratamiento que aplica presión de aire para mejorar el drenaje linfático y la circulación. Ayuda a reducir la retención de líquidos y disminuir la celulitis.', duracion: '45 min', precio: '25€' },
-  { nombre: 'Hidrofacial', descripcion: 'La hidrofacial es un tratamiento facial no invasivo que limpia, exfolia e hidrata la piel en profundidad. Mediante tecnología avanzada, elimina impurezas y células muertas mientras infunde activos hidratantes y antioxidantes, dejando la piel más luminosa,suave y revitalizada desde la primera sesión.', duracion: '1 hora', precio: '1 sesión por 50€, 3 sesiones por 135€, 5 sesiones por 225€' },
-  { nombre: 'Dermapen', descripcion: 'El Dermapen es un tratamiento de microneedling que estimula la regeneración natural de la piel mediante microperforaciones controladas. Favorece la producción de colágeno y elastina, mejorando la textura, firmeza, manchas, cicatrices y líneas de expresión, logrando una piel más uniforme y rejuvenecida.', duracion: '1 hora', precio: '1 sesión por 65€, 3 sesiones por 180€, 5 sesiones por 300€' },
+  { nombre: 'Hidrofacial', descripcion: 'La hidrofacial es un tratamiento facial no invasivo que limpia, exfolia e hidrata la piel en profundidad. Mediante tecnología avanzada, elimina impurezas y células muertas mientras infunde activos hidratantes y antioxidantes, dejando la piel más luminosa,suave y revitalizada desde la primera sesión.', duracion: '1 hora', precio: '1 sesión por 30€, 3 sesiones por 80€, 5 sesiones por 125€' },
+  { nombre: 'Dermapen', descripcion: 'El Dermapen es un tratamiento de microneedling que estimula la regeneración natural de la piel mediante microperforaciones controladas. Favorece la producción de colágeno y elastina, mejorando la textura, firmeza, manchas, cicatrices y líneas de expresión, logrando una piel más uniforme y rejuvenecida.', duracion: '1 hora', precio: '1 sesión por 45€, 3 sesiones por 120€, 5 sesiones por 200€' },
 ];
 
 // Combined array for backward compatibility
@@ -90,7 +90,7 @@ const bonos = [
     titulo: 'Bono 10 Sesiones',
     descripcion: 'Para clientes constantes o con tratamiento prolongado (espalda, cervicales, estrés).',
     detalles: '10 masajes de 50 min',
-    precio: '250€',
+    precio: '230€',
     regalo: '1 masaje facial o podal de 20 min'
   },
   {
@@ -144,33 +144,33 @@ const bonos = [
     titulo: 'Bono Presoterapia',
     descripcion: 'Tratamiento de presoterapia para mejorar drenaje linfático, circulación y reducir celulitis.',
     detalles: '5 sesiones de 45 minutos',
-    precio: '125€ (Precio de apertura, oferta limitada)',
+    precio: '110€ (Precio de apertura, oferta limitada)',
     regalo: ''
   },
   {
     titulo: 'Bono 10 Sesiones Presoterapia',
     descripcion: 'Tratamiento de presoterapia para mejorar drenaje linfático, circulación y reducir celulitis.',
     detalles: '10 sesiones de 45 minutos',
-    precio: '175€ (Precio de apertura, oferta limitada)',
+    precio: '190€ (Precio de apertura, oferta limitada)',
     regalo: ''
   },
   {
     titulo: 'Bono RITUAL RENOVACIÓN FACIAL - Hidrofacial & Dermapen',
     descripcion: 'La combinación perfecta para una piel limpia, luminosa y renovada. Resultados visibles desde la primera sesión.',
     detalles: 'El tiempo de cada sesión de hidrofacial y dermapen es de 1:30 horas aproximadamente.',
-    precio: ' 1 sesión por 90€, 3 sesiones por 230€, 5 sesiones por 360€'
+    precio: ' 1 sesión por 70€, 3 sesiones por 180€, 5 sesiones por 290€'
   },
   {
     titulo: 'Bono RITUAL EQUILIBRIO & BIENESTAR - Hidrofacial & Presoterapia',
     descripcion: 'Un tratamiento que combina el cuidado facial con el bienestar corporal para ayudarte a sentirte mejor por dentro y por fuera.',
     detalles: 'El tiempo de cada sesión de hidrofacial es de 1:30 horas aproximadamente.',
-    precio: ' 1 sesión por 65€, 3 sesiones por 175€, 5 sesiones por 290€'
+    precio: ' 1 sesión por 45€, 3 sesiones por 120€, 5 sesiones por 190€'
   },
   {
     titulo: 'Bono RITUAL ARMONÍA QUIROZEN - Hidrofacial + Dermapen + Presoterapia',
     descripcion: 'Un tratamiento completo que cuida tu piel y tu cuerpo en una sola sesión. Resultados visibles desde la primera sesión.',
     detalles: 'El tiempo de cada sesión de hidrofacial y dermapen es de 1:30 horas aproximadamente.',
-    precio: ' 1 sesión por 110€, 3 sesiones por 300€, 5 sesiones por 500€'
+    precio: ' 1 sesión por 90€, 3 sesiones por 225€, 5 sesiones por 375€'
   },
   {
     titulo: 'Bono Relax Drenante',
