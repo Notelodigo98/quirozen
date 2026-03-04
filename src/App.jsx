@@ -63,9 +63,392 @@ const masajes = [
 ];
 
 const serviciosEstetica = [
-  { nombre: 'Presoterapia', descripcion: 'Tratamiento que aplica presión de aire para mejorar el drenaje linfático y la circulación. Ayuda a reducir la retención de líquidos y disminuir la celulitis.', duracion: '45 min', precio: '25€' },
-  { nombre: 'Hidrofacial', descripcion: 'La hidrofacial es un tratamiento facial no invasivo que limpia, exfolia e hidrata la piel en profundidad. Mediante tecnología avanzada, elimina impurezas y células muertas mientras infunde activos hidratantes y antioxidantes, dejando la piel más luminosa,suave y revitalizada desde la primera sesión.', duracion: '1 hora', precio: '1 sesión por 30€, 3 sesiones por 80€, 5 sesiones por 125€' },
-  { nombre: 'Dermapen', descripcion: 'El Dermapen es un tratamiento de microneedling que estimula la regeneración natural de la piel mediante microperforaciones controladas. Favorece la producción de colágeno y elastina, mejorando la textura, firmeza, manchas, cicatrices y líneas de expresión, logrando una piel más uniforme y rejuvenecida.', duracion: '1 hora', precio: '1 sesión por 45€, 3 sesiones por 120€, 5 sesiones por 200€' },
+  {
+    nombre: 'Presoterapia',
+    descripcion:
+      'Tratamiento que aplica presión de aire para mejorar el drenaje linfático y la circulación. Ayuda a reducir la retención de líquidos y disminuir la celulitis.',
+    duracion: '45 min',
+    precio: '25€'
+  },
+  {
+    nombre: 'Hidrofacial',
+    descripcion:
+      'Tratamiento facial no invasivo que limpia, exfolia e hidrata la piel en profundidad. Elimina impurezas y células muertas mientras infunde activos hidratantes y antioxidantes, dejando la piel más luminosa, suave y revitalizada desde la primera sesión.',
+    duracion: '1 hora',
+    precio: '1 sesión por 30€, 3 sesiones por 80€, 5 sesiones por 125€'
+  },
+  {
+    nombre: 'Dermapen',
+    descripcion:
+      'Tratamiento de microneedling que estimula la regeneración natural de la piel mediante microperforaciones controladas. Favorece la producción de colágeno y elastina, mejorando textura, firmeza, manchas, cicatrices y líneas de expresión.',
+    duracion: '1 hora',
+    precio: '1 sesión por 45€, 3 sesiones por 120€, 5 sesiones por 190€'
+  },
+
+  // Blefaroplastia sin cirugía
+  {
+    nombre: 'Blefaroplastia sin cirugía - Párpado superior',
+    descripcion:
+      'Tratamiento no invasivo para rejuvenecer la mirada y mejorar la firmeza del párpado.',
+    duracion: 'Por sesión',
+    precio: '50€'
+  },
+  {
+    nombre: 'Blefaroplastia sin cirugía - Párpado inferior',
+    descripcion:
+      'Tratamiento no invasivo para rejuvenecer la mirada y mejorar la firmeza del párpado.',
+    duracion: 'Por sesión',
+    precio: '50€'
+  },
+  {
+    nombre: 'Blefaroplastia sin cirugía - Párpado inferior + patas de gallo',
+    descripcion:
+      'Tratamiento no invasivo para rejuvenecer la mirada, suavizar arrugas y mejorar la firmeza del contorno de ojos.',
+    duracion: 'Por sesión',
+    precio: '125€'
+  },
+  {
+    nombre: 'Blefaroplastia sin cirugía - ojo completo',
+    descripcion:
+      'Tratamiento no invasivo integral para rejuvenecer la mirada y mejorar la firmeza de todo el contorno de ojos.',
+    duracion: 'Por sesión',
+    precio: '150€'
+  },
+
+  // Tratamientos de arrugas de expresión
+  {
+    nombre: 'Tratamiento arrugas de expresión - Entrecejo',
+    descripcion:
+      'Mejora la apariencia de las líneas dinámicas del entrecejo y rejuvenece el rostro.',
+    duracion: 'Por sesión',
+    precio: '50€'
+  },
+  {
+    nombre: 'Tratamiento arrugas de expresión - Frente',
+    descripcion:
+      'Suaviza las arrugas horizontales de la frente y aporta un aspecto más descansado.',
+    duracion: 'Por sesión',
+    precio: '150€'
+  },
+  {
+    nombre: 'Tratamiento arrugas de expresión - Entrecejo + frente',
+    descripcion:
+      'Tratamiento combinado para suavizar líneas del entrecejo y frente, logrando un rostro más uniforme y rejuvenecido.',
+    duracion: 'Por sesión',
+    precio: '180€'
+  },
+  {
+    nombre: 'Tratamiento arrugas de expresión - Código de barras (labio superior)',
+    descripcion:
+      'Mejora la apariencia de las arrugas verticales del labio superior, conocidas como código de barras.',
+    duracion: 'Por sesión',
+    precio: '130€'
+  },
+  {
+    nombre: 'Tratamiento arrugas de expresión - Surco nasogeniano',
+    descripcion:
+      'Atenúa las líneas que van desde la nariz hasta la comisura de los labios, suavizando el pliegue nasogeniano.',
+    duracion: 'Por sesión',
+    precio: '100€'
+  },
+
+  // Tratamientos de estructura cutánea
+  {
+    nombre: 'Tratamiento estructura cutánea - Acné',
+    descripcion:
+      'Mejora la calidad y textura de la piel con tendencia acneica, reduciendo imperfecciones y marcas.',
+    duracion: '30 min',
+    precio: 'Desde 50€ por sesión'
+  },
+  {
+    nombre: 'Tratamiento estructura cutánea - Cicatrices de acné',
+    descripcion:
+      'Tratamiento específico para suavizar y mejorar el aspecto de cicatrices producidas por el acné.',
+    duracion: '30 min',
+    precio: 'Desde 50€ por sesión'
+  },
+  {
+    nombre: 'Tratamiento estructura cutánea - Estrías',
+    descripcion:
+      'Mejora la textura y apariencia de las estrías, favoreciendo una piel más uniforme.',
+    duracion: '30 min',
+    precio: 'Desde 50€ por sesión'
+  },
+
+  // Tratamientos de pigmentación
+  {
+    nombre: 'Tratamiento de pigmentación - Léntigos',
+    descripcion:
+      'Tratamiento focalizado para mejorar manchas tipo léntigos y unificar el tono de la piel.',
+    duracion: '30 min',
+    precio: 'Desde 50€ por sesión'
+  },
+  {
+    nombre: 'Tratamiento de pigmentación - Pecas solares',
+    descripcion:
+      'Ayuda a atenuar pecas solares y mejorar la luminosidad general del rostro.',
+    duracion: '30 min',
+    precio: 'Desde 50€ por sesión'
+  },
+  {
+    nombre: 'Tratamiento de pigmentación - Melasma',
+    descripcion:
+      'Pensado para mejorar manchas tipo melasma, unificando el tono y aportando luminosidad.',
+    duracion: '30 min',
+    precio: 'Desde 50€ por sesión'
+  },
+  {
+    nombre: 'Tratamiento de pigmentación - Cloasma',
+    descripcion:
+      'Tratamiento para mejorar manchas tipo cloasma, logrando un tono más uniforme.',
+    duracion: '30 min',
+    precio: 'Desde 50€ por sesión'
+  },
+
+  // Eliminación de lesiones cutáneas
+  {
+    nombre: 'Eliminación de lesiones cutáneas - Acrocordones',
+    descripcion:
+      'Tratamiento seguro para la eliminación de pequeños colgajos cutáneos (acrocordones).',
+    duracion: '30 min',
+    precio: 'Desde 50€ por sesión'
+  },
+  {
+    nombre: 'Eliminación de lesiones cutáneas - Queratosis seborreica',
+    descripcion:
+      'Tratamiento específico para la eliminación de queratosis seborreicas de forma segura.',
+    duracion: '30 min',
+    precio: 'Desde 50€ por sesión'
+  },
+  {
+    nombre: 'Eliminación de lesiones cutáneas - Lunares',
+    descripcion:
+      'Tratamiento para la eliminación de determinados tipos de lunares a nivel estético. (Consultar valoración previa).',
+    duracion: '30 min',
+    precio: 'Desde 50€ por sesión'
+  },
+  {
+    nombre: 'Eliminación de lesiones cutáneas - VPH',
+    descripcion:
+      'Tratamiento orientado a la eliminación de lesiones cutáneas asociadas al VPH. (Consultar valoración previa).',
+    duracion: '30 min',
+    precio: 'Desde 50€ por sesión'
+  },
+
+  // Diseño de la mirada
+  {
+    nombre: 'Extensiones de pestañas clásicas',
+    descripcion: 'Diseño de la mirada con extensiones clásicas para un efecto natural y definido.',
+    duracion: 'Según diseño',
+    precio: '40€'
+  },
+  {
+    nombre: 'Extensiones de pestañas volumen tecnológico',
+    descripcion: 'Extensiones con volumen tecnológico para una mirada más intensa y expresiva.',
+    duracion: 'Según diseño',
+    precio: '45€'
+  },
+  {
+    nombre: 'Extensiones de pestañas volumen ruso',
+    descripcion: 'Técnica de volumen ruso para un efecto más denso y sofisticado en las pestañas.',
+    duracion: 'Según diseño',
+    precio: '60€'
+  },
+
+  // Cejas y pestañas
+  {
+    nombre: 'Diseño de cejas + depilación al hilo',
+    descripcion: 'Definición de cejas con técnica de hilo para un acabado preciso y limpio.',
+    duracion: 'Según diseño',
+    precio: '10€'
+  },
+  {
+    nombre: 'Diseño de cejas + hilo + tinte o henna',
+    descripcion:
+      'Diseño completo de cejas con hilo y coloración mediante tinte o henna para mayor definición.',
+    duracion: 'Según diseño',
+    precio: '15€'
+  },
+  {
+    nombre: 'Laminado de cejas + tinte + depilación',
+    descripcion:
+      'Laminado de cejas para realzar la forma natural, acompañado de tinte y depilación para un acabado perfecto.',
+    duracion: 'Según diseño',
+    precio: '35€'
+  },
+  {
+    nombre: 'Laminado coreano de pestañas + tinte',
+    descripcion:
+      'Lifting y curvatura de pestañas estilo coreano con tinte incluido para una mirada más abierta.',
+    duracion: 'Según diseño',
+    precio: '35€'
+  },
+  {
+    nombre: 'Tinte de pestañas o henna en cejas',
+    descripcion:
+      'Coloración de pestañas o cejas con tinte o henna para intensificar la mirada y definir el rostro.',
+    duracion: 'Según diseño',
+    precio: '10€'
+  },
+
+  // Mesoterapia corporal – Pack Express
+  {
+    nombre: 'Mesoterapia corporal Pack Express - Lipoláser + vacumterapia + radiofrecuencia',
+    descripcion:
+      'Sesión de mesoterapia corporal de 60 minutos combinando lipoláser, vacumterapia y radiofrecuencia para trabajar grasa localizada y reafirmar.',
+    duracion: '60 min',
+    precio: '35€'
+  },
+  {
+    nombre: 'Mesoterapia corporal Pack Express - Cavitación + vacumterapia + radiofrecuencia',
+    descripcion:
+      'Sesión de mesoterapia corporal de 60 minutos con cavitación, vacumterapia y radiofrecuencia para mejorar contorno y textura.',
+    duracion: '60 min',
+    precio: '35€'
+  },
+  {
+    nombre: 'Mesoterapia corporal Pack Express - Lipoláser + maderoterapia + radiofrecuencia',
+    descripcion:
+      'Combinación de lipoláser, maderoterapia y radiofrecuencia para remodelar la silueta y tonificar la piel.',
+    duracion: '60 min',
+    precio: '35€'
+  },
+  {
+    nombre: 'Mesoterapia corporal Pack Express - Cavitación + maderoterapia + radiofrecuencia',
+    descripcion:
+      'Sesión intensiva con cavitación, maderoterapia y radiofrecuencia para tratar celulitis y flacidez.',
+    duracion: '60 min',
+    precio: '35€'
+  },
+  {
+    nombre:
+      'Mesoterapia corporal Pack Express - Lipoláser + drenaje linfático manual + radiofrecuencia',
+    descripcion:
+      'Tratamiento que combina lipoláser, drenaje linfático manual y radiofrecuencia para mejorar retención de líquidos y tonicidad.',
+    duracion: '60 min',
+    precio: '35€'
+  },
+  {
+    nombre:
+      'Mesoterapia corporal Pack Express - Cavitación + drenaje linfático manual + radiofrecuencia',
+    descripcion:
+      'Sesión con cavitación, drenaje linfático manual y radiofrecuencia para trabajar grasa localizada y favorecer el drenaje.',
+    duracion: '60 min',
+    precio: '35€'
+  },
+  {
+    nombre: 'Mesoterapia Gold Premium',
+    descripcion:
+      'Sesión de mesoterapia corporal avanzada de 120 minutos para trabajar grasa localizada, firmeza y drenaje con resultados intensivos. Incluye combinaciones avanzadas de lipoláser, cavitación, vacumterapia, maderoterapia, radiofrecuencia y presoterapia.',
+    duracion: '120 min',
+    precio: 'Sesión individual — 65€'
+  },
+  {
+    nombre: 'Hidratación de labios técnica cristal',
+    descripcion: 'Tratamiento facial avanzado para hidratar y dar volumen natural a los labios.',
+    duracion: 'Según tratamiento',
+    precio: '50€'
+  },
+  {
+    nombre: 'Tratamiento facial Exosomas + PDRN',
+    descripcion:
+      'Tratamiento de última generación con exosomas y PDRN para regenerar, rejuvenecer y revitalizar la piel.',
+    duracion: 'Según tratamiento',
+    precio: '60€'
+  },
+  {
+    nombre: 'Radiofrecuencia facial',
+    descripcion: 'Radiofrecuencia facial avanzada para reafirmar, estimular colágeno y redefinir el óvalo facial.',
+    duracion: '45 min',
+    precio: '35€'
+  },
+  {
+    nombre: 'Endolifting tratamiento doble cuello',
+    descripcion:
+      'Tratamiento específico de endolifting para trabajar la flacidez y el contorno del cuello. Consultar valoración y tarifa.',
+    duracion: 'Según tratamiento',
+    precio: 'Consultar'
+  },
+  {
+    nombre: 'Peeling profesional efecto flash',
+    descripcion: 'Peeling rápido de 30 minutos para aportar luminosidad inmediata y efecto buena cara.',
+    duracion: '30 min',
+    precio: '45€'
+  },
+  {
+    nombre: 'Peeling profesional acné activo',
+    descripcion:
+      'Peeling específico de 30 minutos para pieles con acné activo, que ayuda a controlar la grasa y reducir imperfecciones.',
+    duracion: '30 min',
+    precio: '45€'
+  },
+  {
+    nombre: 'Peeling profesional hiperpigmentación',
+    descripcion:
+      'Peeling de 30 minutos orientado a tratar manchas e hiperpigmentación, unificando el tono de la piel.',
+    duracion: '30 min',
+    precio: '45€'
+  },
+  {
+    nombre: 'Peeling profesional anti-age',
+    descripcion:
+      'Peeling de 30 minutos con acción rejuvenecedora para mejorar textura, luminosidad y signos de la edad.',
+    duracion: '30 min',
+    precio: '45€'
+  },
+  {
+    nombre: 'Peeling profesional piel sensible y rosácea',
+    descripcion:
+      'Peeling suave de 30 minutos adaptado a pieles sensibles o con rosácea para calmar y mejorar el aspecto general.',
+    duracion: '30 min',
+    precio: '45€'
+  },
+  {
+    nombre: 'Electroacupuntura y acupresión',
+    descripcion:
+      'Sesiones de electroacupuntura y acupresión para estética facial y corporal, ansiedad, insomnio, regulación hormonal y otros tratamientos personalizados.',
+    duracion: 'Según tratamiento',
+    precio: 'Sesión — 30€ | Con semillas invisibles — 32€'
+  },
+  {
+    nombre: 'Maderoterapia facial',
+    descripcion: 'Masaje facial con maderoterapia de 50 minutos para tonificar y remodelar el rostro.',
+    duracion: '50 min',
+    precio: '30€'
+  },
+  {
+    nombre: 'Maderoterapia Kobido',
+    descripcion: 'Masaje Kobido con maderoterapia de 50 minutos para efecto lifting natural y relajación profunda.',
+    duracion: '50 min',
+    precio: '30€'
+  },
+  {
+    nombre: 'Drenaje linfático postoperatorio',
+    descripcion: 'Drenaje linfático manual postoperatorio para reducir inflamación y favorecer la recuperación.',
+    duracion: '30 min',
+    precio: '30€'
+  },
+  {
+    nombre: 'Drenaje linfático postoperatorio + radiofrecuencia',
+    descripcion:
+      'Sesión de 60 minutos que combina drenaje linfático postoperatorio con radiofrecuencia para mejorar resultados y firmeza.',
+    duracion: '60 min',
+    precio: '60€'
+  },
+  {
+    nombre: 'Maniobra Vodder',
+    descripcion:
+      'Drenaje linfático manual con técnica Vodder para mejorar circulación y retención de líquidos.',
+    duracion: '30 min',
+    precio: '30€'
+  },
+  {
+    nombre: 'Maniobra Vodder 60 min',
+    descripcion:
+      'Sesión completa de 60 minutos de drenaje linfático manual con técnica Vodder para un trabajo más profundo.',
+    duracion: '60 min',
+    precio: '60€'
+  }
 ];
 
 // Combined array for backward compatibility
@@ -170,7 +553,19 @@ const bonos = [
     titulo: 'Bono RITUAL ARMONÍA QUIROZEN - Hidrofacial + Dermapen + Presoterapia',
     descripcion: 'Un tratamiento completo que cuida tu piel y tu cuerpo en una sola sesión. Resultados visibles desde la primera sesión.',
     detalles: 'El tiempo de cada sesión de hidrofacial y dermapen es de 1:30 horas aproximadamente.',
-    precio: ' 1 sesión por 90€, 3 sesiones por 225€, 5 sesiones por 375€'
+    precio: ' 1 sesión por 90€, 3 sesiones por 225€, 5 sesiones por 370€'
+  },
+  {
+    titulo: 'Bono Mesoterapia Corporal Pack Express 60 min',
+    descripcion: 'Mesoterapia corporal Pack Express para trabajar grasa localizada, drenaje y firmeza con combinaciones avanzadas de aparatología.',
+    detalles: 'Opciones disponibles en cada sesión: Lipoláser + vacumterapia + radiofrecuencia, Cavitación + vacumterapia + radiofrecuencia, Lipoláser + maderoterapia + radiofrecuencia, Cavitación + maderoterapia + radiofrecuencia, Lipoláser + drenaje linfático manual + radiofrecuencia, Cavitación + drenaje linfático manual + radiofrecuencia.',
+    precio: 'Bono 4 sesiones (60 min) — 130€'
+  },
+  {
+    titulo: 'Bono Mesoterapia Corporal Pack Express 80 min',
+    descripcion: 'Mesoterapia corporal Pack Express de mayor duración para un trabajo más profundo de remodelación, drenaje y reafirmación.',
+    detalles: 'Opciones disponibles en cada sesión: Lipoláser + vacumterapia + radiofrecuencia, Cavitación + vacumterapia + radiofrecuencia, Lipoláser + maderoterapia + radiofrecuencia, Cavitación + maderoterapia + radiofrecuencia, Lipoláser + drenaje linfático manual + radiofrecuencia, Cavitación + drenaje linfático manual + radiofrecuencia.',
+    precio: 'Bono 4 sesiones (80 min) — 180€'
   },
   {
     titulo: 'Bono Relax Drenante',
@@ -178,6 +573,14 @@ const bonos = [
     detalles: '40 min de masaje (relajante o descontracturante) + 20 min de presoterapia.',
     precio: ' 1 sesión por 40€, 3 sesiones por 120€, 5 sesiones por 200€'
   },
+  {
+    titulo: 'Bono Mesoterapia Gold Premium',
+    descripcion:
+      'Sesiones de mesoterapia corporal avanzada para trabajar grasa localizada, firmeza y drenaje con resultados intensivos.',
+    detalles:
+      'Incluye combinaciones avanzadas de: Lipoláser, Cavitación, Vacumterapia, Maderoterapia, Radiofrecuencia y Presoterapia.',
+    precio: 'Bono 4 sesiones — 240€'
+  }
 ];
 
 // Reservation utility functions now use Firebase (imported from firebase/reservations.js)
