@@ -10,6 +10,25 @@
 
   gtag('config', 'AW-18013098800');
 </script>
+<!-- Event snippet for Vista de una página conversion page
+In your html page, add the snippet and call gtag_report_conversion when someone clicks on the chosen link or button. -->
+<script>
+  function gtag_report_conversion(url) {
+    var callback = function () {
+      if (typeof(url) != 'undefined') {
+        window.location = url;
+      }
+    };
+    gtag('event', 'conversion', {
+        'send_to': 'AW-18013098800/1-SqCM-y3YccELCmqI1D',
+        'value': 1.0,
+        'currency': 'EUR',
+        'event_callback': callback
+    });
+    return false;
+  }
+  </script>
+  
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/logonuevo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

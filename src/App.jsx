@@ -956,6 +956,12 @@ const ReservationForm = ({ masajes }) => {
       const todosLosServicios = [...masajes, ...serviciosEstetica];
 
       await saveReservationDB(reservation, todosLosServicios);
+      
+      // Google Ads conversion tracking for successful reservation
+      if (typeof window !== 'undefined' && typeof window.gtag_report_conversion === 'function') {
+        window.gtag_report_conversion();
+      }
+
       setReservationCode(code);
       setSubmitted(true);
       setFormData({
