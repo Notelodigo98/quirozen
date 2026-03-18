@@ -267,6 +267,102 @@ main {
 }
 
 /* ============================================
+   LÁSER TABLES
+   ============================================ */
+
+.laser-tables {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.laser-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+}
+
+.laser-card h3 {
+  text-align: center;
+  margin-top: 0;
+}
+
+.laser-block {
+  margin-top: 1.5rem;
+}
+
+.laser-subtitle {
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+
+.laser-list {
+  columns: 2;
+  column-gap: 1.5rem;
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+
+.laser-list li {
+  margin-bottom: 0.25rem;
+}
+
+.laser-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 0.75rem;
+}
+
+.laser-table th,
+.laser-table td {
+  padding: 0.55rem 0.5rem;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+/* Más espacio entre columnas: zonas |       sesión |         bono */
+.laser-table th:nth-child(1),
+.laser-table td:nth-child(1) {
+  padding-right: 2rem;
+}
+
+.laser-table th:nth-child(2),
+.laser-table td:nth-child(2) {
+  padding-right: 2.5rem;
+  text-align: right;
+}
+
+.laser-table th:nth-child(3),
+.laser-table td:nth-child(3) {
+  text-align: right;
+}
+
+.laser-table thead {
+  background: rgba(8, 131, 149, 0.1);
+}
+
+.laser-table th {
+  font-weight: 600;
+  color: var(--text-black);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.laser-table tbody tr:nth-child(even) {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.laser-highlight {
+  font-weight: 600;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+/* ============================================
    HORARIOS LIST
    ============================================ */
 
