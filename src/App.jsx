@@ -2986,6 +2986,256 @@ function Home() {
             ))}
           </div>
         </section>
+        <section id="laser" className="section">
+          <h2>Láser</h2>
+          <p style={{ maxWidth: '800px', margin: '0 auto 2rem', textAlign: 'center' }}>
+            Diseño de sesiones de depilación láser adaptadas a cada zona y tipo de piel, 
+            con bonos de 6 sesiones para conseguir resultados progresivos y duraderos. 
+            Consulta cómodamente las tarifas para mujer y hombre.
+          </p>
+
+          <div className="laser-tables">
+            <div className="laser-card">
+              <h3>Láser Mujer</h3>
+
+              <div className="laser-block">
+                <h4>Mini</h4>
+                <p className="laser-subtitle">Sesión 6€  ·  Bono 30€ (6 sesiones)</p>
+                <ul className="laser-list">
+                  <li>Labio</li>
+                  <li>Mentón</li>
+                  <li>Entrecejo</li>
+                  <li>Patillas</li>
+                  <li>Pómulos</li>
+                  <li>Orejas</li>
+                  <li>Manos</li>
+                  <li>Nuca</li>
+                  <li>Pies</li>
+                  <li>Línea Alba</li>
+                  <li>Areola</li>
+                </ul>
+              </div>
+
+              <div className="laser-block">
+                <h4>Pequeña</h4>
+                <table className="laser-table">
+                  <thead>
+                    <tr>
+                      <th>Zonas</th>
+                      <th>Sesión</th>
+                      <th>Bono 6 sesiones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Perianal</td>
+                      <td>15€</td>
+                      <td>72€</td>
+                    </tr>
+                    <tr>
+                      <td>Axilas</td>
+                      <td>10€</td>
+                      <td>48€</td>
+                    </tr>
+                    <tr>
+                      <td>Ingles normales</td>
+                      <td>10€</td>
+                      <td>48€</td>
+                    </tr>
+                    <tr>
+                      <td>Ingles brasileñas</td>
+                      <td>15€</td>
+                      <td>72€</td>
+                    </tr>
+                    <tr>
+                      <td>Ingles completas</td>
+                      <td>25€</td>
+                      <td>120€</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="laser-block">
+                <h4>Mediana</h4>
+                <table className="laser-table">
+                  <thead>
+                    <tr>
+                      <th>Zonas</th>
+                      <th>Sesión</th>
+                      <th>Bono 6 sesiones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>Medios brazos</td><td>15€</td><td>78€</td></tr>
+                    <tr><td>Hombros</td><td>15€</td><td>78€</td></tr>
+                    <tr><td>Abdomen</td><td>25€</td><td>120€</td></tr>
+                    <tr><td>Cuello</td><td>15€</td><td>78€</td></tr>
+                    <tr><td>Facial completo</td><td>15€</td><td>78€</td></tr>
+                    <tr><td>Glúteos</td><td>25€</td><td>120€</td></tr>
+                    <tr><td>Lumbar</td><td>15€</td><td>78€</td></tr>
+                    <tr><td>Barba</td><td>15€</td><td>78€</td></tr>
+                    <tr><td>Media espalda</td><td>25€</td><td>120€</td></tr>
+                    <tr><td>Antebrazo</td><td>15€</td><td>78€</td></tr>
+                    <tr><td>Intermamaria</td><td>15€</td><td>78€</td></tr>
+                    <tr><td>Medias piernas</td><td>25€</td><td>120€</td></tr>
+                    <tr><td>Muslos</td><td>25€</td><td>120€</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="laser-block">
+                <h4>Grande</h4>
+                <table className="laser-table">
+                  <thead>
+                    <tr>
+                      <th>Zonas</th>
+                      <th>Sesión</th>
+                      <th>Bono 6 sesiones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Piernas completas (incluye pies)</td>
+                      <td rowSpan="2">40€</td>
+                      <td rowSpan="2">210€</td>
+                    </tr>
+                    <tr>
+                      <td>Brazos completos</td>
+                    </tr>
+                    <tr>
+                      <td>Espalda completa</td>
+                      <td>40€</td>
+                      <td>210€</td>
+                    </tr>
+                    <tr>
+                      <td>Tórax completo</td>
+                      <td>40€</td>
+                      <td>210€</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="laser-block">
+                <h4>Cuerpo completo</h4>
+                <p className="laser-highlight">Sesión 80€ · Bono 450€ (6 sesiones)</p>
+              </div>
+            </div>
+
+            <div className="laser-card">
+              <h3>Láser Hombres</h3>
+
+              <div className="laser-block">
+                <h4>Mini</h4>
+                <p className="laser-subtitle">Sesión 8€  ·  Bono 36€ (6 sesiones)</p>
+                <ul className="laser-list">
+                  <li>Labio</li>
+                  <li>Mentón</li>
+                  <li>Entrecejo</li>
+                  <li>Patillas</li>
+                  <li>Pómulos</li>
+                  <li>Orejas</li>
+                  <li>Manos</li>
+                  <li>Nuca</li>
+                  <li>Pies</li>
+                  <li>Línea Alba</li>
+                  <li>Areola</li>
+                </ul>
+              </div>
+
+              <div className="laser-block">
+                <h4>Pequeña</h4>
+                <table className="laser-table">
+                  <thead>
+                    <tr>
+                      <th>Zonas</th>
+                      <th>Sesión</th>
+                      <th>Bono 6 sesiones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>Perianal</td><td>15€</td><td>72€</td></tr>
+                    <tr><td>Perfilado de barba</td><td>15€</td><td>72€</td></tr>
+                    <tr><td>Axilas</td><td>10€</td><td>48€</td></tr>
+                    <tr><td>Ingles normales</td><td>10€</td><td>48€</td></tr>
+                    <tr><td>Ingles brasileñas</td><td>20€</td><td>90€</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="laser-block">
+                <h4>Mediana</h4>
+                <table className="laser-table">
+                  <thead>
+                    <tr>
+                      <th>Zonas</th>
+                      <th>Sesión</th>
+                      <th>Bono 6 sesiones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>Medios brazos</td><td>20€</td><td>108€</td></tr>
+                    <tr><td>Hombros</td><td>20€</td><td>108€</td></tr>
+                    <tr><td>Abdomen</td><td>30€</td><td>150€</td></tr>
+                    <tr><td>Cuello</td><td>20€</td><td>108€</td></tr>
+                    <tr><td>Facial completo</td><td>20€</td><td>108€</td></tr>
+                    <tr><td>Glúteos</td><td>30€</td><td>150€</td></tr>
+                    <tr><td>Lumbar</td><td>30€</td><td>150€</td></tr>
+                    <tr><td>Barba</td><td>20€</td><td>108€</td></tr>
+                    <tr><td>Media espalda</td><td>30€</td><td>150€</td></tr>
+                    <tr><td>Antebrazo</td><td>20€</td><td>108€</td></tr>
+                    <tr><td>Intermamaria</td><td>20€</td><td>108€</td></tr>
+                    <tr><td>Medias piernas</td><td>30€</td><td>150€</td></tr>
+                    <tr><td>Muslos</td><td>30€</td><td>150€</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="laser-block">
+                <h4>Grande</h4>
+                <table className="laser-table">
+                  <thead>
+                    <tr>
+                      <th>Zonas</th>
+                      <th>Sesión</th>
+                      <th>Bono 6 sesiones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Piernas completas (incluye pies)</td>
+                      <td rowSpan="2">50€</td>
+                      <td rowSpan="2">240€</td>
+                    </tr>
+                    <tr>
+                      <td>Brazos completos</td>
+                    </tr>
+                    <tr>
+                      <td>Espalda completa</td>
+                      <td>50€</td>
+                      <td>240€</td>
+                    </tr>
+                    <tr>
+                      <td>Tórax completo</td>
+                      <td>50€</td>
+                      <td>240€</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="laser-block">
+                <h4>Cuerpo completo</h4>
+                <p className="laser-highlight">Sesión 110€ · Bono 600€ (6 sesiones)</p>
+              </div>
+            </div>
+          </div>
+
+          <p style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.9rem', opacity: 0.8 }}>
+            * Todos los bonos son de 6 sesiones.
+          </p>
+        </section>
         <section id="promos" className="section">
           <h2>Promociones y Bonos</h2>
           <div className="bonos-list">

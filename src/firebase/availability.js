@@ -486,6 +486,15 @@ export const getAvailableSlots = async (dateString, reservationsForDate = [], se
         reservationDuration: reservationDuration
       };
     });
+
+    // Calculate the latest allowed end time for any booking on this day.
+    // Each base slot represents un tramo de 30 minutos, así que el final máximo permitido
+    // es el último slot disponible + 30 minutos.
+    const latestAllowedEndMinutes = availability.slots.reduce((maxEnd, slot) => {
+      const start = timeToMinutes(slot);
+      const end = start + 30;
+      return end > maxEnd ? end : maxEnd;
+    }, 0);
     
     const freeSlots = availability.slots.filter(slot => {
       const slotMinutes = timeToMinutes(slot);
@@ -501,6 +510,11 @@ export const getAvailableSlots = async (dateString, reservationsForDate = [], se
         } else {
           // Services <= 30 min block as 30 min
           newServiceEndMinutes = slotMinutes + 30;
+        }
+
+        // Do not allow bookings that would end after the closing time
+        if (newServiceEndMinutes > latestAllowedEndMinutes) {
+          return false;
         }
       }
       

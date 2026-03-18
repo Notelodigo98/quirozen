@@ -34,6 +34,7 @@ function Layout({ children }) {
               <li><a href={isAdminPage ? "/#info" : "#info"} onClick={(e) => { e.preventDefault(); handleNavClick('#info'); }}>Información principal</a></li>
               <li><a href={isAdminPage ? "/#mindfulness" : "#mindfulness"} onClick={(e) => { e.preventDefault(); handleNavClick('#mindfulness'); }}>Mindfulness</a></li>
               <li><a href={isAdminPage ? "/#estetica" : "#estetica"} onClick={(e) => { e.preventDefault(); handleNavClick('#estetica'); }}>Estética y belleza</a></li>
+              <li><a href={isAdminPage ? "/#laser" : "#laser"} onClick={(e) => { e.preventDefault(); handleNavClick('#laser'); }}>Láser</a></li>
               <li><a href={isAdminPage ? "/#promos" : "#promos"} onClick={(e) => { e.preventDefault(); handleNavClick('#promos'); }}>Promociones/Bonos</a></li>
               <li><a href={isAdminPage ? "/#reservas" : "#reservas"} onClick={(e) => { e.preventDefault(); handleNavClick('#reservas'); }}>Reservas</a></li>
               <li><a href={isAdminPage ? "/#sobre" : "#sobre"} onClick={(e) => { e.preventDefault(); handleNavClick('#sobre'); }}>Sobre nosotros</a></li>
