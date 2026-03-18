@@ -4,14 +4,14 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, addDoc, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 
-// Configuración de Firebase
+// Configuración de Firebase (usa variables de entorno o rellena con tus propios valores locales)
 const firebaseConfig = {
-  apiKey: 'AIzaSyCk4_1vG5Wp7bGZu1_fNrKlIuIsRwZpv4o',
-  authDomain: 'quirozenapp.firebaseapp.com',
-  projectId: 'quirozenapp',
-  storageBucket: 'quirozenapp.firebasestorage.app',
-  messagingSenderId: '992779516038',
-  appId: '1:992779516038:web:e5d795590c711522f7b907'
+  apiKey: process.env.VITE_FIREBASE_API_KEY || 'TU_API_KEY_AQUI',
+  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN || 'quirozenapp.firebaseapp.com',
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID || 'quirozenapp',
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || 'quirozenapp.firebasestorage.app',
+  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '992779516038',
+  appId: process.env.VITE_FIREBASE_APP_ID || '1:992779516038:web:e5d795590c711522f7b907'
 };
 
 // Inicializar Firebase

@@ -40,3 +40,17 @@ ui-debug.log
 *.njsproj
 *.sln
 *.sw?
+# --- Firebase (los mismos valores que antes) ---
+VITE_FIREBASE_API_KEY=AIzaSyCk4_1vG5Wp7bGZu1_fNrKlIuIsRwZpv4o
+VITE_FIREBASE_AUTH_DOMAIN=quirozenapp.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=quirozenapp
+VITE_FIREBASE_STORAGE_BUCKET=quirozenapp.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=992779516038
+VITE_FIREBASE_APP_ID=1:992779516038:web:e5d795590c711522f7b907
+
+# --- Google Calendar (función serverless en Vercel: api/calendar-event.js) ---
+# Estos datos salen de la consola de Google Cloud / pantalla de consentimiento OAuth
+GOOGLE_CLIENT_ID=TU_GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_SECRET=TU_GOOGLE_CLIENT_SECRET
+GOOGLE_ACCESS_TOKEN=TU_GOOGLE_ACCESS_TOKEN
+GOOGLE_REFRESH_TOKEN=TU_GOOGLE_REFRESH_TOKEN

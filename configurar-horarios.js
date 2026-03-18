@@ -8,9 +8,9 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, addDoc, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 
-// Configuración de Firebase - usa las variables de entorno
+// Configuración de Firebase - usa las variables de entorno (no expongas claves reales)
 const firebaseConfig = {
-  apiKey: process.env.VITE_FIREBASE_API_KEY || 'AIzaSyCk4_1vG5Wp7bGZu1_fNrKlIuIsRwZpv4o',
+  apiKey: process.env.VITE_FIREBASE_API_KEY || 'TU_API_KEY_AQUI',
   authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN || 'quirozenapp.firebaseapp.com',
   projectId: process.env.VITE_FIREBASE_PROJECT_ID || 'quirozenapp',
   storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || 'quirozenapp.firebasestorage.app',
