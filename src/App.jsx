@@ -354,7 +354,7 @@ const serviciosEstetica = [
     descripcion:
       'Tratamiento de última generación con exosomas y PDRN para regenerar, rejuvenecer y revitalizar la piel.',
     duracion: 'Según tratamiento',
-    precio: '60€'
+    precio: '120€'
   },
   {
     nombre: 'Radiofrecuencia facial',
