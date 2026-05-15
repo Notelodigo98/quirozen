@@ -138,11 +138,18 @@ const bonos = [
   //   regalo: 'Puedes ofrecer ambiente con velas y música suave'
   // },
   {
+    titulo: 'Bono Pareja Presoterapia + Masaje',
+    descripcion: 'Compartir bienestar también es una forma de cuidarse. Este bono está pensado para disfrutar juntos de un momento de calma, desconexión y relax, lejos de las prisas del día a día.',
+    detalles: '45 minutos de masaje relajante + 45 minutos de presoterapia',
+    precio: '90€',
+    regalo: ''
+  },
+  {
     titulo: 'Bono Parejas',
     descripcion: 'Compartir bienestar también es una forma de cuidarse. Este bono está pensado para disfrutar juntos de un momento de calma, desconexión y relax, lejos de las prisas del día a día.',
-    detalles: '45 min masaje relajante con piedras calientes y aromaterapia + 40 min presoterapia con hidrofacial. Incluye detalle de bienvenida.',
+    detalles: '45 min masaje relajante con piedras calientes y aromaterapia + 40 min presoterapia con hidrofacial.',
     precio: '150€',
-    regalo: ''
+    regalo: 'Detalle de bienvenida.'
   },
   {
     titulo: 'Bono "Mimos para mí"',
@@ -190,32 +197,32 @@ const bonos = [
     detalles: 'Hidrofacial + Dermapen + Presoterapia en la misma sesión.',
     precio: '1 sesión — 95€'
   },
-  {
+  ´/*{
     titulo: 'Bono Mesoterapia Corporal Pack Express 60 min',
     descripcion: 'Mesoterapia corporal Pack Express para trabajar grasa localizada, drenaje y firmeza con combinaciones avanzadas de aparatología.',
     detalles: 'Opciones disponibles en cada sesión: Lipoláser + vacumterapia + radiofrecuencia, Cavitación + vacumterapia + radiofrecuencia, Lipoláser + maderoterapia + radiofrecuencia, Cavitación + maderoterapia + radiofrecuencia, Lipoláser + drenaje linfático manual + radiofrecuencia, Cavitación + drenaje linfático manual + radiofrecuencia.',
     precio: 'Bono 4 sesiones (60 min) — 130€'
-  },
-  {
+  },*/
+ /* {
     titulo: 'Bono Mesoterapia Corporal Pack Express 80 min',
     descripcion: 'Mesoterapia corporal Pack Express de mayor duración para un trabajo más profundo de remodelación, drenaje y reafirmación.',
     detalles: 'Opciones disponibles en cada sesión: Lipoláser + vacumterapia + radiofrecuencia, Cavitación + vacumterapia + radiofrecuencia, Lipoláser + maderoterapia + radiofrecuencia, Cavitación + maderoterapia + radiofrecuencia, Lipoláser + drenaje linfático manual + radiofrecuencia, Cavitación + drenaje linfático manual + radiofrecuencia.',
     precio: 'Bono 4 sesiones (80 min) — 180€'
-  },
+  },*/
   {
     titulo: 'Bono Relax Drenante',
     descripcion: 'Disfruta de una experiencia completa de bienestar diseñada para relajar, aliviar tensiones y mejorar la circulación. Una combinación perfecta para cuidar cuerpo y mente, recomendada tanto para relajación como para recuperación muscular.',
     detalles: '40 min de masaje (relajante o descontracturante) + 20 min de presoterapia.',
     precio: ' 1 sesión por 40€, 3 sesiones por 120€, 5 sesiones por 200€'
   },
-  {
+ /* {
     titulo: 'Bono Mesoterapia Gold Premium',
     descripcion:
       'Sesiones de mesoterapia corporal avanzada para trabajar grasa localizada, firmeza y drenaje con resultados intensivos.',
     detalles:
       'Incluye combinaciones avanzadas de: Lipoláser, Cavitación, Vacumterapia, Maderoterapia, Radiofrecuencia y Presoterapia.',
     precio: 'Bono 4 sesiones — 240€'
-  }
+  }*/
 ];
 
 // Reservation utility functions now use Firebase (imported from firebase/reservations.js)
