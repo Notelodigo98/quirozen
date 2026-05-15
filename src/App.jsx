@@ -49,15 +49,15 @@ const masajes = [
   { nombre: 'Masaje relajante', descripcion: 'Suave y rítmico para liberar estrés acumulado y calmar la ansiedad de todo el cuerpo.', duracion: '50 min', precio: '30€' },
   { nombre: 'Masaje deportivo', descripcion: 'Prepara o recupera el músculo con maniobras relajantes que controlan la ansiedad previa al esfuerzo.', duracion: '50 min', precio: '35€' },
   { nombre: 'Masaje circulatorio', descripcion: 'Estimula sistema venoso y linfático con bombeos relajantes que alivian la ansiedad de las piernas cansadas.', duracion: '50 min', precio: '30€' },
-  { nombre: 'Masaje craneofacial', descripcion: 'Trabaja cara, cráneo y cuello con presiones relajantes ideales para dolores de cabeza por ansiedad.', duracion: '30 min', precio: '30€' },
-  { nombre: 'Masaje de espalda', descripcion: 'Focalizado en zona dorsal, lumbar y cervical con pases relajantes que liberan ansiedad postural.', duracion: '30 min', precio: '30€' },
-  { nombre: 'Masaje cervical', descripcion: 'Específico para cervicales y trapecios con fricciones relajantes que disminuyen ansiedad tensional.', duracion: '20 min', precio: '30€' },
+  { nombre: 'Masaje drenaje linfático', descripcion: 'Técnica de masaje muy suave y lenta que estimula el sistema linfático, encargado de eliminar líquidos, toxinas y desechos del cuerpo.', duracion: '50 min', precio: '30€' },
+  { nombre: 'Masaje craneofacial con cervicales', descripcion: 'Trabaja cara, cráneo y cuello con presiones relajantes ideales para dolores de cabeza por ansiedad.', duracion: '30 min', precio: '25€' },
   { nombre: 'Masaje podal (pies)', descripcion: 'Reflexología suave y relajante para descargar la ansiedad acumulada en las piernas.', duracion: '30 min', precio: '20€' },
   { nombre: 'Masaje abdominal', descripcion: 'Movimiento suave y relajante que mejora digestión y calma ansiedad visceral.', duracion: '30 min', precio: '30€' },
   { nombre: 'Masaje combinado', descripcion: 'Espalda + piernas o facial con secuencias relajantes para equilibrar la ansiedad corporal.', duracion: '50 min', precio: '40€' },
   { nombre: 'Masaje con aromaterapia', descripcion: 'Aceites esenciales personalizados para un viaje relajante que reduce ansiedad sensorial.', duracion: '50 min', precio: '30€' },
   { nombre: 'Masaje con piedras calientes', descripcion: 'Calor profundo y maniobras relajantes que derriten ansiedad y contracturas.', duracion: '50 min', precio: '30€' },
-  { nombre: 'Masaje maderoterapia', descripcion: 'Rodillos y copas de madera con ritmo relajante para moldear y liberar ansiedad corporal.', duracion: '50 min', precio: '30€' },
+  { nombre: 'Maderoterapia por zona', descripcion: 'Rodillos y copas de madera con ritmo relajante para moldear y liberar tensión en la zona tratada.', duracion: '30 min', precio: '30€' },
+  { nombre: 'Maderoterapia combinada', descripcion: 'Rodillos y copas de madera con ritmo relajante para moldear y liberar ansiedad corporal en varias zonas.', duracion: '50 min', precio: '45€' },
   { nombre: 'Masaje embarazadas', descripcion: 'En camilla o silla terapéutica con apoyo relajante que tranquiliza ansiedad prenatal.', duracion: '50 min', precio: '30€' },
   { nombre: 'Mindfulness', descripcion: 'Práctica de estar presente en el momento, sin juzgar ni distraerse. Ayuda a reducir el estrés, la ansiedad y mejora el bienestar general.', duracion: '50 min', precio: '40€' },
 ];
@@ -74,380 +74,15 @@ const serviciosEstetica = [
     nombre: 'Hidrofacial',
     descripcion:
       'Tratamiento facial no invasivo que limpia, exfolia e hidrata la piel en profundidad. Elimina impurezas y células muertas mientras infunde activos hidratantes y antioxidantes, dejando la piel más luminosa, suave y revitalizada desde la primera sesión.',
-    duracion: '1 hora',
-    precio: '1 sesión por 30€, 3 sesiones por 80€, 5 sesiones por 125€'
+    duracion: '50 min',
+    precio: '35€'
   },
   {
     nombre: 'Dermapen',
     descripcion:
       'Tratamiento de microneedling que estimula la regeneración natural de la piel mediante microperforaciones controladas. Favorece la producción de colágeno y elastina, mejorando textura, firmeza, manchas, cicatrices y líneas de expresión.',
-    duracion: '1 hora',
-    precio: '1 sesión por 45€, 3 sesiones por 120€, 5 sesiones por 190€'
-  },
-
-  // Blefaroplastia sin cirugía
-  {
-    nombre: 'Blefaroplastia sin cirugía - Párpado superior',
-    descripcion:
-      'Tratamiento no invasivo para rejuvenecer la mirada y mejorar la firmeza del párpado.',
-    duracion: 'Por sesión',
-    precio: '50€'
-  },
-  {
-    nombre: 'Blefaroplastia sin cirugía - Párpado inferior',
-    descripcion:
-      'Tratamiento no invasivo para rejuvenecer la mirada y mejorar la firmeza del párpado.',
-    duracion: 'Por sesión',
-    precio: '50€'
-  },
-  {
-    nombre: 'Blefaroplastia sin cirugía - Párpado inferior + patas de gallo',
-    descripcion:
-      'Tratamiento no invasivo para rejuvenecer la mirada, suavizar arrugas y mejorar la firmeza del contorno de ojos.',
-    duracion: 'Por sesión',
-    precio: '125€'
-  },
-  {
-    nombre: 'Blefaroplastia sin cirugía - ojo completo',
-    descripcion:
-      'Tratamiento no invasivo integral para rejuvenecer la mirada y mejorar la firmeza de todo el contorno de ojos.',
-    duracion: 'Por sesión',
-    precio: '150€'
-  },
-
-  // Tratamientos de arrugas de expresión
-  {
-    nombre: 'Tratamiento arrugas de expresión - Entrecejo',
-    descripcion:
-      'Mejora la apariencia de las líneas dinámicas del entrecejo y rejuvenece el rostro.',
-    duracion: 'Por sesión',
-    precio: '50€'
-  },
-  {
-    nombre: 'Tratamiento arrugas de expresión - Frente',
-    descripcion:
-      'Suaviza las arrugas horizontales de la frente y aporta un aspecto más descansado.',
-    duracion: 'Por sesión',
-    precio: '150€'
-  },
-  {
-    nombre: 'Tratamiento arrugas de expresión - Entrecejo + frente',
-    descripcion:
-      'Tratamiento combinado para suavizar líneas del entrecejo y frente, logrando un rostro más uniforme y rejuvenecido.',
-    duracion: 'Por sesión',
-    precio: '180€'
-  },
-  {
-    nombre: 'Tratamiento arrugas de expresión - Código de barras (labio superior)',
-    descripcion:
-      'Mejora la apariencia de las arrugas verticales del labio superior, conocidas como código de barras.',
-    duracion: 'Por sesión',
-    precio: '130€'
-  },
-  {
-    nombre: 'Tratamiento arrugas de expresión - Surco nasogeniano',
-    descripcion:
-      'Atenúa las líneas que van desde la nariz hasta la comisura de los labios, suavizando el pliegue nasogeniano.',
-    duracion: 'Por sesión',
-    precio: '100€'
-  },
-
-  // Tratamientos de estructura cutánea
-  {
-    nombre: 'Tratamiento estructura cutánea - Acné',
-    descripcion:
-      'Mejora la calidad y textura de la piel con tendencia acneica, reduciendo imperfecciones y marcas.',
-    duracion: '30 min',
-    precio: 'Desde 50€ por sesión'
-  },
-  {
-    nombre: 'Tratamiento estructura cutánea - Cicatrices de acné',
-    descripcion:
-      'Tratamiento específico para suavizar y mejorar el aspecto de cicatrices producidas por el acné.',
-    duracion: '30 min',
-    precio: 'Desde 50€ por sesión'
-  },
-  {
-    nombre: 'Tratamiento estructura cutánea - Estrías',
-    descripcion:
-      'Mejora la textura y apariencia de las estrías, favoreciendo una piel más uniforme.',
-    duracion: '30 min',
-    precio: 'Desde 50€ por sesión'
-  },
-
-  // Tratamientos de pigmentación
-  {
-    nombre: 'Tratamiento de pigmentación - Léntigos',
-    descripcion:
-      'Tratamiento focalizado para mejorar manchas tipo léntigos y unificar el tono de la piel.',
-    duracion: '30 min',
-    precio: 'Desde 50€ por sesión'
-  },
-  {
-    nombre: 'Tratamiento de pigmentación - Pecas solares',
-    descripcion:
-      'Ayuda a atenuar pecas solares y mejorar la luminosidad general del rostro.',
-    duracion: '30 min',
-    precio: 'Desde 50€ por sesión'
-  },
-  {
-    nombre: 'Tratamiento de pigmentación - Melasma',
-    descripcion:
-      'Pensado para mejorar manchas tipo melasma, unificando el tono y aportando luminosidad.',
-    duracion: '30 min',
-    precio: 'Desde 50€ por sesión'
-  },
-  {
-    nombre: 'Tratamiento de pigmentación - Cloasma',
-    descripcion:
-      'Tratamiento para mejorar manchas tipo cloasma, logrando un tono más uniforme.',
-    duracion: '30 min',
-    precio: 'Desde 50€ por sesión'
-  },
-
-  // Eliminación de lesiones cutáneas
-  {
-    nombre: 'Eliminación de lesiones cutáneas - Acrocordones',
-    descripcion:
-      'Tratamiento seguro para la eliminación de pequeños colgajos cutáneos (acrocordones).',
-    duracion: '30 min',
-    precio: 'Desde 50€ por sesión'
-  },
-  {
-    nombre: 'Eliminación de lesiones cutáneas - Queratosis seborreica',
-    descripcion:
-      'Tratamiento específico para la eliminación de queratosis seborreicas de forma segura.',
-    duracion: '30 min',
-    precio: 'Desde 50€ por sesión'
-  },
-  {
-    nombre: 'Eliminación de lesiones cutáneas - Lunares',
-    descripcion:
-      'Tratamiento para la eliminación de determinados tipos de lunares a nivel estético. (Consultar valoración previa).',
-    duracion: '30 min',
-    precio: 'Desde 50€ por sesión'
-  },
-  {
-    nombre: 'Eliminación de lesiones cutáneas - VPH',
-    descripcion:
-      'Tratamiento orientado a la eliminación de lesiones cutáneas asociadas al VPH. (Consultar valoración previa).',
-    duracion: '30 min',
-    precio: 'Desde 50€ por sesión'
-  },
-
-  // Diseño de la mirada
-  {
-    nombre: 'Extensiones de pestañas clásicas',
-    descripcion: 'Diseño de la mirada con extensiones clásicas para un efecto natural y definido.',
-    duracion: 'Según diseño',
-    precio: '40€'
-  },
-  {
-    nombre: 'Extensiones de pestañas volumen tecnológico',
-    descripcion: 'Extensiones con volumen tecnológico para una mirada más intensa y expresiva.',
-    duracion: 'Según diseño',
-    precio: '45€'
-  },
-  {
-    nombre: 'Extensiones de pestañas volumen ruso',
-    descripcion: 'Técnica de volumen ruso para un efecto más denso y sofisticado en las pestañas.',
-    duracion: 'Según diseño',
-    precio: '60€'
-  },
-
-  // Cejas y pestañas
-  {
-    nombre: 'Diseño de cejas + depilación al hilo',
-    descripcion: 'Definición de cejas con técnica de hilo para un acabado preciso y limpio.',
-    duracion: 'Según diseño',
-    precio: '10€'
-  },
-  {
-    nombre: 'Diseño de cejas + hilo + tinte o henna',
-    descripcion:
-      'Diseño completo de cejas con hilo y coloración mediante tinte o henna para mayor definición.',
-    duracion: 'Según diseño',
-    precio: '15€'
-  },
-  {
-    nombre: 'Laminado de cejas + tinte + depilación',
-    descripcion:
-      'Laminado de cejas para realzar la forma natural, acompañado de tinte y depilación para un acabado perfecto.',
-    duracion: 'Según diseño',
-    precio: '35€'
-  },
-  {
-    nombre: 'Laminado coreano de pestañas + tinte',
-    descripcion:
-      'Lifting y curvatura de pestañas estilo coreano con tinte incluido para una mirada más abierta.',
-    duracion: 'Según diseño',
-    precio: '35€'
-  },
-  {
-    nombre: 'Tinte de pestañas o henna en cejas',
-    descripcion:
-      'Coloración de pestañas o cejas con tinte o henna para intensificar la mirada y definir el rostro.',
-    duracion: 'Según diseño',
-    precio: '10€'
-  },
-
-  // Mesoterapia corporal – Pack Express
-  {
-    nombre: 'Mesoterapia corporal Pack Express - Lipoláser + vacumterapia + radiofrecuencia',
-    descripcion:
-      'Sesión de mesoterapia corporal de 60 minutos combinando lipoláser, vacumterapia y radiofrecuencia para trabajar grasa localizada y reafirmar.',
-    duracion: '60 min',
-    precio: '35€'
-  },
-  {
-    nombre: 'Mesoterapia corporal Pack Express - Cavitación + vacumterapia + radiofrecuencia',
-    descripcion:
-      'Sesión de mesoterapia corporal de 60 minutos con cavitación, vacumterapia y radiofrecuencia para mejorar contorno y textura.',
-    duracion: '60 min',
-    precio: '35€'
-  },
-  {
-    nombre: 'Mesoterapia corporal Pack Express - Lipoláser + maderoterapia + radiofrecuencia',
-    descripcion:
-      'Combinación de lipoláser, maderoterapia y radiofrecuencia para remodelar la silueta y tonificar la piel.',
-    duracion: '60 min',
-    precio: '35€'
-  },
-  {
-    nombre: 'Mesoterapia corporal Pack Express - Cavitación + maderoterapia + radiofrecuencia',
-    descripcion:
-      'Sesión intensiva con cavitación, maderoterapia y radiofrecuencia para tratar celulitis y flacidez.',
-    duracion: '60 min',
-    precio: '35€'
-  },
-  {
-    nombre:
-      'Mesoterapia corporal Pack Express - Lipoláser + drenaje linfático manual + radiofrecuencia',
-    descripcion:
-      'Tratamiento que combina lipoláser, drenaje linfático manual y radiofrecuencia para mejorar retención de líquidos y tonicidad.',
-    duracion: '60 min',
-    precio: '35€'
-  },
-  {
-    nombre:
-      'Mesoterapia corporal Pack Express - Cavitación + drenaje linfático manual + radiofrecuencia',
-    descripcion:
-      'Sesión con cavitación, drenaje linfático manual y radiofrecuencia para trabajar grasa localizada y favorecer el drenaje.',
-    duracion: '60 min',
-    precio: '35€'
-  },
-  {
-    nombre: 'Mesoterapia Gold Premium',
-    descripcion:
-      'Sesión de mesoterapia corporal avanzada de 120 minutos para trabajar grasa localizada, firmeza y drenaje con resultados intensivos. Incluye combinaciones avanzadas de lipoláser, cavitación, vacumterapia, maderoterapia, radiofrecuencia y presoterapia.',
-    duracion: '120 min',
-    precio: 'Sesión individual — 65€'
-  },
-  {
-    nombre: 'Hidratación de labios técnica cristal',
-    descripcion: 'Tratamiento facial avanzado para hidratar y dar volumen natural a los labios.',
-    duracion: 'Según tratamiento',
-    precio: '50€'
-  },
-  {
-    nombre: 'Tratamiento facial Exosomas + PDRN',
-    descripcion:
-      'Tratamiento de última generación con exosomas y PDRN para regenerar, rejuvenecer y revitalizar la piel.',
-    duracion: 'Según tratamiento',
-    precio: '120€'
-  },
-  {
-    nombre: 'Radiofrecuencia facial',
-    descripcion: 'Radiofrecuencia facial avanzada para reafirmar, estimular colágeno y redefinir el óvalo facial.',
-    duracion: '45 min',
-    precio: '35€'
-  },
-  {
-    nombre: 'Endolifting tratamiento doble cuello',
-    descripcion:
-      'Tratamiento específico de endolifting para trabajar la flacidez y el contorno del cuello. Consultar valoración y tarifa.',
-    duracion: 'Según tratamiento',
-    precio: 'Consultar'
-  },
-  {
-    nombre: 'Peeling profesional efecto flash',
-    descripcion: 'Peeling rápido de 30 minutos para aportar luminosidad inmediata y efecto buena cara.',
-    duracion: '30 min',
-    precio: '45€'
-  },
-  {
-    nombre: 'Peeling profesional acné activo',
-    descripcion:
-      'Peeling específico de 30 minutos para pieles con acné activo, que ayuda a controlar la grasa y reducir imperfecciones.',
-    duracion: '30 min',
-    precio: '45€'
-  },
-  {
-    nombre: 'Peeling profesional hiperpigmentación',
-    descripcion:
-      'Peeling de 30 minutos orientado a tratar manchas e hiperpigmentación, unificando el tono de la piel.',
-    duracion: '30 min',
-    precio: '45€'
-  },
-  {
-    nombre: 'Peeling profesional anti-age',
-    descripcion:
-      'Peeling de 30 minutos con acción rejuvenecedora para mejorar textura, luminosidad y signos de la edad.',
-    duracion: '30 min',
-    precio: '45€'
-  },
-  {
-    nombre: 'Peeling profesional piel sensible y rosácea',
-    descripcion:
-      'Peeling suave de 30 minutos adaptado a pieles sensibles o con rosácea para calmar y mejorar el aspecto general.',
-    duracion: '30 min',
-    precio: '45€'
-  },
-  {
-    nombre: 'Electroacupuntura y acupresión',
-    descripcion:
-      'Sesiones de electroacupuntura y acupresión para estética facial y corporal, ansiedad, insomnio, regulación hormonal y otros tratamientos personalizados.',
-    duracion: 'Según tratamiento',
-    precio: 'Sesión — 30€ | Con semillas invisibles — 32€'
-  },
-  {
-    nombre: 'Maderoterapia facial',
-    descripcion: 'Masaje facial con maderoterapia de 50 minutos para tonificar y remodelar el rostro.',
     duracion: '50 min',
-    precio: '30€'
-  },
-  {
-    nombre: 'Maderoterapia Kobido',
-    descripcion: 'Masaje Kobido con maderoterapia de 50 minutos para efecto lifting natural y relajación profunda.',
-    duracion: '50 min',
-    precio: '30€'
-  },
-  {
-    nombre: 'Drenaje linfático postoperatorio',
-    descripcion: 'Drenaje linfático manual postoperatorio para reducir inflamación y favorecer la recuperación.',
-    duracion: '30 min',
-    precio: '30€'
-  },
-  {
-    nombre: 'Drenaje linfático postoperatorio + radiofrecuencia',
-    descripcion:
-      'Sesión de 60 minutos que combina drenaje linfático postoperatorio con radiofrecuencia para mejorar resultados y firmeza.',
-    duracion: '60 min',
-    precio: '60€'
-  },
-  {
-    nombre: 'Maniobra Vodder',
-    descripcion:
-      'Drenaje linfático manual con técnica Vodder para mejorar circulación y retención de líquidos.',
-    duracion: '30 min',
-    precio: '30€'
-  },
-  {
-    nombre: 'Maniobra Vodder 60 min',
-    descripcion:
-      'Sesión completa de 60 minutos de drenaje linfático manual con técnica Vodder para un trabajo más profundo.',
-    duracion: '60 min',
-    precio: '60€'
+    precio: '45€'
   }
 ];
 
@@ -503,10 +138,10 @@ const bonos = [
   //   regalo: 'Puedes ofrecer ambiente con velas y música suave'
   // },
   {
-    titulo: 'Bono Parejas ',
-    descripcion: 'Compartir bienestar también es una forma de cuidarse Este bono está pensado para disfrutar juntos de un momento de calma, desconexión y relax, lejos de las prisas del día a dia.',
-    detalles: 'Sesión de 45 min de masaje relajante + 45 min de presoterapia ',
-    precio: '90€',
+    titulo: 'Bono Parejas',
+    descripcion: 'Compartir bienestar también es una forma de cuidarse. Este bono está pensado para disfrutar juntos de un momento de calma, desconexión y relax, lejos de las prisas del día a día.',
+    detalles: '45 min masaje relajante con piedras calientes y aromaterapia + 40 min presoterapia con hidrofacial. Incluye detalle de bienvenida.',
+    precio: '150€',
     regalo: ''
   },
   {
@@ -540,20 +175,20 @@ const bonos = [
   {
     titulo: 'Bono RITUAL RENOVACIÓN FACIAL - Hidrofacial & Dermapen',
     descripcion: 'La combinación perfecta para una piel limpia, luminosa y renovada. Resultados visibles desde la primera sesión.',
-    detalles: 'El tiempo de cada sesión de hidrofacial y dermapen es de 1:30 horas aproximadamente.',
-    precio: ' 1 sesión por 70€, 3 sesiones por 180€, 5 sesiones por 290€'
+    detalles: 'Hidrofacial + Dermapen en la misma sesión.',
+    precio: '1 sesión — 75€'
   },
   {
     titulo: 'Bono RITUAL EQUILIBRIO & BIENESTAR - Hidrofacial & Presoterapia',
     descripcion: 'Un tratamiento que combina el cuidado facial con el bienestar corporal para ayudarte a sentirte mejor por dentro y por fuera.',
-    detalles: 'El tiempo de cada sesión de hidrofacial es de 1:30 horas aproximadamente.',
-    precio: ' 1 sesión por 45€, 3 sesiones por 120€, 5 sesiones por 190€'
+    detalles: 'Hidrofacial + Presoterapia en la misma sesión.',
+    precio: '1 sesión — 50€ | 3 sesiones — 125€ | 5 sesiones — 195€'
   },
   {
     titulo: 'Bono RITUAL ARMONÍA QUIROZEN - Hidrofacial + Dermapen + Presoterapia',
     descripcion: 'Un tratamiento completo que cuida tu piel y tu cuerpo en una sola sesión. Resultados visibles desde la primera sesión.',
-    detalles: 'El tiempo de cada sesión de hidrofacial y dermapen es de 1:30 horas aproximadamente.',
-    precio: ' 1 sesión por 90€, 3 sesiones por 225€, 5 sesiones por 370€'
+    detalles: 'Hidrofacial + Dermapen + Presoterapia en la misma sesión.',
+    precio: '1 sesión — 95€'
   },
   {
     titulo: 'Bono Mesoterapia Corporal Pack Express 60 min',
@@ -3000,20 +2635,29 @@ function Home() {
 
               <div className="laser-block">
                 <h4>Mini</h4>
-                <p className="laser-subtitle">Sesión 6€  ·  Bono 30€ (6 sesiones)</p>
-                <ul className="laser-list">
-                  <li>Labio</li>
-                  <li>Mentón</li>
-                  <li>Entrecejo</li>
-                  <li>Patillas</li>
-                  <li>Pómulos</li>
-                  <li>Orejas</li>
-                  <li>Manos</li>
-                  <li>Nuca</li>
-                  <li>Pies</li>
-                  <li>Línea Alba</li>
-                  <li>Areola</li>
-                </ul>
+                <table className="laser-table">
+                  <thead>
+                    <tr>
+                      <th>Zonas</th>
+                      <th>Sesión</th>
+                      <th>Bono 6 sesiones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>Labio</td><td>6€</td><td>36€</td></tr>
+                    <tr><td>Mentón</td><td>6€</td><td>36€</td></tr>
+                    <tr><td>Entrecejo</td><td>6€</td><td>36€</td></tr>
+                    <tr><td>Patillas</td><td>6€</td><td>36€</td></tr>
+                    <tr><td>Pómulos</td><td>6€</td><td>36€</td></tr>
+                    <tr><td>Manos</td><td>6€</td><td>36€</td></tr>
+                    <tr><td>Nuca</td><td>6€</td><td>36€</td></tr>
+                    <tr><td>Pies</td><td>6€</td><td>36€</td></tr>
+                    <tr><td>Línea alba</td><td>6€</td><td>36€</td></tr>
+                    <tr><td>Areola</td><td>6€</td><td>36€</td></tr>
+                    <tr><td>Perianal</td><td>6€</td><td>36€</td></tr>
+                    <tr><td>Intermamaria</td><td>6€</td><td>36€</td></tr>
+                  </tbody>
+                </table>
               </div>
 
               <div className="laser-block">
@@ -3027,31 +2671,10 @@ function Home() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>Perianal</td>
-                      <td>15€</td>
-                      <td>72€</td>
-                    </tr>
-                    <tr>
-                      <td>Axilas</td>
-                      <td>10€</td>
-                      <td>48€</td>
-                    </tr>
-                    <tr>
-                      <td>Ingles normales</td>
-                      <td>10€</td>
-                      <td>48€</td>
-                    </tr>
-                    <tr>
-                      <td>Ingles brasileñas</td>
-                      <td>15€</td>
-                      <td>72€</td>
-                    </tr>
-                    <tr>
-                      <td>Ingles completas</td>
-                      <td>25€</td>
-                      <td>120€</td>
-                    </tr>
+                    <tr><td>Cuello</td><td>15€</td><td>78€</td></tr>
+                    <tr><td>Barba</td><td>15€</td><td>78€</td></tr>
+                    <tr><td>Axilas</td><td>15€</td><td>78€</td></tr>
+                    <tr><td>Ingles brasileñas</td><td>15€</td><td>78€</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -3067,19 +2690,14 @@ function Home() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr><td>Medios brazos</td><td>15€</td><td>78€</td></tr>
-                    <tr><td>Hombros</td><td>15€</td><td>78€</td></tr>
-                    <tr><td>Abdomen</td><td>25€</td><td>120€</td></tr>
-                    <tr><td>Cuello</td><td>15€</td><td>78€</td></tr>
-                    <tr><td>Facial completo</td><td>15€</td><td>78€</td></tr>
+                    <tr><td>Hombros</td><td>25€</td><td>120€</td></tr>
+                    <tr><td>Medio tórax</td><td>25€</td><td>120€</td></tr>
+                    <tr><td>Facial completo</td><td>25€</td><td>120€</td></tr>
+                    <tr><td>Ingles completas</td><td>25€</td><td>120€</td></tr>
                     <tr><td>Glúteos</td><td>25€</td><td>120€</td></tr>
-                    <tr><td>Lumbar</td><td>15€</td><td>78€</td></tr>
-                    <tr><td>Barba</td><td>15€</td><td>78€</td></tr>
                     <tr><td>Media espalda</td><td>25€</td><td>120€</td></tr>
-                    <tr><td>Antebrazo</td><td>15€</td><td>78€</td></tr>
-                    <tr><td>Intermamaria</td><td>15€</td><td>78€</td></tr>
+                    <tr><td>Medios brazos</td><td>25€</td><td>120€</td></tr>
                     <tr><td>Medias piernas</td><td>25€</td><td>120€</td></tr>
-                    <tr><td>Muslos</td><td>25€</td><td>120€</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -3095,24 +2713,10 @@ function Home() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>Piernas completas (incluye pies)</td>
-                      <td rowSpan="2">40€</td>
-                      <td rowSpan="2">210€</td>
-                    </tr>
-                    <tr>
-                      <td>Brazos completos</td>
-                    </tr>
-                    <tr>
-                      <td>Espalda completa</td>
-                      <td>40€</td>
-                      <td>210€</td>
-                    </tr>
-                    <tr>
-                      <td>Tórax completo</td>
-                      <td>40€</td>
-                      <td>210€</td>
-                    </tr>
+                    <tr><td>Piernas completas (incluye pies)</td><td>40€</td><td>210€</td></tr>
+                    <tr><td>Brazos completos (incluye manos)</td><td>40€</td><td>210€</td></tr>
+                    <tr><td>Espalda completa</td><td>40€</td><td>210€</td></tr>
+                    <tr><td>Tórax completo</td><td>40€</td><td>210€</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -3128,20 +2732,29 @@ function Home() {
 
               <div className="laser-block">
                 <h4>Mini</h4>
-                <p className="laser-subtitle">Sesión 8€  ·  Bono 36€ (6 sesiones)</p>
-                <ul className="laser-list">
-                  <li>Labio</li>
-                  <li>Mentón</li>
-                  <li>Entrecejo</li>
-                  <li>Patillas</li>
-                  <li>Pómulos</li>
-                  <li>Orejas</li>
-                  <li>Manos</li>
-                  <li>Nuca</li>
-                  <li>Pies</li>
-                  <li>Línea Alba</li>
-                  <li>Areola</li>
-                </ul>
+                <table className="laser-table">
+                  <thead>
+                    <tr>
+                      <th>Zonas</th>
+                      <th>Sesión</th>
+                      <th>Bono 6 sesiones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>Labio</td><td>8€</td><td>36€</td></tr>
+                    <tr><td>Mentón</td><td>8€</td><td>36€</td></tr>
+                    <tr><td>Entrecejo</td><td>8€</td><td>36€</td></tr>
+                    <tr><td>Patillas</td><td>8€</td><td>36€</td></tr>
+                    <tr><td>Pómulos</td><td>8€</td><td>36€</td></tr>
+                    <tr><td>Orejas</td><td>8€</td><td>36€</td></tr>
+                    <tr><td>Manos</td><td>8€</td><td>36€</td></tr>
+                    <tr><td>Nuca</td><td>8€</td><td>36€</td></tr>
+                    <tr><td>Pies</td><td>8€</td><td>36€</td></tr>
+                    <tr><td>Línea alba</td><td>8€</td><td>36€</td></tr>
+                    <tr><td>Areola</td><td>8€</td><td>36€</td></tr>
+                    <tr><td>Perianal</td><td>8€</td><td>36€</td></tr>
+                  </tbody>
+                </table>
               </div>
 
               <div className="laser-block">
@@ -3155,11 +2768,10 @@ function Home() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr><td>Perianal</td><td>15€</td><td>72€</td></tr>
+                    <tr><td>Cuello</td><td>15€</td><td>72€</td></tr>
                     <tr><td>Perfilado de barba</td><td>15€</td><td>72€</td></tr>
-                    <tr><td>Axilas</td><td>10€</td><td>48€</td></tr>
-                    <tr><td>Ingles normales</td><td>10€</td><td>48€</td></tr>
-                    <tr><td>Ingles brasileñas</td><td>20€</td><td>90€</td></tr>
+                    <tr><td>Axilas</td><td>15€</td><td>72€</td></tr>
+                    <tr><td>Ingles brasileñas</td><td>15€</td><td>72€</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -3175,19 +2787,14 @@ function Home() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr><td>Medios brazos</td><td>20€</td><td>108€</td></tr>
-                    <tr><td>Hombros</td><td>20€</td><td>108€</td></tr>
-                    <tr><td>Abdomen</td><td>30€</td><td>150€</td></tr>
-                    <tr><td>Cuello</td><td>20€</td><td>108€</td></tr>
-                    <tr><td>Facial completo</td><td>20€</td><td>108€</td></tr>
-                    <tr><td>Glúteos</td><td>30€</td><td>150€</td></tr>
-                    <tr><td>Lumbar</td><td>30€</td><td>150€</td></tr>
-                    <tr><td>Barba</td><td>20€</td><td>108€</td></tr>
-                    <tr><td>Media espalda</td><td>30€</td><td>150€</td></tr>
-                    <tr><td>Antebrazo</td><td>20€</td><td>108€</td></tr>
-                    <tr><td>Intermamaria</td><td>20€</td><td>108€</td></tr>
-                    <tr><td>Medias piernas</td><td>30€</td><td>150€</td></tr>
-                    <tr><td>Muslos</td><td>30€</td><td>150€</td></tr>
+                    <tr><td>Hombros</td><td>25€</td><td>120€</td></tr>
+                    <tr><td>Medio tórax</td><td>25€</td><td>120€</td></tr>
+                    <tr><td>Facial completo</td><td>25€</td><td>120€</td></tr>
+                    <tr><td>Glúteos</td><td>25€</td><td>120€</td></tr>
+                    <tr><td>Media espalda</td><td>25€</td><td>120€</td></tr>
+                    <tr><td>Medios brazos</td><td>25€</td><td>120€</td></tr>
+                    <tr><td>Medias piernas</td><td>25€</td><td>120€</td></tr>
+                    <tr><td>Ingles completas</td><td>25€</td><td>120€</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -3203,24 +2810,10 @@ function Home() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>Piernas completas (incluye pies)</td>
-                      <td rowSpan="2">50€</td>
-                      <td rowSpan="2">240€</td>
-                    </tr>
-                    <tr>
-                      <td>Brazos completos</td>
-                    </tr>
-                    <tr>
-                      <td>Espalda completa</td>
-                      <td>50€</td>
-                      <td>240€</td>
-                    </tr>
-                    <tr>
-                      <td>Tórax completo</td>
-                      <td>50€</td>
-                      <td>240€</td>
-                    </tr>
+                    <tr><td>Piernas completas (incluye pies)</td><td>50€</td><td>240€</td></tr>
+                    <tr><td>Brazos completos (incluye manos)</td><td>50€</td><td>240€</td></tr>
+                    <tr><td>Espalda completa</td><td>50€</td><td>240€</td></tr>
+                    <tr><td>Tórax completo</td><td>50€</td><td>240€</td></tr>
                   </tbody>
                 </table>
               </div>
