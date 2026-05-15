@@ -197,13 +197,13 @@ const bonos = [
     detalles: 'Hidrofacial + Dermapen + Presoterapia en la misma sesión.',
     precio: '1 sesión — 95€'
   },
-  ´/*{
+  /*{
     titulo: 'Bono Mesoterapia Corporal Pack Express 60 min',
     descripcion: 'Mesoterapia corporal Pack Express para trabajar grasa localizada, drenaje y firmeza con combinaciones avanzadas de aparatología.',
     detalles: 'Opciones disponibles en cada sesión: Lipoláser + vacumterapia + radiofrecuencia, Cavitación + vacumterapia + radiofrecuencia, Lipoláser + maderoterapia + radiofrecuencia, Cavitación + maderoterapia + radiofrecuencia, Lipoláser + drenaje linfático manual + radiofrecuencia, Cavitación + drenaje linfático manual + radiofrecuencia.',
     precio: 'Bono 4 sesiones (60 min) — 130€'
-  },*/
- /* {
+  },
+ {
     titulo: 'Bono Mesoterapia Corporal Pack Express 80 min',
     descripcion: 'Mesoterapia corporal Pack Express de mayor duración para un trabajo más profundo de remodelación, drenaje y reafirmación.',
     detalles: 'Opciones disponibles en cada sesión: Lipoláser + vacumterapia + radiofrecuencia, Cavitación + vacumterapia + radiofrecuencia, Lipoláser + maderoterapia + radiofrecuencia, Cavitación + maderoterapia + radiofrecuencia, Lipoláser + drenaje linfático manual + radiofrecuencia, Cavitación + drenaje linfático manual + radiofrecuencia.',
