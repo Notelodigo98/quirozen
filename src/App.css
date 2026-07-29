@@ -1107,6 +1107,16 @@ main {
   display: block;
 }
 
+/* Imágenes con encuadre cerrado: mostrar completa sin recortar */
+.banner-image-fit {
+  object-fit: contain;
+  object-position: center;
+}
+
+.banner-slide:has(.banner-image-fit) {
+  background: #1a1a1a;
+}
+
 .banner-nav {
   position: absolute;
   top: 50%;

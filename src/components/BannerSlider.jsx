@@ -60,7 +60,7 @@ function BannerSlider() {
               <img 
                 src={image} 
                 alt={`Banner ${index + 1}`}
-                className="banner-image"
+                className={`banner-image${image.endsWith('f1.jpeg') ? ' banner-image-fit' : ''}`}
               />
             </div>
           ))}
