@@ -71,8 +71,8 @@ function Layout({ children }) {
               <div>
                 <p>
                   <strong>Masajes:</strong>{' '}
-                  <a href="tel:675610730" className="footer-link">
-                    675 61 07 30
+                  <a href="tel:635518666" className="footer-link">
+                    635518666
                   </a>
                 </p>
                 <p>

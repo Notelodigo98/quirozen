@@ -9,7 +9,8 @@ const bannerImages = [
   '/interior/im3.jpeg',
   '/interior/im4.jpeg',
   '/interior/im5.jpeg',
-  '/interior/im6.jpeg'
+  '/interior/im6.jpeg',
+  '/interior/f1.jpeg'
 ];
 
 function BannerSlider() {

@@ -218,7 +218,7 @@ const Cookies = () => {
             </p>
             <ul>
               <li><strong>Email:</strong> quirozendh1@gmail.com</li>
-              <li><strong>Teléfono:</strong> 675 61 07 30</li>
+              <li><strong>Teléfono:</strong> 635518666</li>
               <li><strong>Dirección:</strong> Calle Leopoldo Arias Clarín, Local 148, Dos Hermanas, Sevilla</li>
             </ul>
           </section>

@@ -2904,7 +2904,7 @@ function Home() {
                 <div className="contact-icon">📞</div>
                 <div className="contact-details">
                   <h3>Teléfono</h3>
-                  <p><a href="tel:675610730" className="phone-link">675 61 07 30</a></p>
+                  <p><a href="tel:635518666" className="phone-link">635518666</a></p>
                 </div>
               </div>
             </div>
